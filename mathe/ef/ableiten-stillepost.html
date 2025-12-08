@@ -809,9 +809,9 @@
         var selectedFunction = null;
         var selectedDerivative = null;
 
-        function generateInitialFunction() {
+function generateInitialFunction() {
             var functions = [
-                // Parabeln - schöne Bögen
+                // Parabeln - verschiedene Öffnungen und Richtungen
                 {
                     f: function(x) { return -0.12 * x * x; },
                     df: function(x) { return -0.24 * x; },
@@ -822,8 +822,18 @@
                     df: function(x) { return 0.2 * x; },
                     name: 'f(x) = 0,1x²'
                 },
+                {
+                    f: function(x) { return -0.08 * x * x; },
+                    df: function(x) { return -0.16 * x; },
+                    name: 'f(x) = -0,08x²'
+                },
+                {
+                    f: function(x) { return 0.15 * x * x; },
+                    df: function(x) { return 0.3 * x; },
+                    name: 'f(x) = 0,15x²'
+                },
                 
-                // Kubische - sanfte S-Kurven mit Bergen und Tälern
+                // Kubische - S-Kurven mit Bergen und Tälern
                 {
                     f: function(x) { return 0.02 * x * x * x - 0.4 * x; },
                     df: function(x) { return 0.06 * x * x - 0.4; },
@@ -839,6 +849,21 @@
                     df: function(x) { return 0.075 * x * x - 0.5; },
                     name: 'f(x) = 0,025x³ - 0,5x'
                 },
+                {
+                    f: function(x) { return -0.03 * x * x * x + 0.6 * x; },
+                    df: function(x) { return -0.09 * x * x + 0.6; },
+                    name: 'f(x) = -0,03x³ + 0,6x'
+                },
+                {
+                    f: function(x) { return 0.015 * x * x * x - 0.3 * x; },
+                    df: function(x) { return 0.045 * x * x - 0.3; },
+                    name: 'f(x) = 0,015x³ - 0,3x'
+                },
+                {
+                    f: function(x) { return -0.022 * x * x * x + 0.45 * x; },
+                    df: function(x) { return -0.066 * x * x + 0.45; },
+                    name: 'f(x) = -0,022x³ + 0,45x'
+                },
                 
                 // Grad 4 - W und M Formen
                 {
@@ -851,8 +876,23 @@
                     df: function(x) { return -0.016 * x * x * x + 0.2 * x; },
                     name: 'f(x) = -0,004x⁴ + 0,1x²'
                 },
+                {
+                    f: function(x) { return 0.006 * x * x * x * x - 0.15 * x * x; },
+                    df: function(x) { return 0.024 * x * x * x - 0.3 * x; },
+                    name: 'f(x) = 0,006x⁴ - 0,15x²'
+                },
+                {
+                    f: function(x) { return -0.005 * x * x * x * x + 0.13 * x * x; },
+                    df: function(x) { return -0.02 * x * x * x + 0.26 * x; },
+                    name: 'f(x) = -0,005x⁴ + 0,13x²'
+                },
+                {
+                    f: function(x) { return 0.003 * x * x * x * x - 0.08 * x * x; },
+                    df: function(x) { return 0.012 * x * x * x - 0.16 * x; },
+                    name: 'f(x) = 0,003x⁴ - 0,08x²'
+                },
                 
-                // Einfache Geraden
+                // Geraden - verschiedene Steigungen
                 {
                     f: function(x) { return 0.35 * x; },
                     df: function(x) { return 0.35; },
@@ -862,6 +902,38 @@
                     f: function(x) { return -0.3 * x; },
                     df: function(x) { return -0.3; },
                     name: 'f(x) = -0,3x'
+                },
+                {
+                    f: function(x) { return 0.5 * x; },
+                    df: function(x) { return 0.5; },
+                    name: 'f(x) = 0,5x'
+                },
+                {
+                    f: function(x) { return -0.45 * x; },
+                    df: function(x) { return -0.45; },
+                    name: 'f(x) = -0,45x'
+                },
+                {
+                    f: function(x) { return 0.25 * x; },
+                    df: function(x) { return 0.25; },
+                    name: 'f(x) = 0,25x'
+                },
+                
+                // Gemischte kubische mit kleinem quadratischen Anteil
+                {
+                    f: function(x) { return 0.02 * x * x * x - 0.08 * x * x - 0.2 * x; },
+                    df: function(x) { return 0.06 * x * x - 0.16 * x - 0.2; },
+                    name: 'f(x) = 0,02x³ - 0,08x² - 0,2x'
+                },
+                {
+                    f: function(x) { return -0.015 * x * x * x - 0.06 * x * x + 0.3 * x; },
+                    df: function(x) { return -0.045 * x * x - 0.12 * x + 0.3; },
+                    name: 'f(x) = -0,015x³ - 0,06x² + 0,3x'
+                },
+                {
+                    f: function(x) { return 0.018 * x * x * x + 0.05 * x * x - 0.35 * x; },
+                    df: function(x) { return 0.054 * x * x + 0.1 * x - 0.35; },
+                    name: 'f(x) = 0,018x³ + 0,05x² - 0,35x'
                 }
             ];
 
