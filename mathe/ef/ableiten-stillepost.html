@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stille Post – Graphisches Ableiten</title>
+    <link href="https://fonts.bunny.net/css?family=caveat:400,700|dm-sans:400,500,700" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f3460;
+            --accent-orange: #e94560;
+            --accent-yellow: #f9ed69;
+            --accent-green: #6bff8e;
+            --accent-blue: #4fc3f7;
+            --accent-purple: #bb86fc;
+            --text-primary: #f5f5f5;
+            --text-secondary: #b0b0b0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-family: 'Caveat', cursive;
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-yellow), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        /* Setup Screen */
+        .setup-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .setup-title {
+            font-family: 'Caveat', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--accent-yellow);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .player-count-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .count-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-orange);
+            background: transparent;
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .count-btn:hover {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .count-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .player-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #333;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-orange), #ff6b6b);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        /* Game Screen */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .round-badge {
+            background: var(--accent-orange);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+
+        .task-box {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.15), rgba(249, 237, 105, 0.1));
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(233, 69, 96, 0.2);
+        }
+
+        .task-box h2 {
+            font-family: 'Caveat', cursive;
+            font-size: 1.6rem;
+            color: var(--accent-yellow);
+            margin-bottom: 5px;
+        }
+
+        .task-box p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 800px) {
+            .canvas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-box {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .canvas-box.draw-box {
+            border: 3px solid var(--accent-orange);
+        }
+
+        .canvas-label {
+            background: var(--bg-tertiary);
+            padding: 10px 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .canvas-area {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+        }
+
+        .canvas-area canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        .tools {
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            background: #f5f5f5;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .color-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .color-btn.active {
+            border-color: #333;
+        }
+
+        .tool-btn {
+            padding: 8px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: #333;
+        }
+
+        .tool-btn:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        /* Transition Screen */
+        .transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .transition-overlay.active {
+            display: flex;
+        }
+
+        .transition-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--accent-yellow);
+        }
+
+        .transition-title {
+            font-family: 'Caveat', cursive;
+            font-size: 2.2rem;
+            color: var(--accent-yellow);
+            margin-bottom: 15px;
+        }
+
+        .transition-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        /* Results Screen */
+        .results-title {
+            font-family: 'Caveat', cursive;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--accent-yellow);
+        }
+
+        .comparison-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .vs-text {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-item canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .evolution-section {
+            margin-top: 20px;
+        }
+
+        .evolution-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .evolution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .evolution-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .evolution-card-header {
+            padding: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .evolution-card-header .step {
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        .evolution-card-header .player {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .evolution-card canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: white;
+        }
+
+        .solution-section {
+            background: rgba(76, 175, 80, 0.1);
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .solution-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 15px;
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .solution-item {
+            text-align: center;
+        }
+
+        .solution-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .solution-canvas-wrap {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .solution-canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .solution-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: var(--accent-green);
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stille Post – Graphisches Ableiten</h1>
+        </header>
+
+        <!-- Setup Screen -->
+        <div class="screen active" id="setupScreen">
+            <div class="setup-box">
+                <h2 class="setup-title">Spieler einrichten</h2>
+                
+                <div class="form-group">
+                    <label>Anzahl Spieler</label>
+                    <div class="player-count-control">
+                        <button class="count-btn" id="btnMinus">−</button>
+                        <span class="count-display" id="playerCount">3</span>
+                        <button class="count-btn" id="btnPlus">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Spielernamen</label>
+                    <div class="player-inputs" id="playerInputs"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btnStart">Spiel starten</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="screen" id="gameScreen">
+            <div class="game-header">
+                <div class="round-badge" id="roundBadge">Runde 1 von 4</div>
+                <div class="player-info">
+                    <div class="player-dot" id="playerDot"></div>
+                    <span id="playerName">Spieler 1</span>
+                </div>
+                <button class="btn btn-primary" id="btnFinish">Fertig</button>
+            </div>
+
+            <div class="task-box">
+                <h2 id="taskTitle">Zeichne die Ableitungsfunktion f'(x)</h2>
+                <p id="taskDesc">Analysiere den Graphen links und zeichne rechts die Ableitung.</p>
+            </div>
+
+            <div class="canvas-grid">
+                <div class="canvas-box">
+                    <div class="canvas-label" id="sourceLabel">Vorlage</div>
+                    <div class="canvas-area">
+                        <canvas id="sourceCanvas"></canvas>
+                    </div>
+                </div>
+
+                <div class="canvas-box draw-box">
+                    <div class="canvas-label" id="drawLabel">Deine Zeichnung</div>
+                    <div class="canvas-area">
+                        <canvas id="drawCanvas"></canvas>
+                    </div>
+                    <div class="tools">
+                        <button class="color-btn active" style="background: #e94560;" data-color="#e94560"></button>
+                        <button class="color-btn" style="background: #2196f3;" data-color="#2196f3"></button>
+                        <button class="color-btn" style="background: #4caf50;" data-color="#4caf50"></button>
+                        <button class="color-btn" style="background: #ff9800;" data-color="#ff9800"></button>
+                        <button class="color-btn" style="background: #333333;" data-color="#333333"></button>
+                        <button class="tool-btn" id="btnClear">Löschen</button>
+                        <button class="tool-btn" id="btnUndo">Zurück</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transition Screen -->
+        <div class="transition-overlay" id="transitionScreen">
+            <div class="transition-icon">→</div>
+            <h2 class="transition-title" id="transitionTitle">Nächster Spieler</h2>
+            <p class="transition-text" id="transitionText">Gib das Gerät weiter</p>
+            <button class="btn btn-primary" id="btnContinue">Bereit!</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="screen" id="resultsScreen">
+            <h2 class="results-title">Ergebnis</h2>
+
+            <div class="comparison-section">
+                <div class="comparison-header">
+                    <span>Original</span>
+                    <span class="vs-text">VS</span>
+                    <span>Endergebnis</span>
+                </div>
+                <div class="comparison-grid" id="comparisonGrid"></div>
+            </div>
+
+            <button class="btn btn-secondary" id="btnShowSolution" style="display: block; margin: 20px auto;">
+                Korrekte Ableitung anzeigen
+            </button>
+
+            <div class="solution-section hidden" id="solutionSection">
+                <div class="solution-title">Die mathematisch korrekte Ableitung f'(x)</div>
+                <div class="solution-grid">
+                    <div class="solution-item">
+                        <div class="solution-label">Original f(x)</div>
+                        <div class="solution-canvas-wrap">
+                            <canvas id="solutionOriginal"></canvas>
+                        </div>
+                        <div class="solution-formula" id="formulaOriginal"></div>
+                    </div>
+                    <div class="solution-item">
+                        <div class="solution-label">Korrekte Ableitung f'(x)</div>
+                        <div class="solution-canvas-wrap">
+                            <canvas id="solutionDerivative"></canvas>
+                        </div>
+                        <div class="solution-formula" id="formulaDerivative"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" id="btnToggleEvolution" style="display: block; margin: 20px auto;">
+                Alle Schritte anzeigen
+            </button>
+
+            <div class="evolution-section hidden" id="evolutionSection">
+                <div class="evolution-title">Die komplette Evolution</div>
+                <div class="evolution-grid" id="evolutionGrid"></div>
+            </div>
+
+            <div class="btn-group" style="margin-top: 30px;">
+                <button class="btn btn-primary" id="btnRestart">Neues Spiel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        var CANVAS_SIZE = 500;
+        var GRID_SIZE = 30;
+        var PLAYER_COLORS = ['#e94560', '#f9ed69', '#6bff8e', '#4fc3f7', '#bb86fc', '#ff9800'];
+        
+        // State
+        var playerCount = 3;
+        var players = [];
+        var currentRound = 1;
+        var currentPlayer = 0;
+        var gameHistory = [];
+        var drawHistory = [];
+        var currentColor = '#e94560';
+        var isDrawing = false;
+        var lastPoint = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            updatePlayerInputs();
+            bindEvents();
+        }
+
+        function bindEvents() {
+            document.getElementById('btnMinus').addEventListener('click', function() { changePlayerCount(-1); });
+            document.getElementById('btnPlus').addEventListener('click', function() { changePlayerCount(1); });
+            document.getElementById('btnStart').addEventListener('click', startGame);
+            document.getElementById('btnFinish').addEventListener('click', finishRound);
+            document.getElementById('btnContinue').addEventListener('click', continueGame);
+            document.getElementById('btnClear').addEventListener('click', clearDrawing);
+            document.getElementById('btnUndo').addEventListener('click', undoDrawing);
+            document.getElementById('btnToggleEvolution').addEventListener('click', toggleEvolution);
+            document.getElementById('btnShowSolution').addEventListener('click', toggleSolution);
+            document.getElementById('btnRestart').addEventListener('click', restartGame);
+
+            // Color buttons
+            var colorBtns = document.querySelectorAll('.color-btn');
+            for (var i = 0; i < colorBtns.length; i++) {
+                (function(btn) {
+                    btn.addEventListener('click', function() {
+                        var allBtns = document.querySelectorAll('.color-btn');
+                        for (var j = 0; j < allBtns.length; j++) {
+                            allBtns[j].classList.remove('active');
+                        }
+                        btn.classList.add('active');
+                        currentColor = btn.getAttribute('data-color');
+                    });
+                })(colorBtns[i]);
+            }
+        }
+
+        function changePlayerCount(delta) {
+            playerCount = Math.max(2, Math.min(6, playerCount + delta));
+            document.getElementById('playerCount').textContent = playerCount;
+            updatePlayerInputs();
+        }
+
+        function updatePlayerInputs() {
+            var container = document.getElementById('playerInputs');
+            container.innerHTML = '';
+            
+            for (var i = 0; i < playerCount; i++) {
+                var row = document.createElement('div');
+                row.className = 'player-row';
+                row.innerHTML = '<div class="player-num" style="background: ' + PLAYER_COLORS[i] + '">' + (i + 1) + '</div>' +
+                    '<input type="text" placeholder="Spieler ' + (i + 1) + '" id="playerInput' + i + '">';
+                container.appendChild(row);
+            }
+        }
+
+        function showScreen(name) {
+            var screens = ['setupScreen', 'gameScreen', 'resultsScreen'];
+            for (var i = 0; i < screens.length; i++) {
+                var el = document.getElementById(screens[i]);
+                if (el) {
+                    el.classList.remove('active');
+                }
+            }
+            var target = document.getElementById(name);
+            if (target) {
+                target.classList.add('active');
+            }
+        }
+
+        function startGame() {
+            // Get player names
+            players = [];
+            for (var i = 0; i < playerCount; i++) {
+                var input = document.getElementById('playerInput' + i);
+                players.push(input.value.trim() || ('Spieler ' + (i + 1)));
+            }
+
+            // Reset state
+            currentRound = 1;
+            currentPlayer = 0;
+            gameHistory = [];
+            drawHistory = [];
+
+            // Generate initial function
+            generateInitialFunction();
+
+            // Start game
+            showScreen('gameScreen');
+            initGameCanvas();
+            updateGameUI();
+        }
+
+        // Store the selected function and its derivative globally
+        var selectedFunction = null;
+        var selectedDerivative = null;
+
+        function generateInitialFunction() {
+            var functions = [
+                // Parabeln - schöne Bögen
+                {
+                    f: function(x) { return -0.12 * x * x; },
+                    df: function(x) { return -0.24 * x; },
+                    name: 'f(x) = -0,12x²'
+                },
+                {
+                    f: function(x) { return 0.1 * x * x; },
+                    df: function(x) { return 0.2 * x; },
+                    name: 'f(x) = 0,1x²'
+                },
+                
+                // Kubische - sanfte S-Kurven mit Bergen und Tälern
+                {
+                    f: function(x) { return 0.02 * x * x * x - 0.4 * x; },
+                    df: function(x) { return 0.06 * x * x - 0.4; },
+                    name: 'f(x) = 0,02x³ - 0,4x'
+                },
+                {
+                    f: function(x) { return -0.018 * x * x * x + 0.35 * x; },
+                    df: function(x) { return -0.054 * x * x + 0.35; },
+                    name: 'f(x) = -0,018x³ + 0,35x'
+                },
+                {
+                    f: function(x) { return 0.025 * x * x * x - 0.5 * x; },
+                    df: function(x) { return 0.075 * x * x - 0.5; },
+                    name: 'f(x) = 0,025x³ - 0,5x'
+                },
+                
+                // Grad 4 - W und M Formen
+                {
+                    f: function(x) { return 0.005 * x * x * x * x - 0.12 * x * x; },
+                    df: function(x) { return 0.02 * x * x * x - 0.24 * x; },
+                    name: 'f(x) = 0,005x⁴ - 0,12x²'
+                },
+                {
+                    f: function(x) { return -0.004 * x * x * x * x + 0.1 * x * x; },
+                    df: function(x) { return -0.016 * x * x * x + 0.2 * x; },
+                    name: 'f(x) = -0,004x⁴ + 0,1x²'
+                },
+                
+                // Einfache Geraden
+                {
+                    f: function(x) { return 0.35 * x; },
+                    df: function(x) { return 0.35; },
+                    name: 'f(x) = 0,35x'
+                },
+                {
+                    f: function(x) { return -0.3 * x; },
+                    df: function(x) { return -0.3; },
+                    name: 'f(x) = -0,3x'
+                }
+            ];
+
+            var selected = functions[Math.floor(Math.random() * functions.length)];
+            selectedFunction = selected;
+            selectedDerivative = selected.df;
+            
+            var points = [];
+            
+            // Draw smooth curve from edge to edge
+            for (var px = 0; px <= CANVAS_SIZE; px += 2) {
+                var x = (px - CANVAS_SIZE / 2) / GRID_SIZE;
+                var y = selected.f(x);
+                var py = CANVAS_SIZE / 2 - y * GRID_SIZE;
+                points.push({ x: px, y: py });
+            }
+
+            gameHistory.push({
+                paths: [{ color: '#2196f3', width: 4, points: points }],
+                player: 'Computer',
+                round: 0,
+                label: 'Original f(x)',
+                functionName: selected.name
+            });
+        }
+
+        function initGameCanvas() {
+            var sourceCanvas = document.getElementById('sourceCanvas');
+            var drawCanvas = document.getElementById('drawCanvas');
+
+            setupCanvas(sourceCanvas);
+            setupCanvas(drawCanvas);
+
+            // Draw source
+            drawOnCanvas(sourceCanvas, gameHistory[gameHistory.length - 1]);
+
+            // Setup drawing
+            drawGrid(drawCanvas);
+            setupDrawing(drawCanvas);
+        }
+
+        function setupCanvas(canvas) {
+            var dpr = window.devicePixelRatio || 1;
+            canvas.width = CANVAS_SIZE * dpr;
+            canvas.height = CANVAS_SIZE * dpr;
+            var ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function drawGrid(canvas) {
+            var ctx = canvas.getContext('2d');
+            var size = CANVAS_SIZE;
+            var center = size / 2;
+
+            // Background
+            ctx.fillStyle = '#fefefe';
+            ctx.fillRect(0, 0, size, size);
+
+            // Grid
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+
+            for (var i = 0; i <= size; i += GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, size);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(size, i);
+                ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(0, center);
+            ctx.lineTo(size, center);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(center, 0);
+            ctx.lineTo(center, size);
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#666';
+            ctx.font = '14px DM Sans, sans-serif';
+            ctx.fillText('x', size - 15, center - 8);
+            ctx.fillText('y', center + 8, 15);
+        }
+
+        function drawOnCanvas(canvas, historyItem) {
+            drawGrid(canvas);
+            var ctx = canvas.getContext('2d');
+
+            if (historyItem && historyItem.paths) {
+                for (var p = 0; p < historyItem.paths.length; p++) {
+                    var path = historyItem.paths[p];
+                    if (path.points.length < 2) continue;
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = path.color;
+                    ctx.lineWidth = path.width;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    ctx.moveTo(path.points[0].x, path.points[0].y);
+                    for (var i = 1; i < path.points.length; i++) {
+                        ctx.lineTo(path.points[i].x, path.points[i].y);
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function setupDrawing(canvas) {
+            function getPos(e) {
+                var rect = canvas.getBoundingClientRect();
+                var clientX, clientY;
+
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+
+                return {
+                    x: ((clientX - rect.left) / rect.width) * CANVAS_SIZE,
+                    y: ((clientY - rect.top) / rect.height) * CANVAS_SIZE
+                };
+            }
+
+            function startDraw(e) {
+                e.preventDefault();
+                isDrawing = true;
+                lastPoint = getPos(e);
+                drawHistory.push({
+                    color: currentColor,
+                    width: 4,
+                    points: [{ x: lastPoint.x, y: lastPoint.y }]
+                });
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+
+                var pos = getPos(e);
+                var ctx = canvas.getContext('2d');
+                var currentPath = drawHistory[drawHistory.length - 1];
+
+                ctx.beginPath();
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.moveTo(lastPoint.x, lastPoint.y);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+
+                currentPath.points.push({ x: pos.x, y: pos.y });
+                lastPoint = pos;
+            }
+
+            function endDraw() {
+                isDrawing = false;
+                lastPoint = null;
+            }
+
+            // Mouse events
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('mouseleave', endDraw);
+
+            // Touch events
+            canvas.addEventListener('touchstart', startDraw, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', endDraw);
+            canvas.addEventListener('touchcancel', endDraw);
+        }
+
+        function clearDrawing() {
+            drawHistory = [];
+            var canvas = document.getElementById('drawCanvas');
+            drawGrid(canvas);
+        }
+
+        function undoDrawing() {
+            if (drawHistory.length > 0) {
+                drawHistory.pop();
+                var canvas = document.getElementById('drawCanvas');
+                drawGrid(canvas);
+
+                var ctx = canvas.getContext('2d');
+                for (var p = 0; p < drawHistory.length; p++) {
+                    var path = drawHistory[p];
+                    if (path.points.length < 2) continue;
+                    ctx.beginPath();
+                    ctx.strokeStyle = path.color;
+                    ctx.lineWidth = path.width;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.moveTo(path.points[0].x, path.points[0].y);
+                    for (var i = 1; i < path.points.length; i++) {
+                        ctx.lineTo(path.points[i].x, path.points[i].y);
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function updateGameUI() {
+            var roundLabels = [
+                { title: "Zeichne die Ableitung f'(x)", desc: "Wo steigt/fällt der Graph? Wo sind Extrema?", source: "Funktion f(x)", draw: "Ableitung f'(x)" },
+                { title: "Rekonstruiere die Stammfunktion", desc: "Welche Funktion hat diese Ableitung?", source: "Ableitung f'(x)", draw: "Stammfunktion F(x)" },
+                { title: "Zeichne die Ableitung f'(x)", desc: "Leite den Graphen graphisch ab.", source: "Funktion f(x)", draw: "Ableitung f'(x)" },
+                { title: "Rekonstruiere die Stammfunktion", desc: "Finde eine passende Stammfunktion.", source: "Ableitung f'(x)", draw: "Stammfunktion F(x)" }
+            ];
+
+            var info = roundLabels[currentRound - 1];
+
+            document.getElementById('roundBadge').textContent = 'Runde ' + currentRound + ' von 4';
+            document.getElementById('playerName').textContent = players[currentPlayer];
+            document.getElementById('playerDot').style.background = PLAYER_COLORS[currentPlayer];
+            document.getElementById('taskTitle').textContent = info.title;
+            document.getElementById('taskDesc').textContent = info.desc;
+            document.getElementById('sourceLabel').textContent = info.source;
+            document.getElementById('drawLabel').textContent = info.draw;
+        }
+
+        function finishRound() {
+            if (drawHistory.length === 0) {
+                if (!confirm('Du hast noch nichts gezeichnet. Trotzdem fortfahren?')) return;
+            }
+
+            // Deep copy drawing
+            var pathsCopy = [];
+            for (var p = 0; p < drawHistory.length; p++) {
+                var path = drawHistory[p];
+                var pointsCopy = [];
+                for (var i = 0; i < path.points.length; i++) {
+                    pointsCopy.push({ x: path.points[i].x, y: path.points[i].y });
+                }
+                pathsCopy.push({ color: path.color, width: path.width, points: pointsCopy });
+            }
+
+            var labels = ["Ableitung f'(x)", "Stammfunktion F(x)", "Ableitung f'(x)", "Stammfunktion F(x)"];
+            gameHistory.push({
+                paths: pathsCopy,
+                player: players[currentPlayer],
+                round: currentRound,
+                label: labels[currentRound - 1]
+            });
+
+            // Next round
+            currentRound++;
+            currentPlayer = (currentPlayer + 1) % players.length;
+            drawHistory = [];
+
+            if (currentRound > 4) {
+                showResults();
+            } else {
+                showTransition();
+            }
+        }
+
+        function showTransition() {
+            var roundLabels = [
+                "Zeichne die Ableitung",
+                "Rekonstruiere die Stammfunktion",
+                "Zeichne die Ableitung",
+                "Rekonstruiere die Stammfunktion"
+            ];
+
+            document.getElementById('transitionTitle').textContent = 'Runde ' + currentRound + ': ' + players[currentPlayer];
+            document.getElementById('transitionText').textContent = roundLabels[currentRound - 1];
+            document.getElementById('transitionScreen').classList.add('active');
+        }
+
+        function continueGame() {
+            document.getElementById('transitionScreen').classList.remove('active');
+            initGameCanvas();
+            updateGameUI();
+        }
+
+        function showResults() {
+            showScreen('resultsScreen');
+            
+            // Small delay to ensure DOM is ready
+            setTimeout(function() {
+                renderComparison();
+                renderEvolution();
+            }, 100);
+        }
+
+        function renderComparison() {
+            var grid = document.getElementById('comparisonGrid');
+            grid.innerHTML = '';
+
+            // Original
+            var origDiv = document.createElement('div');
+            origDiv.className = 'comparison-item';
+            var origCanvas = document.createElement('canvas');
+            origDiv.appendChild(origCanvas);
+            grid.appendChild(origDiv);
+
+            // Final
+            var finalDiv = document.createElement('div');
+            finalDiv.className = 'comparison-item';
+            var finalCanvas = document.createElement('canvas');
+            finalDiv.appendChild(finalCanvas);
+            grid.appendChild(finalDiv);
+
+            // Render
+            renderHistoryToCanvas(origCanvas, gameHistory[0], 400);
+            renderHistoryToCanvas(finalCanvas, gameHistory[gameHistory.length - 1], 400);
+        }
+
+        function renderEvolution() {
+            var grid = document.getElementById('evolutionGrid');
+            grid.innerHTML = '';
+
+            for (var idx = 0; idx < gameHistory.length; idx++) {
+                var item = gameHistory[idx];
+                
+                var card = document.createElement('div');
+                card.className = 'evolution-card';
+
+                var header = document.createElement('div');
+                header.className = 'evolution-card-header';
+                header.innerHTML = '<div class="step">' + (idx === 0 ? 'Start' : 'Schritt ' + idx) + ': ' + item.label + '</div>' +
+                    '<div class="player">von ' + item.player + '</div>';
+                card.appendChild(header);
+
+                var canvas = document.createElement('canvas');
+                card.appendChild(canvas);
+                grid.appendChild(card);
+
+                // Render immediately
+                renderHistoryToCanvas(canvas, item, 200);
+            }
+        }
+
+        function renderHistoryToCanvas(canvas, historyItem, size) {
+            var dpr = window.devicePixelRatio || 1;
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+
+            var ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            // Draw grid
+            var center = size / 2;
+            var gridSize = size / 16;
+
+            ctx.fillStyle = '#fefefe';
+            ctx.fillRect(0, 0, size, size);
+
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+
+            for (var i = 0; i <= size; i += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, size);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(size, i);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(0, center);
+            ctx.lineTo(size, center);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(center, 0);
+            ctx.lineTo(center, size);
+            ctx.stroke();
+
+            // Draw paths scaled
+            if (historyItem && historyItem.paths) {
+                var scale = size / CANVAS_SIZE;
+
+                for (var p = 0; p < historyItem.paths.length; p++) {
+                    var path = historyItem.paths[p];
+                    if (path.points.length < 2) continue;
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = path.color;
+                    ctx.lineWidth = Math.max(2, path.width * scale);
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    ctx.moveTo(path.points[0].x * scale, path.points[0].y * scale);
+                    for (var i = 1; i < path.points.length; i++) {
+                        ctx.lineTo(path.points[i].x * scale, path.points[i].y * scale);
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function toggleEvolution() {
+            var section = document.getElementById('evolutionSection');
+            var btn = document.getElementById('btnToggleEvolution');
+
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+                btn.textContent = 'Schritte ausblenden';
+            } else {
+                section.classList.add('hidden');
+                btn.textContent = 'Alle Schritte anzeigen';
+            }
+        }
+
+        function toggleSolution() {
+            var section = document.getElementById('solutionSection');
+            var btn = document.getElementById('btnShowSolution');
+
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+                btn.textContent = 'Lösung ausblenden';
+                renderSolution();
+            } else {
+                section.classList.add('hidden');
+                btn.textContent = 'Korrekte Ableitung anzeigen';
+            }
+        }
+
+        function renderSolution() {
+            if (!selectedFunction || !selectedDerivative) return;
+
+            var size = 350;
+
+            // Render original function
+            var origCanvas = document.getElementById('solutionOriginal');
+            renderFunctionToCanvas(origCanvas, selectedFunction.f, size, '#2196f3');
+
+            // Render derivative
+            var derivCanvas = document.getElementById('solutionDerivative');
+            renderFunctionToCanvas(derivCanvas, selectedDerivative, size, '#4caf50');
+
+            // Show formulas
+            document.getElementById('formulaOriginal').textContent = selectedFunction.name;
+            
+            // Generate derivative formula name
+            var derivName = selectedFunction.name
+                .replace('f(x)', "f'(x)")
+                .replace('x⁴', '4x³')
+                .replace('x³', '3x²')
+                .replace('x²', '2x')
+                .replace(/(\d+,\d+)(2x)/g, function(m, coef, term) {
+                    var num = parseFloat(coef.replace(',', '.')) * 2;
+                    return num.toFixed(2).replace('.', ',') + 'x';
+                })
+                .replace(/(\d+,\d+)(3x²)/g, function(m, coef, term) {
+                    var num = parseFloat(coef.replace(',', '.')) * 3;
+                    return num.toFixed(3).replace('.', ',') + 'x²';
+                })
+                .replace(/(\d+,\d+)(4x³)/g, function(m, coef, term) {
+                    var num = parseFloat(coef.replace(',', '.')) * 4;
+                    return num.toFixed(3).replace('.', ',') + 'x³';
+                });
+            
+            // Simplified: just show "Ableitung von [original]"
+            document.getElementById('formulaDerivative').textContent = "f'(x) - Ableitung";
+        }
+
+        function renderFunctionToCanvas(canvas, func, size, color) {
+            var dpr = window.devicePixelRatio || 1;
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+
+            var ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            // Draw grid
+            var center = size / 2;
+            var gridSize = size / 16;
+
+            ctx.fillStyle = '#fefefe';
+            ctx.fillRect(0, 0, size, size);
+
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+
+            for (var i = 0; i <= size; i += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, size);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(size, i);
+                ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            ctx.moveTo(0, center);
+            ctx.lineTo(size, center);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(center, 0);
+            ctx.lineTo(center, size);
+            ctx.stroke();
+
+            // Draw function
+            var scale = size / CANVAS_SIZE;
+            var localGridSize = GRID_SIZE * scale;
+
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            var firstPoint = true;
+            for (var px = 0; px <= size; px += 2) {
+                var x = (px - center) / localGridSize;
+                var y = func(x);
+                var py = center - y * localGridSize;
+
+                if (firstPoint) {
+                    ctx.moveTo(px, py);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#666';
+            ctx.font = '12px DM Sans, sans-serif';
+            ctx.fillText('x', size - 12, center - 6);
+            ctx.fillText('y', center + 6, 12);
+        }
+
+        function restartGame() {
+            showScreen('setupScreen');
+            gameHistory = [];
+            drawHistory = [];
+            currentRound = 1;
+            currentPlayer = 0;
+            selectedFunction = null;
+            selectedDerivative = null;
+            
+            // Reset solution section
+            document.getElementById('solutionSection').classList.add('hidden');
+            document.getElementById('btnShowSolution').textContent = 'Korrekte Ableitung anzeigen';
+            
+            // Reset evolution section
+            document.getElementById('evolutionSection').classList.add('hidden');
+            document.getElementById('btnToggleEvolution').textContent = 'Alle Schritte anzeigen';
+        }
+    </script>
+</body>
+</html>
