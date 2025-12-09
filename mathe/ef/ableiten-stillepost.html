@@ -934,6 +934,78 @@ function generateInitialFunction() {
                     f: function(x) { return 0.018 * x * x * x + 0.05 * x * x - 0.35 * x; },
                     df: function(x) { return 0.054 * x * x + 0.1 * x - 0.35; },
                     name: 'f(x) = 0,018x³ + 0,05x² - 0,35x'
+                },
+                // Grad 4 asymmetrisch - ein Tal tiefer als das andere
+                {
+                    f: function(x) { return 0.005 * x * x * x * x - 0.03 * x * x * x - 0.1 * x * x; },
+                    df: function(x) { return 0.02 * x * x * x - 0.09 * x * x - 0.2 * x; },
+                    name: 'f(x) = 0,005x⁴ - 0,03x³ - 0,1x²'
+                },
+                {
+                    f: function(x) { return -0.004 * x * x * x * x - 0.025 * x * x * x + 0.12 * x * x; },
+                    df: function(x) { return -0.016 * x * x * x - 0.075 * x * x + 0.24 * x; },
+                    name: 'f(x) = -0,004x⁴ - 0,025x³ + 0,12x²'
+                },
+                {
+                    f: function(x) { return 0.0035 * x * x * x * x + 0.02 * x * x * x - 0.09 * x * x; },
+                    df: function(x) { return 0.014 * x * x * x + 0.06 * x * x - 0.18 * x; },
+                    name: 'f(x) = 0,0035x⁴ + 0,02x³ - 0,09x²'
+                },
+                {
+                    f: function(x) { return -0.0045 * x * x * x * x + 0.018 * x * x * x + 0.1 * x * x; },
+                    df: function(x) { return -0.018 * x * x * x + 0.054 * x * x + 0.2 * x; },
+                    name: 'f(x) = -0,0045x⁴ + 0,018x³ + 0,1x²'
+                },
+                
+                // Schräge Parabeln (mit linearem Anteil)
+                {
+                    f: function(x) { return 0.08 * x * x + 0.25 * x; },
+                    df: function(x) { return 0.16 * x + 0.25; },
+                    name: 'f(x) = 0,08x² + 0,25x'
+                },
+                {
+                    f: function(x) { return -0.1 * x * x + 0.3 * x; },
+                    df: function(x) { return -0.2 * x + 0.3; },
+                    name: 'f(x) = -0,1x² + 0,3x'
+                },
+                {
+                    f: function(x) { return 0.07 * x * x - 0.35 * x; },
+                    df: function(x) { return 0.14 * x - 0.35; },
+                    name: 'f(x) = 0,07x² - 0,35x'
+                },
+                {
+                    f: function(x) { return -0.09 * x * x - 0.2 * x; },
+                    df: function(x) { return -0.18 * x - 0.2; },
+                    name: 'f(x) = -0,09x² - 0,2x'
+                },
+                
+                // Stark asymmetrische Grad 3
+                {
+                    f: function(x) { return 0.03 * x * x * x - 0.2 * x * x - 0.1 * x; },
+                    df: function(x) { return 0.09 * x * x - 0.4 * x - 0.1; },
+                    name: 'f(x) = 0,03x³ - 0,2x² - 0,1x'
+                },
+                {
+                    f: function(x) { return -0.025 * x * x * x - 0.15 * x * x + 0.5 * x; },
+                    df: function(x) { return -0.075 * x * x - 0.3 * x + 0.5; },
+                    name: 'f(x) = -0,025x³ - 0,15x² + 0,5x'
+                },
+                {
+                    f: function(x) { return 0.02 * x * x * x + 0.18 * x * x - 0.25 * x; },
+                    df: function(x) { return 0.06 * x * x + 0.36 * x - 0.25; },
+                    name: 'f(x) = 0,02x³ + 0,18x² - 0,25x'
+                },
+                
+                // Doppelwellen leicht schief
+                {
+                    f: function(x) { return 0.006 * x * x * x * x - 0.04 * x * x * x - 0.05 * x * x + 0.15 * x; },
+                    df: function(x) { return 0.024 * x * x * x - 0.12 * x * x - 0.1 * x + 0.15; },
+                    name: 'f(x) = 0,006x⁴ - 0,04x³ - 0,05x² + 0,15x'
+                },
+                {
+                    f: function(x) { return -0.005 * x * x * x * x + 0.035 * x * x * x + 0.06 * x * x - 0.2 * x; },
+                    df: function(x) { return -0.02 * x * x * x + 0.105 * x * x + 0.12 * x - 0.2; },
+                    name: 'f(x) = -0,005x⁴ + 0,035x³ + 0,06x² - 0,2x'
                 }
             ];
 
