@@ -809,203 +809,179 @@
         var selectedFunction = null;
         var selectedDerivative = null;
 
-function generateInitialFunction() {
+        function generateInitialFunction() {
             var functions = [
-                // Parabeln - verschiedene Öffnungen und Richtungen
+                // === GERADEN ===
                 {
-                    f: function(x) { return -0.12 * x * x; },
-                    df: function(x) { return -0.24 * x; },
-                    name: 'f(x) = -0,12x²'
+                    f: function(x) { return 0.4 * x; },
+                    df: function(x) { return 0.4; },
+                    name: 'f(x) = 0,4x'
                 },
                 {
-                    f: function(x) { return 0.1 * x * x; },
-                    df: function(x) { return 0.2 * x; },
-                    name: 'f(x) = 0,1x²'
+                    f: function(x) { return -0.35 * x; },
+                    df: function(x) { return -0.35; },
+                    name: 'f(x) = -0,35x'
                 },
                 {
-                    f: function(x) { return -0.08 * x * x; },
-                    df: function(x) { return -0.16 * x; },
-                    name: 'f(x) = -0,08x²'
-                },
-                {
-                    f: function(x) { return 0.15 * x * x; },
-                    df: function(x) { return 0.3 * x; },
-                    name: 'f(x) = 0,15x²'
+                    f: function(x) { return 0.55 * x; },
+                    df: function(x) { return 0.55; },
+                    name: 'f(x) = 0,55x'
                 },
                 
-                // Kubische - S-Kurven mit Bergen und Tälern
+                // === PARABELN (symmetrisch) ===
                 {
-                    f: function(x) { return 0.02 * x * x * x - 0.4 * x; },
-                    df: function(x) { return 0.06 * x * x - 0.4; },
-                    name: 'f(x) = 0,02x³ - 0,4x'
+                    f: function(x) { return 0.06 * x * x; },
+                    df: function(x) { return 0.12 * x; },
+                    name: 'f(x) = 0,06x²'
                 },
                 {
-                    f: function(x) { return -0.018 * x * x * x + 0.35 * x; },
-                    df: function(x) { return -0.054 * x * x + 0.35; },
-                    name: 'f(x) = -0,018x³ + 0,35x'
+                    f: function(x) { return -0.07 * x * x; },
+                    df: function(x) { return -0.14 * x; },
+                    name: 'f(x) = -0,07x²'
                 },
                 {
-                    f: function(x) { return 0.025 * x * x * x - 0.5 * x; },
-                    df: function(x) { return 0.075 * x * x - 0.5; },
-                    name: 'f(x) = 0,025x³ - 0,5x'
-                },
-                {
-                    f: function(x) { return -0.03 * x * x * x + 0.6 * x; },
-                    df: function(x) { return -0.09 * x * x + 0.6; },
-                    name: 'f(x) = -0,03x³ + 0,6x'
-                },
-                {
-                    f: function(x) { return 0.015 * x * x * x - 0.3 * x; },
-                    df: function(x) { return 0.045 * x * x - 0.3; },
-                    name: 'f(x) = 0,015x³ - 0,3x'
-                },
-                {
-                    f: function(x) { return -0.022 * x * x * x + 0.45 * x; },
-                    df: function(x) { return -0.066 * x * x + 0.45; },
-                    name: 'f(x) = -0,022x³ + 0,45x'
+                    f: function(x) { return 0.05 * x * x; },
+                    df: function(x) { return 0.1 * x; },
+                    name: 'f(x) = 0,05x²'
                 },
                 
-                // Grad 4 - W und M Formen
+                // === PARABELN (verschoben/schräg) - Scheitel weit vom Ursprung ===
                 {
-                    f: function(x) { return 0.005 * x * x * x * x - 0.12 * x * x; },
-                    df: function(x) { return 0.02 * x * x * x - 0.24 * x; },
-                    name: 'f(x) = 0,005x⁴ - 0,12x²'
+                    f: function(x) { return 0.04 * x * x - 0.32 * x; },
+                    df: function(x) { return 0.08 * x - 0.32; },
+                    name: 'f(x) = 0,04x² - 0,32x'
                 },
                 {
-                    f: function(x) { return -0.004 * x * x * x * x + 0.1 * x * x; },
-                    df: function(x) { return -0.016 * x * x * x + 0.2 * x; },
-                    name: 'f(x) = -0,004x⁴ + 0,1x²'
+                    f: function(x) { return -0.05 * x * x - 0.25 * x; },
+                    df: function(x) { return -0.1 * x - 0.25; },
+                    name: 'f(x) = -0,05x² - 0,25x'
                 },
                 {
-                    f: function(x) { return 0.006 * x * x * x * x - 0.15 * x * x; },
-                    df: function(x) { return 0.024 * x * x * x - 0.3 * x; },
-                    name: 'f(x) = 0,006x⁴ - 0,15x²'
+                    f: function(x) { return 0.045 * x * x + 0.27 * x; },
+                    df: function(x) { return 0.09 * x + 0.27; },
+                    name: 'f(x) = 0,045x² + 0,27x'
                 },
                 {
-                    f: function(x) { return -0.005 * x * x * x * x + 0.13 * x * x; },
-                    df: function(x) { return -0.02 * x * x * x + 0.26 * x; },
-                    name: 'f(x) = -0,005x⁴ + 0,13x²'
-                },
-                {
-                    f: function(x) { return 0.003 * x * x * x * x - 0.08 * x * x; },
-                    df: function(x) { return 0.012 * x * x * x - 0.16 * x; },
-                    name: 'f(x) = 0,003x⁴ - 0,08x²'
+                    f: function(x) { return -0.04 * x * x + 0.36 * x; },
+                    df: function(x) { return -0.08 * x + 0.36; },
+                    name: 'f(x) = -0,04x² + 0,36x'
                 },
                 
-                // Geraden - verschiedene Steigungen
+                // === KUBISCHE (symmetrisch) - Extrema bei ca. ±4 bis ±5 ===
                 {
-                    f: function(x) { return 0.35 * x; },
-                    df: function(x) { return 0.35; },
-                    name: 'f(x) = 0,35x'
+                    f: function(x) { return 0.008 * x * x * x - 0.24 * x; },
+                    df: function(x) { return 0.024 * x * x - 0.24; },
+                    name: 'f(x) = 0,008x³ - 0,24x'
                 },
                 {
-                    f: function(x) { return -0.3 * x; },
-                    df: function(x) { return -0.3; },
-                    name: 'f(x) = -0,3x'
+                    f: function(x) { return -0.007 * x * x * x + 0.21 * x; },
+                    df: function(x) { return -0.021 * x * x + 0.21; },
+                    name: 'f(x) = -0,007x³ + 0,21x'
                 },
                 {
-                    f: function(x) { return 0.5 * x; },
-                    df: function(x) { return 0.5; },
-                    name: 'f(x) = 0,5x'
+                    f: function(x) { return 0.01 * x * x * x - 0.3 * x; },
+                    df: function(x) { return 0.03 * x * x - 0.3; },
+                    name: 'f(x) = 0,01x³ - 0,3x'
                 },
                 {
-                    f: function(x) { return -0.45 * x; },
-                    df: function(x) { return -0.45; },
-                    name: 'f(x) = -0,45x'
-                },
-                {
-                    f: function(x) { return 0.25 * x; },
-                    df: function(x) { return 0.25; },
-                    name: 'f(x) = 0,25x'
+                    f: function(x) { return -0.009 * x * x * x + 0.27 * x; },
+                    df: function(x) { return -0.027 * x * x + 0.27; },
+                    name: 'f(x) = -0,009x³ + 0,27x'
                 },
                 
-                // Gemischte kubische mit kleinem quadratischen Anteil
+                // === KUBISCHE (asymmetrisch) - unterschiedliche Extrema-Höhen ===
                 {
-                    f: function(x) { return 0.02 * x * x * x - 0.08 * x * x - 0.2 * x; },
-                    df: function(x) { return 0.06 * x * x - 0.16 * x - 0.2; },
-                    name: 'f(x) = 0,02x³ - 0,08x² - 0,2x'
+                    f: function(x) { return 0.006 * x * x * x - 0.04 * x * x - 0.15 * x; },
+                    df: function(x) { return 0.018 * x * x - 0.08 * x - 0.15; },
+                    name: 'f(x) = 0,006x³ - 0,04x² - 0,15x'
                 },
                 {
-                    f: function(x) { return -0.015 * x * x * x - 0.06 * x * x + 0.3 * x; },
-                    df: function(x) { return -0.045 * x * x - 0.12 * x + 0.3; },
-                    name: 'f(x) = -0,015x³ - 0,06x² + 0,3x'
+                    f: function(x) { return -0.007 * x * x * x - 0.035 * x * x + 0.18 * x; },
+                    df: function(x) { return -0.021 * x * x - 0.07 * x + 0.18; },
+                    name: 'f(x) = -0,007x³ - 0,035x² + 0,18x'
                 },
                 {
-                    f: function(x) { return 0.018 * x * x * x + 0.05 * x * x - 0.35 * x; },
-                    df: function(x) { return 0.054 * x * x + 0.1 * x - 0.35; },
-                    name: 'f(x) = 0,018x³ + 0,05x² - 0,35x'
-                },
-                // Grad 4 asymmetrisch - ein Tal tiefer als das andere
-                {
-                    f: function(x) { return 0.005 * x * x * x * x - 0.03 * x * x * x - 0.1 * x * x; },
-                    df: function(x) { return 0.02 * x * x * x - 0.09 * x * x - 0.2 * x; },
-                    name: 'f(x) = 0,005x⁴ - 0,03x³ - 0,1x²'
+                    f: function(x) { return 0.008 * x * x * x + 0.05 * x * x - 0.22 * x; },
+                    df: function(x) { return 0.024 * x * x + 0.1 * x - 0.22; },
+                    name: 'f(x) = 0,008x³ + 0,05x² - 0,22x'
                 },
                 {
-                    f: function(x) { return -0.004 * x * x * x * x - 0.025 * x * x * x + 0.12 * x * x; },
-                    df: function(x) { return -0.016 * x * x * x - 0.075 * x * x + 0.24 * x; },
-                    name: 'f(x) = -0,004x⁴ - 0,025x³ + 0,12x²'
-                },
-                {
-                    f: function(x) { return 0.0035 * x * x * x * x + 0.02 * x * x * x - 0.09 * x * x; },
-                    df: function(x) { return 0.014 * x * x * x + 0.06 * x * x - 0.18 * x; },
-                    name: 'f(x) = 0,0035x⁴ + 0,02x³ - 0,09x²'
-                },
-                {
-                    f: function(x) { return -0.0045 * x * x * x * x + 0.018 * x * x * x + 0.1 * x * x; },
-                    df: function(x) { return -0.018 * x * x * x + 0.054 * x * x + 0.2 * x; },
-                    name: 'f(x) = -0,0045x⁴ + 0,018x³ + 0,1x²'
+                    f: function(x) { return -0.006 * x * x * x + 0.045 * x * x + 0.16 * x; },
+                    df: function(x) { return -0.018 * x * x + 0.09 * x + 0.16; },
+                    name: 'f(x) = -0,006x³ + 0,045x² + 0,16x'
                 },
                 
-                // Schräge Parabeln (mit linearem Anteil)
+                // === W-FORMEN (Grad 4, symmetrisch) - Extrema bei ca. ±4 bis ±5 ===
                 {
-                    f: function(x) { return 0.08 * x * x + 0.25 * x; },
-                    df: function(x) { return 0.16 * x + 0.25; },
-                    name: 'f(x) = 0,08x² + 0,25x'
+                    f: function(x) { return 0.002 * x * x * x * x - 0.08 * x * x; },
+                    df: function(x) { return 0.008 * x * x * x - 0.16 * x; },
+                    name: 'f(x) = 0,002x⁴ - 0,08x²'
                 },
                 {
-                    f: function(x) { return -0.1 * x * x + 0.3 * x; },
-                    df: function(x) { return -0.2 * x + 0.3; },
-                    name: 'f(x) = -0,1x² + 0,3x'
+                    f: function(x) { return 0.0018 * x * x * x * x - 0.072 * x * x; },
+                    df: function(x) { return 0.0072 * x * x * x - 0.144 * x; },
+                    name: 'f(x) = 0,0018x⁴ - 0,072x²'
                 },
                 {
-                    f: function(x) { return 0.07 * x * x - 0.35 * x; },
-                    df: function(x) { return 0.14 * x - 0.35; },
-                    name: 'f(x) = 0,07x² - 0,35x'
+                    f: function(x) { return 0.0025 * x * x * x * x - 0.1 * x * x; },
+                    df: function(x) { return 0.01 * x * x * x - 0.2 * x; },
+                    name: 'f(x) = 0,0025x⁴ - 0,1x²'
                 },
                 {
-                    f: function(x) { return -0.09 * x * x - 0.2 * x; },
-                    df: function(x) { return -0.18 * x - 0.2; },
-                    name: 'f(x) = -0,09x² - 0,2x'
-                },
-                
-                // Stark asymmetrische Grad 3
-                {
-                    f: function(x) { return 0.03 * x * x * x - 0.2 * x * x - 0.1 * x; },
-                    df: function(x) { return 0.09 * x * x - 0.4 * x - 0.1; },
-                    name: 'f(x) = 0,03x³ - 0,2x² - 0,1x'
-                },
-                {
-                    f: function(x) { return -0.025 * x * x * x - 0.15 * x * x + 0.5 * x; },
-                    df: function(x) { return -0.075 * x * x - 0.3 * x + 0.5; },
-                    name: 'f(x) = -0,025x³ - 0,15x² + 0,5x'
-                },
-                {
-                    f: function(x) { return 0.02 * x * x * x + 0.18 * x * x - 0.25 * x; },
-                    df: function(x) { return 0.06 * x * x + 0.36 * x - 0.25; },
-                    name: 'f(x) = 0,02x³ + 0,18x² - 0,25x'
+                    f: function(x) { return 0.0015 * x * x * x * x - 0.06 * x * x; },
+                    df: function(x) { return 0.006 * x * x * x - 0.12 * x; },
+                    name: 'f(x) = 0,0015x⁴ - 0,06x²'
                 },
                 
-                // Doppelwellen leicht schief
+                // === M-FORMEN (Grad 4, symmetrisch, nach unten offen) ===
                 {
-                    f: function(x) { return 0.006 * x * x * x * x - 0.04 * x * x * x - 0.05 * x * x + 0.15 * x; },
-                    df: function(x) { return 0.024 * x * x * x - 0.12 * x * x - 0.1 * x + 0.15; },
-                    name: 'f(x) = 0,006x⁴ - 0,04x³ - 0,05x² + 0,15x'
+                    f: function(x) { return -0.002 * x * x * x * x + 0.08 * x * x; },
+                    df: function(x) { return -0.008 * x * x * x + 0.16 * x; },
+                    name: 'f(x) = -0,002x⁴ + 0,08x²'
                 },
                 {
-                    f: function(x) { return -0.005 * x * x * x * x + 0.035 * x * x * x + 0.06 * x * x - 0.2 * x; },
-                    df: function(x) { return -0.02 * x * x * x + 0.105 * x * x + 0.12 * x - 0.2; },
-                    name: 'f(x) = -0,005x⁴ + 0,035x³ + 0,06x² - 0,2x'
+                    f: function(x) { return -0.0018 * x * x * x * x + 0.07 * x * x; },
+                    df: function(x) { return -0.0072 * x * x * x + 0.14 * x; },
+                    name: 'f(x) = -0,0018x⁴ + 0,07x²'
+                },
+                {
+                    f: function(x) { return -0.0022 * x * x * x * x + 0.09 * x * x; },
+                    df: function(x) { return -0.0088 * x * x * x + 0.18 * x; },
+                    name: 'f(x) = -0,0022x⁴ + 0,09x²'
+                },
+                
+                // === W/M-FORMEN (asymmetrisch) - ein Tal/Berg höher als das andere ===
+                {
+                    f: function(x) { return 0.0015 * x * x * x * x - 0.012 * x * x * x - 0.05 * x * x; },
+                    df: function(x) { return 0.006 * x * x * x - 0.036 * x * x - 0.1 * x; },
+                    name: 'f(x) = 0,0015x⁴ - 0,012x³ - 0,05x²'
+                },
+                {
+                    f: function(x) { return -0.0012 * x * x * x * x - 0.01 * x * x * x + 0.055 * x * x; },
+                    df: function(x) { return -0.0048 * x * x * x - 0.03 * x * x + 0.11 * x; },
+                    name: 'f(x) = -0,0012x⁴ - 0,01x³ + 0,055x²'
+                },
+                {
+                    f: function(x) { return 0.0018 * x * x * x * x + 0.015 * x * x * x - 0.07 * x * x; },
+                    df: function(x) { return 0.0072 * x * x * x + 0.045 * x * x - 0.14 * x; },
+                    name: 'f(x) = 0,0018x⁴ + 0,015x³ - 0,07x²'
+                },
+                {
+                    f: function(x) { return -0.0014 * x * x * x * x + 0.012 * x * x * x + 0.06 * x * x; },
+                    df: function(x) { return -0.0056 * x * x * x + 0.036 * x * x + 0.12 * x; },
+                    name: 'f(x) = -0,0014x⁴ + 0,012x³ + 0,06x²'
+                },
+                
+                // === KONSTANTEN ===
+                {
+                    f: function(x) { return 2; },
+                    df: function(x) { return 0; },
+                    name: 'f(x) = 2'
+                },
+                {
+                    f: function(x) { return -1.5; },
+                    df: function(x) { return 0; },
+                    name: 'f(x) = -1,5'
                 }
             ];
 
