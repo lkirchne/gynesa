@@ -420,6 +420,7 @@
                     <button class="btn-primary" onclick="runMain()">Abfrage Ausführen</button>
                     <button onclick="clearMain()">Leeren</button>
                 </div>
+                <h3 id="main-result-header" style="display:none; margin-top: 1.5rem; font-size: 1rem; color: var(--text-muted);">Ergebnis:</h3>
                 <div id="main-result"></div>
             </div>
         </div>
@@ -577,6 +578,8 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                 db = new SQL.Database(new Uint8Array(buf));
                 renderTasks();
                 updateStats();
+                // Führe initialen Query im Editor aus, damit man direkt was sieht
+                runMain();
             } catch(e) {
                 document.getElementById('main-result').innerHTML = `<div class="message error">Fehler beim Laden der Datenbank: ${e.message}<br>Bitte stelle sicher, dass 'terra.db' im Verzeichnis liegt.</div>`;
             }
@@ -603,6 +606,11 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             if (!db || !q.trim()) return;
             try {
                 const res = db.exec(q);
+                // Toggle header im Main Editor wenn es Ergebnisse gibt
+                if(target === 'main-result') {
+                    document.getElementById('main-result-header').style.display = 'block';
+                }
+
                 if (res.length === 0) {
                     el.innerHTML += '<div class="message success">Query erfolgreich ausgeführt (keine Ergebnisse).</div>';
                     return;
@@ -620,7 +628,11 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
         }
         
         function runMain() { run(document.getElementById('main-editor').value, 'main-result'); }
-        function clearMain() { document.getElementById('main-editor').value = ''; document.getElementById('main-result').innerHTML = ''; }
+        function clearMain() { 
+            document.getElementById('main-editor').value = ''; 
+            document.getElementById('main-result').innerHTML = ''; 
+            document.getElementById('main-result-header').style.display = 'none';
+        }
         
         function renderTasks() {
             const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
