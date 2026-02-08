@@ -4,260 +4,391 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQL Übungen - Terra Datenbank</title>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <style>
+        :root {
+            /* Pastel Palette & Minimalist Tones */
+            --bg-body: #fdfcfc;
+            --bg-surface: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --primary: #7dd3fc; /* Pastel Blue */
+            --primary-dark: #0ea5e9;
+            --primary-bg: #f0f9ff;
+            --accent: #818cf8; /* Soft Indigo */
+            
+            --border-color: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            
+            --success-bg: #dcfce7;
+            --success-text: #166534;
+            --success-border: #86efac;
+            
+            --error-bg: #fee2e2;
+            --error-text: #991b1b;
+            --error-border: #fca5a5;
+            
+            --code-font: 'Source Code Pro', monospace;
+            --body-font: 'Inter', sans-serif;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: Inter, sans-serif;
-            background: #fafafa;
-            color: #222;
+            font-family: var(--body-font);
+            background: var(--bg-body);
+            color: var(--text-main);
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
         
+        /* Layout & Header */
         .header {
-            background: #fff;
+            background: var(--bg-surface);
             padding: 1.5rem 2rem;
-            border-bottom: 2px solid #e0e0e0;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
         
         h1 {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #111;
+            color: #1e293b;
+            letter-spacing: -0.025em;
         }
         
         .subtitle {
-            color: #666;
-            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
             margin-top: 0.25rem;
         }
         
         .container {
-            max-width: 1100px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2rem 1rem;
         }
         
+        /* Stats & Navigation */
         .stats {
             display: flex;
             gap: 2rem;
             margin-bottom: 2rem;
             font-size: 0.9rem;
-            color: #555;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
         }
         
         .stats span {
             font-weight: 600;
-            color: #111;
+            color: var(--text-main);
         }
         
         nav {
-            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            gap: 0.5rem;
             margin-bottom: 2rem;
+            padding-bottom: 1px;
+            overflow-x: auto;
         }
         
         nav button {
-            background: none;
+            background: transparent;
             border: none;
             padding: 0.75rem 1.25rem;
             font-size: 0.95rem;
-            color: #666;
+            color: var(--text-muted);
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
+            border-radius: 8px;
             font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
         
-        nav button:hover { color: #111; }
-        nav button.active { color: #111; border-bottom-color: #111; }
+        nav button:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
         
-        .tab-content { display: none; }
+        nav button.active {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Sections & Cards */
         .section {
-            background: #fff;
-            padding: 1.5rem;
+            background: var(--bg-surface);
+            padding: 2rem;
             margin-bottom: 1.5rem;
-            border: 1px solid #ddd;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
         }
         
         .section h2 {
             font-size: 1.25rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
             font-weight: 600;
+            color: #1e293b;
         }
         
         .section h3 {
-            font-size: 1.05rem;
+            font-size: 1rem;
             margin: 1.5rem 0 0.75rem 0;
             font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         
+        /* Editors & Inputs */
         textarea {
             width: 100%;
-            min-height: 100px;
-            padding: 0.75rem;
-            font-family: 'Source Code Pro', monospace;
+            min-height: 120px;
+            padding: 1rem;
+            font-family: var(--code-font);
             font-size: 0.9rem;
-            border: 1px solid #ccc;
-            background: #fafafa;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #f8fafc;
             resize: vertical;
+            color: #334155;
+            transition: border-color 0.2s, background 0.2s;
         }
         
         textarea:focus {
-            outline: 2px solid #666;
-            outline-offset: -1px;
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
         }
         
         button {
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             font-size: 0.9rem;
             background: #fff;
-            border: 1px solid #ccc;
+            border: 1px solid #cbd5e1;
             cursor: pointer;
             font-family: inherit;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.2s;
         }
         
-        button:hover { background: #f5f5f5; }
-        button:active { background: #eee; }
+        button:hover { background: #f8fafc; border-color: #94a3b8; }
+        button:active { transform: translateY(1px); }
         
         .btn-primary {
-            background: #111;
+            background: #3b82f6; /* Modern Blue */
             color: #fff;
-            border-color: #111;
+            border: none;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
         }
         
-        .btn-primary:hover { background: #333; }
-        .btn-primary:active { background: #000; }
+        .btn-primary:hover { background: #2563eb; border-color: transparent; }
         
-        .button-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
+        /* Tables - BEAUTIFIED */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 1rem;
+            background: #fff;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.875rem;
-            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            min-width: 600px; /* Ensure table doesn't squish too much */
         }
         
         th {
             text-align: left;
-            padding: 0.5rem;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
+            padding: 0.85rem 1rem;
+            background: #f1f5f9;
+            color: #475569;
             font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
         }
         
         td {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: top;
         }
         
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background-color: #fafbfc; }
+        tr:hover td { background-color: #f0f9ff; }
+        
+        /* Messages & Feedback */
         .message {
-            padding: 0.75rem;
-            margin-top: 0.75rem;
-            border-left: 3px solid;
-            background: #f9f9f9;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 8px;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
         }
         
-        .success { border-color: #2d5; background: #e8f5e9; }
-        .error { border-color: #e33; background: #ffebee; }
+        .success { 
+            background: var(--success-bg); 
+            color: var(--success-text); 
+            border: 1px solid var(--success-border);
+        }
         
+        .error { 
+            background: var(--error-bg); 
+            color: var(--error-text); 
+            border: 1px solid var(--error-border);
+        }
+        
+        /* Tasks */
         .task {
-            border: 1px solid #ddd;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
             background: #fff;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .task:hover {
+            box-shadow: var(--shadow-sm);
         }
         
         .task.solved {
-            background: #f0f9f0;
-            border-color: #2d5;
+            background: #f0fdf4;
+            border-color: #bbf7d0;
         }
         
         .task-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
         }
         
         .task-title {
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            color: #1e293b;
         }
         
         .badge {
             font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
-            background: #eee;
-            border: 1px solid #ccc;
+            padding: 0.25rem 0.75rem;
+            background: #f1f5f9;
+            border-radius: 999px;
             font-weight: 600;
+            color: #64748b;
         }
         
-        .badge.solved { background: #2d5; color: #fff; border-color: #2d5; }
+        .badge.solved { 
+            background: #dcfce7; 
+            color: #15803d;
+        }
         
         .task-desc {
-            color: #555;
+            color: #475569;
             font-size: 0.95rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
         }
         
+        /* Hints & Help */
         .hint {
-            background: #fffbf0;
-            border: 1px solid #e5d699;
-            padding: 0.75rem;
-            margin-top: 0.75rem;
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+            padding: 1rem;
+            margin-top: 1rem;
             display: none;
             font-size: 0.9rem;
+            border-radius: 8px;
         }
         
-        .hint.visible { display: block; }
-        .hint strong { display: block; margin-bottom: 0.25rem; }
+        .hint.visible { display: block; animation: fadeIn 0.3s; }
         
         .help-block {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
             margin-bottom: 1rem;
+            border-radius: 8px;
         }
         
         .help-block h4 {
             font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            color: #334155;
         }
         
         .help-block code {
             display: block;
-            font-family: 'Source Code Pro', monospace;
+            font-family: var(--code-font);
             font-size: 0.85rem;
             background: #fff;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
             white-space: pre;
             overflow-x: auto;
-            margin-top: 0.25rem;
+            color: #0f172a;
         }
         
-        code {
-            font-family: 'Source Code Pro', monospace;
-            background: #f0f0f0;
+        code.inline {
+            font-family: var(--code-font);
+            background: #f1f5f9;
             padding: 0.1rem 0.3rem;
             font-size: 0.9em;
+            border-radius: 4px;
+            color: #0f172a;
         }
         
         .result-info {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0.5rem 0;
+            text-align: right;
+            font-family: var(--code-font);
         }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body>
@@ -274,19 +405,20 @@
         </div>
         
         <nav>
-            <button class="active" onclick="switchTab('editor')">Editor</button>
+            <button class="active" onclick="switchTab('editor')">Freier Editor</button>
             <button onclick="switchTab('tasks')">Aufgaben</button>
-            <button onclick="switchTab('database')">Datenbank</button>
-            <button onclick="switchTab('help')">Hilfe</button>
+            <button onclick="switchTab('database')">Datenbank Struktur</button>
+            <button onclick="switchTab('help')">Cheat Sheet</button>
         </nav>
         
         <div id="tab-editor" class="tab-content active">
             <div class="section">
-                <h2>SQL Editor</h2>
-                <textarea id="main-editor" placeholder="SELECT * FROM BERG LIMIT 10;"></textarea>
+                <h2>SQL Playground</h2>
+                <p style="margin-bottom: 1rem; color: var(--text-muted);">Teste hier deine eigenen Abfragen gegen die Terra-Datenbank.</p>
+                <textarea id="main-editor" placeholder="SELECT * FROM BERG ORDER BY HOEHE DESC LIMIT 10;">SELECT * FROM LAND LIMIT 10;</textarea>
                 <div class="button-group">
-                    <button class="btn-primary" onclick="runMain()">Ausführen</button>
-                    <button onclick="clearMain()">Löschen</button>
+                    <button class="btn-primary" onclick="runMain()">Abfrage Ausführen</button>
+                    <button onclick="clearMain()">Leeren</button>
                 </div>
                 <div id="main-result"></div>
             </div>
@@ -295,9 +427,9 @@
         <div id="tab-tasks" class="tab-content">
             <div id="tasks"></div>
             <div class="section">
-                <h2>Export</h2>
-                <p style="color: #666; margin-bottom: 1rem;">Exportiere deine Lösungen als Markdown.</p>
-                <button class="btn-primary" onclick="exportSolutions()">Exportieren</button>
+                <h2>Lösungen Speichern</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Exportiere deine Lösungen als Markdown-Datei für deine Unterlagen.</p>
+                <button class="btn-primary" onclick="exportSolutions()">Lösungen herunterladen</button>
             </div>
         </div>
         
@@ -346,88 +478,31 @@ LAENGE       double        - Längengrad</code>
                 </div>
                 
                 <h3>Verbindungstabellen (für JOINs)</h3>
-                
-                <div class="help-block">
-                    <h4>GEO_BERG</h4>
-                    <code>id           int           - ID
-L_ID         varchar(4)    - Länder-ID
-B_NAME       varchar(20)   - Bergname
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                    <div class="help-block">
+                        <h4>GEO_BERG</h4>
+                        <code>id           int
+L_ID         varchar(4)
+B_NAME       varchar(20)
 
 Verbindet: LAND ↔ BERG</code>
-                </div>
-                
-                <div class="help-block">
-                    <h4>GEO_FLUSS</h4>
-                    <code>L_ID         varchar(4)    - Länder-ID
-F_NAME       varchar(20)   - Flussname
+                    </div>
+                    
+                    <div class="help-block">
+                        <h4>GEO_FLUSS</h4>
+                        <code>L_ID         varchar(4)
+F_NAME       varchar(20)
 
 Verbindet: LAND ↔ FLUSS</code>
-                </div>
-                
-                <div class="help-block">
-                    <h4>UMFASST</h4>
-                    <code>K_NAME       varchar(10)   - Kontinentname
-L_ID         varchar(4)    - Länder-ID
+                    </div>
+                    
+                    <div class="help-block">
+                        <h4>UMFASST</h4>
+                        <code>K_NAME       varchar(10)
+L_ID         varchar(4)
 
 Verbindet: KONTINENT ↔ LAND</code>
-                </div>
-                
-                <div class="help-block">
-                    <h4>LIEGT_AN</h4>
-                    <code>ST_NAME      varchar(25)   - Stadtname
-F_NAME       varchar(20)   - Flussname
-S_NAME       varchar(25)   - Seename
-
-Verbindet: STADT ↔ FLUSS/SEE</code>
-                </div>
-                
-                <h3>Weitere Tabellen</h3>
-                
-                <div class="help-block">
-                    <h4>Geografie</h4>
-                    <code>KONTINENT    - K_NAME, FLAECHE
-MEER         - M_NAME, TIEFE
-SEE          - S_NAME, TIEFE, FLAECHE
-INSEL        - I_NAME, INSELGRUPPE, FLAECHE
-WUESTE       - W_NAME, FLAECHE, WUESTENART
-EBENE        - E_NAME, FLAECHE</code>
-                </div>
-                
-                <div class="help-block">
-                    <h4>Organisationen</h4>
-                    <code>ORGANISATION     - ABKUERZUNG, O_NAME, GRUENDUNGSDATUM
-IST_MITGLIED_VON - Verbindet LAND ↔ ORGANISATION
-HAT_SITZ_IN      - Verbindet ORGANISATION ↔ STADT</code>
-                </div>
-                
-                <div class="help-block">
-                    <h4>Beziehungen</h4>
-                    <code>IST_BENACHBART_ZU - Nachbarländer
-GEHT_UEBER_IN     - Flussverläufe</code>
-                </div>
-                
-                <h3>Wichtige Verknüpfungen</h3>
-                
-                <div class="help-block">
-                    <code>-- Berge mit Ländern
-BERG → GEO_BERG → LAND
-ON BERG.B_NAME = GEO_BERG.B_NAME
-ON GEO_BERG.L_ID = LAND.L_ID
-
--- Flüsse mit Ländern
-FLUSS → GEO_FLUSS → LAND
-ON FLUSS.F_NAME = GEO_FLUSS.F_NAME
-ON GEO_FLUSS.L_ID = LAND.L_ID
-
--- Länder mit Kontinenten
-LAND → UMFASST → KONTINENT
-ON LAND.L_ID = UMFASST.L_ID
-ON UMFASST.K_NAME = KONTINENT.K_NAME
-
--- Städte an Flüssen
-STADT → LIEGT_AN → FLUSS
-ON STADT.ST_NAME = LIEGT_AN.ST_NAME
-ON LIEGT_AN.F_NAME = FLUSS.F_NAME</code>
+                    </div>
                 </div>
             </div>
         </div>
@@ -453,37 +528,13 @@ GROUP BY GEBIRGE
 HAVING COUNT(*) > 5;</code>
                 </div>
                 
-                <h3>Verknüpfung</h3>
+                <h3>Verknüpfung (JOINs)</h3>
                 <div class="help-block">
                     <h4>INNER JOIN</h4>
                     <code>SELECT b.B_NAME, l.L_NAME
 FROM BERG b
 JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME
 JOIN LAND l ON gb.L_ID = l.L_ID;</code>
-                </div>
-                
-                <div class="help-block">
-                    <h4>LEFT JOIN</h4>
-                    <code>SELECT l.L_NAME, COUNT(b.B_NAME)
-FROM LAND l
-LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID
-GROUP BY l.L_NAME;</code>
-                </div>
-                
-                <h3>Sortierung</h3>
-                <div class="help-block">
-                    <h4>ORDER BY & LIMIT</h4>
-                    <code>SELECT * FROM BERG
-ORDER BY HOEHE DESC
-LIMIT 10;</code>
-                </div>
-                
-                <h3>Tabellen</h3>
-                <div class="help-block">
-                    <code>BERG: B_NAME, GEBIRGE, HOEHE
-LAND: L_ID, L_NAME, FLAECHE, EINWOHNER
-GEO_BERG: L_ID, B_NAME
-FLUSS: F_NAME, LAENGE</code>
                 </div>
             </div>
         </div>
@@ -518,12 +569,17 @@ FLUSS: F_NAME, LAENGE</code>
         }
         
         async function initDatabase() {
-            const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
-            const res = await fetch('terra.db');
-            const buf = await res.arrayBuffer();
-            db = new SQL.Database(new Uint8Array(buf));
-            renderTasks();
-            updateStats();
+            try {
+                const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+                const res = await fetch('terra.db');
+                if (!res.ok) throw new Error('terra.db nicht gefunden.');
+                const buf = await res.arrayBuffer();
+                db = new SQL.Database(new Uint8Array(buf));
+                renderTasks();
+                updateStats();
+            } catch(e) {
+                document.getElementById('main-result').innerHTML = `<div class="message error">Fehler beim Laden der Datenbank: ${e.message}<br>Bitte stelle sicher, dass 'terra.db' im Verzeichnis liegt.</div>`;
+            }
         }
         
         function norm(q) { return q.toUpperCase().replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').replace(/\s*=\s*/g, '=').replace(/\s*\(\s*/g, '(').replace(/\s*\)\s*/g, ')').trim().replace(/;$/, ''); }
@@ -541,23 +597,25 @@ FLUSS: F_NAME, LAENGE</code>
             return false;
         }
         
-        function run(q, target) {
+        function run(q, target, extraMsg = '') {
             const el = document.getElementById(target);
-            el.innerHTML = '';
+            el.innerHTML = extraMsg;
             if (!db || !q.trim()) return;
             try {
                 const res = db.exec(q);
                 if (res.length === 0) {
-                    el.innerHTML = '<div class="message success">Query erfolgreich.</div>';
+                    el.innerHTML += '<div class="message success">Query erfolgreich ausgeführt (keine Ergebnisse).</div>';
                     return;
                 }
                 const r = res[0];
-                let html = '<div class="result-info">' + r.values.length + ' Zeilen</div><table><tr>';
-                html += r.columns.map(c => '<th>' + c + '</th>').join('') + '</tr>';
-                html += r.values.map(row => '<tr>' + row.map(c => '<td>' + (c === null ? 'NULL' : c) + '</td>').join('') + '</tr>').join('');
-                el.innerHTML = html + '</table>';
+                let html = `<div class="result-info">${r.values.length} Ergebnisse</div>`;
+                html += '<div class="table-wrapper"><table><thead><tr>';
+                html += r.columns.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+                html += r.values.map(row => '<tr>' + row.map(c => '<td>' + (c === null ? '<span style="color:#aaa">NULL</span>' : c) + '</td>').join('') + '</tr>').join('');
+                html += '</tbody></table></div>';
+                el.innerHTML += html;
             } catch (e) {
-                el.innerHTML = '<div class="message error">' + e.message + '</div>';
+                el.innerHTML += '<div class="message error">SQL Fehler: ' + e.message + '</div>';
             }
         }
         
@@ -583,11 +641,11 @@ FLUSS: F_NAME, LAENGE</code>
                         <div class="task-desc">${t.desc}</div>
                         <textarea id="t-${t.id}" placeholder="SELECT ...">${q}</textarea>
                         <div class="button-group">
-                            <button class="btn-primary" onclick="checkTask('${t.id}')">Prüfen</button>
-                            <button onclick="runTask('${t.id}')">Ausführen</button>
+                            <button class="btn-primary" onclick="checkTask('${t.id}')">Überprüfen</button>
+                            <button onclick="runTask('${t.id}')">Nur Ausführen</button>
                             <button onclick="toggleHint('${t.id}')">Hinweis</button>
                         </div>
-                        <div id="hint-${t.id}" class="hint"><strong>Hinweis:</strong> ${t.hint}</div>
+                        <div id="hint-${t.id}" class="hint"><strong>Tipp:</strong> ${t.hint}</div>
                         <div id="res-${t.id}"></div>
                     </div>`;
                 });
@@ -601,23 +659,38 @@ FLUSS: F_NAME, LAENGE</code>
             const task = tasks.find(t => t.id === id);
             const q = document.getElementById('t-' + id).value;
             const el = document.getElementById('res-' + id);
-            if (!q.trim()) { el.innerHTML = '<div class="message error">Query eingeben</div>'; return; }
-            if (check(q, task.sols)) {
-                el.innerHTML = '<div class="message success">Richtig!</div>';
+            
+            if (!q.trim()) { 
+                el.innerHTML = '<div class="message error">Bitte gib eine Query ein.</div>'; 
+                return; 
+            }
+            
+            let message = '';
+            let isCorrect = check(q, task.sols);
+            
+            if (isCorrect) {
+                message = '<div class="message success" style="margin-bottom:1rem">Richtig gelöst! ✓</div>';
                 const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
                 saved[id] = q;
                 localStorage.setItem('terra-sql', JSON.stringify(saved));
-                renderTasks();
+                
+                // Nur UI Updates, kein komplettes Re-Render um Fokus nicht zu verlieren
+                document.querySelector(`.task[data-id="${id}"]`).classList.add('solved');
+                document.querySelector(`.task[data-id="${id}"] .badge`).classList.add('solved');
+                document.querySelector(`.task[data-id="${id}"] .badge`).innerHTML = `N${task.n} ✓`;
                 updateStats();
             } else {
-                run(q, 'res-' + id);
-                if (document.getElementById('res-' + id).querySelector('.message.success')) {
-                    el.innerHTML = '<div class="message error">Läuft, aber Ergebnis falsch</div>' + el.innerHTML;
-                }
+                 message = '<div class="message error" style="margin-bottom:1rem">Leider nicht korrekt. Versuche es nochmal oder prüfe die Ergebnisse unten.</div>';
             }
+
+            // Immer das Ergebnis anzeigen, damit der User sieht was er getan hat
+            run(q, 'res-' + id, message);
         }
         
-        function runTask(id) { run(document.getElementById('t-' + id).value, 'res-' + id); }
+        function runTask(id) { 
+            run(document.getElementById('t-' + id).value, 'res-' + id); 
+        }
+        
         function toggleHint(id) { document.getElementById('hint-' + id).classList.toggle('visible'); }
         
         function updateStats() {
