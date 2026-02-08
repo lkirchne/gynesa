@@ -30,6 +30,10 @@
             --error-text: #991b1b;
             --error-border: #fca5a5;
             
+            --warning-bg: #fef3c7;
+            --warning-text: #92400e;
+            --warning-border: #fcd34d;
+            
             --code-font: 'Source Code Pro', monospace;
             --body-font: 'Inter', sans-serif;
         }
@@ -72,6 +76,12 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 2rem 1rem;
+        }
+        
+        /* Status Bar for DB Debugging */
+        #db-status {
+            margin-bottom: 1.5rem;
+            display: none;
         }
         
         /* Stats & Navigation */
@@ -272,6 +282,12 @@
             border: 1px solid var(--error-border);
         }
         
+        .warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            border: 1px solid var(--warning-border);
+        }
+        
         /* Tasks */
         .task {
             border: 1px solid var(--border-color);
@@ -398,6 +414,9 @@
     </div>
     
     <div class="container">
+        <!-- Notification Area for DB Status -->
+        <div id="db-status"></div>
+
         <div class="stats">
             <div>Gelöst: <span id="solved">0</span>/<span id="total">0</span></div>
             <div>Fortschritt: <span id="progress">0%</span></div>
@@ -569,20 +588,91 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             document.getElementById('tab-' + name).classList.add('active');
         }
         
+        // --- DATA SETUP ---
+        function createDemoData(db) {
+            db.run("CREATE TABLE IF NOT EXISTS LAND (L_ID varchar(4), L_NAME varchar(50), EINWOHNER double, FLAECHE double, HAUPTSTADT varchar(25), LT_ID varchar(4));");
+            db.run("INSERT INTO LAND VALUES ('D', 'Deutschland', 83000000, 357000, 'Berlin', 'EU');");
+            db.run("INSERT INTO LAND VALUES ('F', 'Frankreich', 67000000, 551000, 'Paris', 'EU');");
+            
+            db.run("CREATE TABLE IF NOT EXISTS BERG (B_NAME varchar(20), GEBIRGE varchar(25), HOEHE double, JAHR int, LAENGE double, BREITE double);");
+            db.run("INSERT INTO BERG VALUES ('Zugspitze', 'Alpen', 2962, 1820, 10.98, 47.42);");
+            db.run("INSERT INTO BERG VALUES ('Mont Blanc', 'Alpen', 4810, 1786, 6.86, 45.83);");
+            
+            db.run("CREATE TABLE IF NOT EXISTS GEO_BERG (id int, L_ID varchar(4), B_NAME varchar(20));");
+            db.run("INSERT INTO GEO_BERG VALUES (1, 'D', 'Zugspitze');");
+            db.run("INSERT INTO GEO_BERG VALUES (2, 'F', 'Mont Blanc');");
+
+            db.run("CREATE TABLE IF NOT EXISTS FLUSS (F_NAME varchar(20), LAENGE int);");
+            db.run("INSERT INTO FLUSS VALUES ('Rhein', 1230);");
+            
+            // Minimal set for tasks to not crash
+            db.run("CREATE TABLE IF NOT EXISTS STADT (ST_NAME varchar(25));");
+            db.run("CREATE TABLE IF NOT EXISTS KONTINENT (K_NAME varchar(10));");
+        }
+
         async function initDatabase() {
+            const statusEl = document.getElementById('db-status');
+            statusEl.style.display = 'block';
+            statusEl.innerHTML = '<div class="message warning">Verbinde zur Datenbank...</div>';
+
             try {
                 const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
-                const res = await fetch('terra.db');
-                if (!res.ok) throw new Error('terra.db nicht gefunden.');
-                const buf = await res.arrayBuffer();
+                
+                // FORCE CACHE BUSTING with Timestamp
+                const fetchUrl = 'terra.db?v=' + new Date().getTime();
+                
+                let buf;
+                try {
+                    const res = await fetch(fetchUrl);
+                    if (!res.ok) throw new Error(`Status ${res.status}`);
+                    buf = await res.arrayBuffer();
+                } catch(netErr) {
+                     statusEl.innerHTML = `<div class="message error">Konnte 'terra.db' nicht laden (${netErr.message}). Nutze Demo-Daten.</div>`;
+                     db = new SQL.Database();
+                     createDemoData(db);
+                     finishInit(statusEl, true);
+                     return;
+                }
+
+                if (buf.byteLength < 1000) {
+                     statusEl.innerHTML = `<div class="message error">Datei 'terra.db' ist zu klein/defekt. Lade Demo-Daten.</div>`;
+                     db = new SQL.Database();
+                     createDemoData(db);
+                     finishInit(statusEl, true);
+                     return;
+                }
+
                 db = new SQL.Database(new Uint8Array(buf));
-                renderTasks();
-                updateStats();
-                // Führe initialen Query im Editor aus, damit man direkt was sieht
-                runMain();
+                
+                // AGGRESSIVE CHECK: Is there data in BERG?
+                let rowCount = 0;
+                try {
+                    const r = db.exec("SELECT count(*) as c FROM BERG");
+                    if(r.length > 0) rowCount = r[0].values[0][0];
+                } catch(e) { rowCount = 0; }
+
+                if (rowCount === 0) {
+                    // DB loaded but empty tables? Fallback to demo
+                    statusEl.innerHTML = `<div class="message warning">Datenbank geladen, aber Tabellen sind leer. <strong>Lade Demo-Daten</strong> als Fallback.</div>`;
+                    createDemoData(db);
+                    finishInit(statusEl, true);
+                } else {
+                    // Success
+                    statusEl.innerHTML = `<div class="message success">Datenbank erfolgreich verbunden! (${rowCount} Berge gefunden)</div>`;
+                    finishInit(statusEl, false);
+                }
+
             } catch(e) {
-                document.getElementById('main-result').innerHTML = `<div class="message error">Fehler beim Laden der Datenbank: ${e.message}<br>Bitte stelle sicher, dass 'terra.db' im Verzeichnis liegt.</div>`;
+                statusEl.innerHTML = `<div class="message error">Kritischer Fehler: ${e.message}</div>`;
+                console.error(e);
             }
+        }
+        
+        function finishInit(statusEl, isDemo) {
+            if(!isDemo) setTimeout(() => statusEl.style.display = 'none', 4000);
+            renderTasks();
+            updateStats();
+            runMain();
         }
         
         function norm(q) { return q.toUpperCase().replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').replace(/\s*=\s*/g, '=').replace(/\s*\(\s*/g, '(').replace(/\s*\)\s*/g, ')').trim().replace(/;$/, ''); }
@@ -606,7 +696,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             if (!db || !q.trim()) return;
             try {
                 const res = db.exec(q);
-                // Toggle header im Main Editor wenn es Ergebnisse gibt
+                
                 if(target === 'main-result') {
                     document.getElementById('main-result-header').style.display = 'block';
                 }
