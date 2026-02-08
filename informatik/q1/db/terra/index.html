@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Übungen - Terra Datenbank</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: Inter, sans-serif;
+            background: #fafafa;
+            color: #222;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: #fff;
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #111;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .stats span {
+            font-weight: 600;
+            color: #111;
+        }
+        
+        nav {
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 2rem;
+        }
+        
+        nav button {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-family: inherit;
+        }
+        
+        nav button:hover { color: #111; }
+        nav button.active { color: #111; border-bottom-color: #111; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .section {
+            background: #fff;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #ddd;
+        }
+        
+        .section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .section h3 {
+            font-size: 1.05rem;
+            margin: 1.5rem 0 0.75rem 0;
+            font-weight: 600;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.75rem;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            background: #fafafa;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: 2px solid #666;
+            outline-offset: -1px;
+        }
+        
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            background: #fff;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        
+        button:hover { background: #f5f5f5; }
+        button:active { background: #eee; }
+        
+        .btn-primary {
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+        
+        .btn-primary:hover { background: #333; }
+        .btn-primary:active { background: #000; }
+        
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            margin-top: 0.75rem;
+        }
+        
+        th {
+            text-align: left;
+            padding: 0.5rem;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+        }
+        
+        .message {
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            border-left: 3px solid;
+            background: #f9f9f9;
+            font-size: 0.9rem;
+        }
+        
+        .success { border-color: #2d5; background: #e8f5e9; }
+        .error { border-color: #e33; background: #ffebee; }
+        
+        .task {
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #fff;
+        }
+        
+        .task.solved {
+            background: #f0f9f0;
+            border-color: #2d5;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: #eee;
+            border: 1px solid #ccc;
+            font-weight: 600;
+        }
+        
+        .badge.solved { background: #2d5; color: #fff; border-color: #2d5; }
+        
+        .task-desc {
+            color: #555;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .hint {
+            background: #fffbf0;
+            border: 1px solid #e5d699;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+        
+        .hint.visible { display: block; }
+        .hint strong { display: block; margin-bottom: 0.25rem; }
+        
+        .help-block {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .help-block h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .help-block code {
+            display: block;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 0.85rem;
+            background: #fff;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            white-space: pre;
+            overflow-x: auto;
+            margin-top: 0.25rem;
+        }
+        
+        code {
+            font-family: 'Source Code Pro', monospace;
+            background: #f0f0f0;
+            padding: 0.1rem 0.3rem;
+            font-size: 0.9em;
+        }
+        
+        .result-info {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SQL Übungen - Terra Datenbank</h1>
+        <p class="subtitle">Aggregationsfunktionen & JOINs</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+            <div>Gelöst: <span id="solved">0</span>/<span id="total">0</span></div>
+            <div>Fortschritt: <span id="progress">0%</span></div>
+            <div>Niveau: <span id="niveau">1</span></div>
+        </div>
+        
+        <nav>
+            <button class="active" onclick="switchTab('editor')">Editor</button>
+            <button onclick="switchTab('tasks')">Aufgaben</button>
+            <button onclick="switchTab('database')">Datenbank</button>
+            <button onclick="switchTab('help')">Hilfe</button>
+        </nav>
+        
+        <div id="tab-editor" class="tab-content active">
+            <div class="section">
+                <h2>SQL Editor</h2>
+                <textarea id="main-editor" placeholder="SELECT * FROM BERG LIMIT 10;"></textarea>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="runMain()">Ausführen</button>
+                    <button onclick="clearMain()">Löschen</button>
+                </div>
+                <div id="main-result"></div>
+            </div>
+        </div>
+        
+        <div id="tab-tasks" class="tab-content">
+            <div id="tasks"></div>
+            <div class="section">
+                <h2>Export</h2>
+                <p style="color: #666; margin-bottom: 1rem;">Exportiere deine Lösungen als Markdown.</p>
+                <button class="btn-primary" onclick="exportSolutions()">Exportieren</button>
+            </div>
+        </div>
+        
+        <div id="tab-database" class="tab-content">
+            <div class="section">
+                <h2>Datenbank-Übersicht</h2>
+                
+                <h3>Haupttabellen</h3>
+                
+                <div class="help-block">
+                    <h4>BERG</h4>
+                    <code>B_NAME       varchar(20)   - Bergname
+GEBIRGE      varchar(25)   - Gebirgsname
+HOEHE        double        - Höhe in Metern
+JAHR         int           - Jahr der Erstbesteigung
+LAENGE       double        - Längengrad
+BREITE       double        - Breitengrad</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>LAND</h4>
+                    <code>L_ID         varchar(4)    - Länder-ID
+L_NAME       varchar(50)   - Landesname
+EINWOHNER    double        - Einwohnerzahl
+FLAECHE      double        - Fläche in km²
+HAUPTSTADT   varchar(25)   - Hauptstadt
+LT_ID        varchar(4)    - Landteil-ID</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>FLUSS</h4>
+                    <code>F_NAME       varchar(20)   - Flussname
+FLUSS        varchar(20)   - Quellfluss
+SEE          varchar(25)   - Mündet in See
+MEER         varchar(25)   - Mündet in Meer
+LAENGE       int           - Länge in km</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>STADT</h4>
+                    <code>ST_NAME      varchar(25)   - Stadtname
+L_ID         varchar(4)    - Länder-ID
+EINWOHNER    int           - Einwohnerzahl
+BREITE       double        - Breitengrad
+LAENGE       double        - Längengrad</code>
+                </div>
+                
+                <h3>Verbindungstabellen (für JOINs)</h3>
+                
+                <div class="help-block">
+                    <h4>GEO_BERG</h4>
+                    <code>id           int           - ID
+L_ID         varchar(4)    - Länder-ID
+B_NAME       varchar(20)   - Bergname
+
+Verbindet: LAND ↔ BERG</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>GEO_FLUSS</h4>
+                    <code>L_ID         varchar(4)    - Länder-ID
+F_NAME       varchar(20)   - Flussname
+
+Verbindet: LAND ↔ FLUSS</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>UMFASST</h4>
+                    <code>K_NAME       varchar(10)   - Kontinentname
+L_ID         varchar(4)    - Länder-ID
+
+Verbindet: KONTINENT ↔ LAND</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>LIEGT_AN</h4>
+                    <code>ST_NAME      varchar(25)   - Stadtname
+F_NAME       varchar(20)   - Flussname
+S_NAME       varchar(25)   - Seename
+
+Verbindet: STADT ↔ FLUSS/SEE</code>
+                </div>
+                
+                <h3>Weitere Tabellen</h3>
+                
+                <div class="help-block">
+                    <h4>Geografie</h4>
+                    <code>KONTINENT    - K_NAME, FLAECHE
+MEER         - M_NAME, TIEFE
+SEE          - S_NAME, TIEFE, FLAECHE
+INSEL        - I_NAME, INSELGRUPPE, FLAECHE
+WUESTE       - W_NAME, FLAECHE, WUESTENART
+EBENE        - E_NAME, FLAECHE</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>Organisationen</h4>
+                    <code>ORGANISATION     - ABKUERZUNG, O_NAME, GRUENDUNGSDATUM
+IST_MITGLIED_VON - Verbindet LAND ↔ ORGANISATION
+HAT_SITZ_IN      - Verbindet ORGANISATION ↔ STADT</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>Beziehungen</h4>
+                    <code>IST_BENACHBART_ZU - Nachbarländer
+GEHT_UEBER_IN     - Flussverläufe</code>
+                </div>
+                
+                <h3>Wichtige Verknüpfungen</h3>
+                
+                <div class="help-block">
+                    <code>-- Berge mit Ländern
+BERG → GEO_BERG → LAND
+ON BERG.B_NAME = GEO_BERG.B_NAME
+ON GEO_BERG.L_ID = LAND.L_ID
+
+-- Flüsse mit Ländern
+FLUSS → GEO_FLUSS → LAND
+ON FLUSS.F_NAME = GEO_FLUSS.F_NAME
+ON GEO_FLUSS.L_ID = LAND.L_ID
+
+-- Länder mit Kontinenten
+LAND → UMFASST → KONTINENT
+ON LAND.L_ID = UMFASST.L_ID
+ON UMFASST.K_NAME = KONTINENT.K_NAME
+
+-- Städte an Flüssen
+STADT → LIEGT_AN → FLUSS
+ON STADT.ST_NAME = LIEGT_AN.ST_NAME
+ON LIEGT_AN.F_NAME = FLUSS.F_NAME</code>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-help" class="tab-content">
+            <div class="section">
+                <h2>SQL Referenz</h2>
+                
+                <h3>Aggregation</h3>
+                <div class="help-block">
+                    <h4>COUNT, MAX, MIN, AVG</h4>
+                    <code>SELECT COUNT(*) FROM LAND;
+SELECT MAX(HOEHE) FROM BERG;
+SELECT AVG(FLAECHE) FROM LAND;</code>
+                </div>
+                
+                <h3>Gruppierung</h3>
+                <div class="help-block">
+                    <h4>GROUP BY & HAVING</h4>
+                    <code>SELECT GEBIRGE, COUNT(*)
+FROM BERG
+GROUP BY GEBIRGE
+HAVING COUNT(*) > 5;</code>
+                </div>
+                
+                <h3>Verknüpfung</h3>
+                <div class="help-block">
+                    <h4>INNER JOIN</h4>
+                    <code>SELECT b.B_NAME, l.L_NAME
+FROM BERG b
+JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME
+JOIN LAND l ON gb.L_ID = l.L_ID;</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>LEFT JOIN</h4>
+                    <code>SELECT l.L_NAME, COUNT(b.B_NAME)
+FROM LAND l
+LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID
+GROUP BY l.L_NAME;</code>
+                </div>
+                
+                <h3>Sortierung</h3>
+                <div class="help-block">
+                    <h4>ORDER BY & LIMIT</h4>
+                    <code>SELECT * FROM BERG
+ORDER BY HOEHE DESC
+LIMIT 10;</code>
+                </div>
+                
+                <h3>Tabellen</h3>
+                <div class="help-block">
+                    <code>BERG: B_NAME, GEBIRGE, HOEHE
+LAND: L_ID, L_NAME, FLAECHE, EINWOHNER
+GEO_BERG: L_ID, B_NAME
+FLUSS: F_NAME, LAENGE</code>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let db;
+        const tasks = [
+            { id: 'n1-1', n: 1, title: 'Anzahl Länder', desc: 'Wie viele Länder gibt es in der Datenbank?', hint: 'COUNT(*) auf LAND', sols: ['SELECT COUNT(*) FROM LAND', 'SELECT COUNT(*) AS anzahl FROM LAND', 'SELECT COUNT(L_ID) FROM LAND'] },
+            { id: 'n1-2', n: 1, title: 'Größtes Land', desc: 'Wie groß ist das größte Land (nach Fläche)?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 oder MAX()', sols: ['SELECT L_NAME, FLAECHE FROM LAND ORDER BY FLAECHE DESC LIMIT 1', 'SELECT L_NAME, MAX(FLAECHE) FROM LAND', 'SELECT L_NAME, FLAECHE FROM LAND WHERE FLAECHE = (SELECT MAX(FLAECHE) FROM LAND)'] },
+            { id: 'n1-3', n: 1, title: 'Bevölkerungsreichstes Land', desc: 'Wie viele Einwohner hat das bevölkerungsreichste Land?', hint: 'MAX(EINWOHNER)', sols: ['SELECT MAX(EINWOHNER) FROM LAND', 'SELECT L_NAME, EINWOHNER FROM LAND ORDER BY EINWOHNER DESC LIMIT 1', 'SELECT EINWOHNER FROM LAND WHERE EINWOHNER = (SELECT MAX(EINWOHNER) FROM LAND)'] },
+            { id: 'n1-4', n: 1, title: 'Längster Fluss', desc: 'Wie lang ist der längste Fluss?', hint: 'MAX(LAENGE) auf FLUSS', sols: ['SELECT MAX(LAENGE) FROM FLUSS', 'SELECT F_NAME, LAENGE FROM FLUSS ORDER BY LAENGE DESC LIMIT 1', 'SELECT LAENGE FROM FLUSS WHERE LAENGE = (SELECT MAX(LAENGE) FROM FLUSS)'] },
+            { id: 'n1-5', n: 1, title: 'Anzahl Gebirge', desc: 'Wie viele verschiedene Gebirge gibt es?', hint: 'COUNT(DISTINCT GEBIRGE)', sols: ['SELECT COUNT(DISTINCT GEBIRGE) FROM BERG', 'SELECT COUNT(DISTINCT GEBIRGE) AS anzahl FROM BERG'] },
+            { id: 'n1-6', n: 1, title: 'Durchschnittliche Berghöhe', desc: 'Durchschnittliche Höhe aller Berge?', hint: 'AVG(HOEHE)', sols: ['SELECT AVG(HOEHE) FROM BERG', 'SELECT AVG(HOEHE) AS durchschnitt FROM BERG', 'SELECT ROUND(AVG(HOEHE), 0) FROM BERG'] },
+            { id: 'n2-1', n: 2, title: 'Berge pro Gebirge', desc: 'Wie viele Berge pro Gebirge? (sortiert)', hint: 'GROUP BY GEBIRGE', sols: ['SELECT GEBIRGE, COUNT(*) FROM BERG GROUP BY GEBIRGE ORDER BY COUNT(*) DESC', 'SELECT GEBIRGE, COUNT(*) AS anzahl FROM BERG GROUP BY GEBIRGE ORDER BY anzahl DESC'] },
+            { id: 'n2-2', n: 2, title: 'Gebirge mit >10 Bergen', desc: 'Welche Gebirge haben mehr als 10 Berge?', hint: 'HAVING COUNT(*) > 10', sols: ['SELECT GEBIRGE, COUNT(*) FROM BERG GROUP BY GEBIRGE HAVING COUNT(*) > 10', 'SELECT GEBIRGE, COUNT(*) AS anzahl FROM BERG GROUP BY GEBIRGE HAVING COUNT(*) > 10'] },
+            { id: 'n2-3', n: 2, title: 'Durchschnitt pro Gebirge', desc: 'Durchschnittliche Höhe pro Gebirge?', hint: 'AVG(HOEHE) mit GROUP BY', sols: ['SELECT GEBIRGE, AVG(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, ROUND(AVG(HOEHE), 0) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, AVG(HOEHE) AS durchschnitt FROM BERG GROUP BY GEBIRGE ORDER BY durchschnitt DESC'] },
+            { id: 'n2-4', n: 2, title: 'Max/Min pro Gebirge', desc: 'Höchster und niedrigster Berg pro Gebirge?', hint: 'MAX() und MIN() mit GROUP BY', sols: ['SELECT GEBIRGE, MAX(HOEHE), MIN(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, MAX(HOEHE) AS hoechster, MIN(HOEHE) AS niedrigster FROM BERG GROUP BY GEBIRGE'] },
+            { id: 'n3-1', n: 3, title: 'Top 10 Berge + Länder', desc: 'Die 10 höchsten Berge mit ihren Ländern?', hint: 'JOIN über 3 Tabellen', sols: ['SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10', 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b INNER JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME INNER JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10'] },
+            { id: 'n3-2', n: 3, title: 'Länder >6000m', desc: 'Welche Länder haben Berge über 6000m?', hint: 'JOIN mit WHERE HOEHE > 6000', sols: ['SELECT DISTINCT l.L_NAME FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 6000', 'SELECT DISTINCT l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE b.HOEHE > 6000'] },
+            { id: 'n3-3', n: 3, title: 'Länder + Berganzahl', desc: 'Alle Länder mit Anzahl ihrer Berge?', hint: 'LEFT JOIN mit GROUP BY', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME) FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0 ORDER BY anzahl DESC'] },
+            { id: 'n4-1', n: 4, title: 'Anzahl Länder >5000m', desc: 'Wie viele Länder haben Berge über 5000m?', hint: 'COUNT(DISTINCT)', sols: ['SELECT COUNT(DISTINCT l.L_ID) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000', 'SELECT COUNT(DISTINCT l.L_NAME) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000'] },
+            { id: 'n4-2', n: 4, title: 'Höchster Durchschnitt', desc: 'Land mit höchster Durchschnittshöhe?', hint: 'AVG mit ORDER BY LIMIT 1', sols: ['SELECT l.L_NAME, AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY AVG(b.HOEHE) DESC LIMIT 1', 'SELECT l.L_NAME, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC LIMIT 1'] },
+            { id: 'n4-3', n: 4, title: 'Länderstatistik', desc: 'Für jedes Land: Anzahl und Durchschnittshöhe?', hint: 'COUNT und AVG kombinieren', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME), AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC'] }
+        ];
+        
+        function switchTab(name) {
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + name).classList.add('active');
+        }
+        
+        async function initDatabase() {
+            const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+            const res = await fetch('terra.db');
+            const buf = await res.arrayBuffer();
+            db = new SQL.Database(new Uint8Array(buf));
+            renderTasks();
+            updateStats();
+        }
+        
+        function norm(q) { return q.toUpperCase().replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').replace(/\s*=\s*/g, '=').replace(/\s*\(\s*/g, '(').replace(/\s*\)\s*/g, ')').trim().replace(/;$/, ''); }
+        
+        function check(q, sols) {
+            const nq = norm(q);
+            for (let s of sols) if (nq === norm(s)) return true;
+            try {
+                const ur = db.exec(q);
+                for (let s of sols) {
+                    const sr = db.exec(s);
+                    if (JSON.stringify(ur) === JSON.stringify(sr)) return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+        
+        function run(q, target) {
+            const el = document.getElementById(target);
+            el.innerHTML = '';
+            if (!db || !q.trim()) return;
+            try {
+                const res = db.exec(q);
+                if (res.length === 0) {
+                    el.innerHTML = '<div class="message success">Query erfolgreich.</div>';
+                    return;
+                }
+                const r = res[0];
+                let html = '<div class="result-info">' + r.values.length + ' Zeilen</div><table><tr>';
+                html += r.columns.map(c => '<th>' + c + '</th>').join('') + '</tr>';
+                html += r.values.map(row => '<tr>' + row.map(c => '<td>' + (c === null ? 'NULL' : c) + '</td>').join('') + '</tr>').join('');
+                el.innerHTML = html + '</table>';
+            } catch (e) {
+                el.innerHTML = '<div class="message error">' + e.message + '</div>';
+            }
+        }
+        
+        function runMain() { run(document.getElementById('main-editor').value, 'main-result'); }
+        function clearMain() { document.getElementById('main-editor').value = ''; document.getElementById('main-result').innerHTML = ''; }
+        
+        function renderTasks() {
+            const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
+            const grouped = {};
+            tasks.forEach(t => { if (!grouped[t.n]) grouped[t.n] = []; grouped[t.n].push(t); });
+            
+            let html = '';
+            Object.keys(grouped).sort().forEach(n => {
+                html += '<div class="section"><h2>Niveau ' + n + '</h2>';
+                grouped[n].forEach(t => {
+                    const q = saved[t.id] || '';
+                    const solved = q && check(q, t.sols);
+                    html += `<div class="task ${solved ? 'solved' : ''}" data-id="${t.id}">
+                        <div class="task-header">
+                            <div class="task-title">${t.title}</div>
+                            <span class="badge ${solved ? 'solved' : ''}">N${t.n} ${solved ? '✓' : ''}</span>
+                        </div>
+                        <div class="task-desc">${t.desc}</div>
+                        <textarea id="t-${t.id}" placeholder="SELECT ...">${q}</textarea>
+                        <div class="button-group">
+                            <button class="btn-primary" onclick="checkTask('${t.id}')">Prüfen</button>
+                            <button onclick="runTask('${t.id}')">Ausführen</button>
+                            <button onclick="toggleHint('${t.id}')">Hinweis</button>
+                        </div>
+                        <div id="hint-${t.id}" class="hint"><strong>Hinweis:</strong> ${t.hint}</div>
+                        <div id="res-${t.id}"></div>
+                    </div>`;
+                });
+                html += '</div>';
+            });
+            document.getElementById('tasks').innerHTML = html;
+            document.getElementById('total').textContent = tasks.length;
+        }
+        
+        function checkTask(id) {
+            const task = tasks.find(t => t.id === id);
+            const q = document.getElementById('t-' + id).value;
+            const el = document.getElementById('res-' + id);
+            if (!q.trim()) { el.innerHTML = '<div class="message error">Query eingeben</div>'; return; }
+            if (check(q, task.sols)) {
+                el.innerHTML = '<div class="message success">Richtig!</div>';
+                const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
+                saved[id] = q;
+                localStorage.setItem('terra-sql', JSON.stringify(saved));
+                renderTasks();
+                updateStats();
+            } else {
+                run(q, 'res-' + id);
+                if (document.getElementById('res-' + id).querySelector('.message.success')) {
+                    el.innerHTML = '<div class="message error">Läuft, aber Ergebnis falsch</div>' + el.innerHTML;
+                }
+            }
+        }
+        
+        function runTask(id) { run(document.getElementById('t-' + id).value, 'res-' + id); }
+        function toggleHint(id) { document.getElementById('hint-' + id).classList.toggle('visible'); }
+        
+        function updateStats() {
+            const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
+            let solved = 0, maxN = 1;
+            tasks.forEach(t => {
+                if (saved[t.id] && check(saved[t.id], t.sols)) {
+                    solved++;
+                    maxN = Math.max(maxN, t.n);
+                }
+            });
+            document.getElementById('solved').textContent = solved;
+            document.getElementById('progress').textContent = Math.round(solved / tasks.length * 100) + '%';
+            document.getElementById('niveau').textContent = maxN;
+        }
+        
+        function exportSolutions() {
+            const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
+            let md = '# SQL Übungen\n\n**Datum:** ' + new Date().toLocaleDateString('de-DE') + '\n';
+            md += '**Gelöst:** ' + document.getElementById('solved').textContent + '/' + tasks.length + '\n\n---\n\n';
+            
+            const grouped = {};
+            tasks.forEach(t => { if (!grouped[t.n]) grouped[t.n] = []; grouped[t.n].push(t); });
+            
+            Object.keys(grouped).sort().forEach(n => {
+                md += `## Niveau ${n}\n\n`;
+                grouped[n].forEach(t => {
+                    const q = saved[t.id] || '';
+                    const ok = q && check(q, t.sols);
+                    md += `### ${t.title} ${ok ? '✓' : ''}\n\n${t.desc}\n\n`;
+                    if (q) {
+                        md += '```sql\n' + q + '\n```\n\n';
+                        try {
+                            const r = db.exec(q);
+                            if (r.length && r[0].values.length <= 10) {
+                                md += '| ' + r[0].columns.join(' | ') + ' |\n';
+                                md += '|' + r[0].columns.map(() => '---').join('|') + '|\n';
+                                r[0].values.forEach(row => md += '| ' + row.map(v => v || 'NULL').join(' | ') + ' |\n');
+                                md += '\n';
+                            }
+                        } catch (e) {}
+                    }
+                    md += '---\n\n';
+                });
+            });
+            
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'SQL-Loesungen-' + new Date().toISOString().split('T')[0] + '.md';
+            a.click();
+        }
+        
+        initDatabase();
+    </script>
+</body>
+</html>
