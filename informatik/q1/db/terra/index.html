@@ -195,6 +195,14 @@
                 <div class="help-block"><h4>JOIN</h4><code>SELECT * FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME;</code></div>
             </div>
         </div>
+
+        <!-- Footer / Reset Section -->
+        <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted);">
+            <p style="margin-bottom: 1rem; font-size: 0.9rem;">Probleme mit der Datenbank, Git LFS oder dem Fortschritt?</p>
+            <button onclick="resetApp()" style="background: #fee2e2; color: #991b1b; border-color: #fca5a5; font-size: 0.8rem; padding: 0.5rem 1rem;">
+                ⚠️ App Zurücksetzen & Cache leeren
+            </button>
+        </div>
     </div>
     
     <script>
@@ -419,6 +427,20 @@
             a.click();
         }
         
+        function resetApp() {
+            if(confirm("Bist du sicher? Dies löscht:\n1. Deinen gespeicherten Fortschritt\n2. Den Browser-Cache für diese Seite\n\nDie Seite wird danach neu geladen.")) {
+                localStorage.clear();
+                if('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) caches.delete(name);
+                    });
+                }
+                const url = new URL(window.location.href);
+                url.searchParams.set('reloadTime', Date.now());
+                window.location.href = url.toString();
+            }
+        }
+
         initDatabase();
     </script>
 </body>
