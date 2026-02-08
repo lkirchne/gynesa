@@ -4,24 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQL Übungen - Terra Datenbank</title>
+    <!-- Fonts für das Design -->
     <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <style>
         :root {
+            /* Das gewünschte Pastell-Schema */
             --bg-body: #fdfcfc;
             --bg-surface: #ffffff;
             --text-main: #334155;
             --text-muted: #64748b;
-            --primary: #7dd3fc;
+            
+            --primary: #7dd3fc; /* Pastel Blue */
             --primary-dark: #0ea5e9;
             --primary-bg: #f0f9ff;
+            --accent: #818cf8;
+            
             --border-color: #f1f5f9;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            
             --success-bg: #dcfce7;
             --success-text: #166534;
+            --success-border: #86efac;
+            
             --error-bg: #fee2e2;
             --error-text: #991b1b;
+            --error-border: #fca5a5;
+            
+            --warning-bg: #fff7ed;
+            --warning-text: #9a3412;
+            --warning-border: #fdba74;
+            
             --code-font: 'Source Code Pro', monospace;
             --body-font: 'Inter', sans-serif;
         }
@@ -33,8 +47,10 @@
             background: var(--bg-body);
             color: var(--text-main);
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
         
+        /* Layout & Header */
         .header {
             background: var(--bg-surface);
             padding: 1.5rem 2rem;
@@ -43,103 +59,398 @@
             top: 0;
             z-index: 100;
             box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        h1 { font-size: 1.5rem; font-weight: 600; color: #1e293b; }
-        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
+        .header-content h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            letter-spacing: -0.025em;
+        }
         
-        /* Debug / Status Bar */
-        #db-status { margin-bottom: 1.5rem; display: none; }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* File Upload Button Styled */
+        .file-upload-btn {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .file-upload-btn:hover {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            border-color: var(--primary);
+        }
         
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        /* Status Bar */
+        #db-status {
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        /* Stats & Navigation */
         .stats {
-            display: flex; gap: 2rem; margin-bottom: 2rem;
-            font-size: 0.9rem; color: var(--text-muted);
-            background: var(--bg-surface); padding: 1rem 1.5rem;
-            border-radius: 12px; box-shadow: var(--shadow-sm);
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
         }
         
-        .stats span { font-weight: 600; color: var(--text-main); }
+        .stats span {
+            font-weight: 600;
+            color: var(--text-main);
+        }
         
-        nav { display: flex; gap: 0.5rem; margin-bottom: 2rem; overflow-x: auto; }
+        nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1px;
+            overflow-x: auto;
+        }
         
         nav button {
-            background: transparent; border: none; padding: 0.75rem 1.25rem;
-            font-size: 0.95rem; color: var(--text-muted); cursor: pointer;
-            border-radius: 8px; font-weight: 500; transition: all 0.2s;
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
-        nav button:hover { background: #f1f5f9; color: var(--text-main); }
-        nav button.active { background: var(--primary-bg); color: var(--primary-dark); font-weight: 600; }
         
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        nav button:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+        
+        nav button.active {
+            background: var(--primary-bg);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* Sections & Cards */
         .section {
-            background: var(--bg-surface); padding: 2rem; margin-bottom: 1.5rem;
-            border-radius: 16px; box-shadow: var(--shadow-md);
+            background: var(--bg-surface);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border-color);
         }
         
-        h2 { font-size: 1.25rem; margin-bottom: 1.25rem; font-weight: 600; color: #1e293b; }
-        h3 { font-size: 1rem; margin: 1.5rem 0 0.75rem 0; font-weight: 600; color: #475569; text-transform: uppercase; }
-        
-        textarea {
-            width: 100%; min-height: 120px; padding: 1rem;
-            font-family: var(--code-font); font-size: 0.9rem;
-            border: 2px solid var(--border-color); border-radius: 8px;
-            background: #f8fafc; resize: vertical; color: #334155;
+        .section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
         }
-        textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
         
-        .button-group { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+        .section h3 {
+            font-size: 1rem;
+            margin: 1.5rem 0 0.75rem 0;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Editors & Inputs */
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            font-family: var(--code-font);
+            font-size: 0.9rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #f8fafc;
+            resize: vertical;
+            color: #334155;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
         
         button {
-            padding: 0.6rem 1.2rem; font-size: 0.9rem; background: #fff;
-            border: 1px solid #cbd5e1; cursor: pointer; border-radius: 6px;
-            font-weight: 500; color: #475569; transition: all 0.2s;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            font-family: inherit;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.2s;
         }
-        button:hover { background: #f8fafc; }
-        .btn-primary { background: #3b82f6; color: #fff; border: none; }
-        .btn-primary:hover { background: #2563eb; }
         
-        .table-wrapper { width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 1rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px; }
-        th { text-align: left; padding: 0.85rem 1rem; background: #f1f5f9; position: sticky; top: 0; }
-        td { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        button:hover { background: #f8fafc; border-color: #94a3b8; }
+        button:active { transform: translateY(1px); }
+        
+        .btn-primary {
+            background: #3b82f6; /* Modern Blue */
+            color: #fff;
+            border: none;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary:hover { background: #2563eb; border-color: transparent; }
+        
+        /* Tables - BEAUTIFIED */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-top: 1rem;
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 600px; /* Ensure table doesn't squish too much */
+        }
+        
+        th {
+            text-align: left;
+            padding: 0.85rem 1rem;
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: top;
+        }
+        
+        tr:last-child td { border-bottom: none; }
         tr:nth-child(even) { background-color: #fafbfc; }
+        tr:hover td { background-color: #f0f9ff; }
         
-        .message { padding: 1rem; margin-top: 1rem; border-radius: 8px; font-size: 0.9rem; }
-        .success { background: var(--success-bg); color: var(--success-text); }
-        .error { background: var(--error-bg); color: var(--error-text); border: 1px solid #fca5a5; }
+        /* Messages & Feedback */
+        .message {
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
         
-        .task { border: 1px solid var(--border-color); padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 12px; }
-        .task.solved { background: #f0fdf4; border-color: #bbf7d0; }
+        .success { 
+            background: var(--success-bg); 
+            color: var(--success-text); 
+            border: 1px solid var(--success-border);
+        }
         
-        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
-        .task-title { font-weight: 600; color: #1e293b; }
-        .badge { font-size: 0.75rem; padding: 0.25rem 0.75rem; background: #f1f5f9; border-radius: 999px; }
-        .badge.solved { background: #dcfce7; color: #15803d; }
+        .error { 
+            background: var(--error-bg); 
+            color: var(--error-text); 
+            border: 1px solid var(--error-border);
+        }
         
-        .hint { background: #fffbeb; padding: 1rem; margin-top: 1rem; display: none; border-radius: 8px; color: #92400e; }
-        .hint.visible { display: block; }
+        .warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+            border: 1px solid var(--warning-border);
+        }
         
-        .help-block { background: #f8fafc; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .help-block code { display: block; font-family: var(--code-font); background: #fff; padding: 0.75rem; border-radius: 6px; white-space: pre; overflow-x: auto; }
+        /* Tasks */
+        .task {
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: #fff;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .task:hover {
+            box-shadow: var(--shadow-sm);
+        }
         
-        code.inline { font-family: var(--code-font); background: #f1f5f9; padding: 0.1rem 0.3rem; border-radius: 4px; }
-        .result-info { font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0; text-align: right; }
+        .task.solved {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #1e293b;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-weight: 600;
+            color: #64748b;
+        }
+        
+        .badge.solved { 
+            background: #dcfce7; 
+            color: #15803d;
+        }
+        
+        .task-desc {
+            color: #475569;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        /* Hints & Help */
+        .hint {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            color: #92400e;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+            font-size: 0.9rem;
+            border-radius: 8px;
+        }
+        
+        .hint.visible { display: block; animation: fadeIn 0.3s; }
+        
+        .help-block {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+        
+        .help-block h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #334155;
+        }
+        
+        .help-block code {
+            display: block;
+            font-family: var(--code-font);
+            font-size: 0.85rem;
+            background: #fff;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            white-space: pre;
+            overflow-x: auto;
+            color: #0f172a;
+        }
+        
+        code.inline {
+            font-family: var(--code-font);
+            background: #f1f5f9;
+            padding: 0.1rem 0.3rem;
+            font-size: 0.9em;
+            border-radius: 4px;
+            color: #0f172a;
+        }
+        
+        .result-info {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0.5rem 0;
+            text-align: right;
+            font-family: var(--code-font);
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>SQL Übungen - Terra Datenbank</h1>
-        <p class="subtitle">Aggregationsfunktionen & JOINs</p>
+        <div class="header-content">
+            <h1>SQL Übungen - Terra Datenbank</h1>
+            <p class="subtitle">Aggregationsfunktionen & JOINs</p>
+        </div>
+        <div>
+            <!-- Hidden File Input -->
+            <input type="file" id="local-file-input" accept=".db,.sqlite,.sqlite3" style="display: none;" onchange="loadLocalFile(this)">
+            <button class="file-upload-btn" onclick="document.getElementById('local-file-input').click()">
+                Lokale Datei öffnen
+            </button>
+        </div>
     </div>
     
     <div class="container">
-        <!-- Debug Area -->
+        <!-- Notification Area for DB Status -->
         <div id="db-status"></div>
 
         <div class="stats">
@@ -158,11 +469,13 @@
         <div id="tab-editor" class="tab-content active">
             <div class="section">
                 <h2>SQL Playground</h2>
-                <textarea id="main-editor" placeholder="SELECT * FROM BERG LIMIT 10;">SELECT * FROM LAND LIMIT 10;</textarea>
+                <p style="margin-bottom: 1rem; color: var(--text-muted);">Teste hier deine eigenen Abfragen gegen die Terra-Datenbank.</p>
+                <textarea id="main-editor" placeholder="SELECT * FROM BERG ORDER BY HOEHE DESC LIMIT 10;">SELECT * FROM LAND LIMIT 10;</textarea>
                 <div class="button-group">
                     <button class="btn-primary" onclick="runMain()">Abfrage Ausführen</button>
                     <button onclick="clearMain()">Leeren</button>
                 </div>
+                <h3 id="main-result-header" style="display:none; margin-top: 1.5rem; font-size: 1rem; color: var(--text-muted);">Ergebnis:</h3>
                 <div id="main-result"></div>
             </div>
         </div>
@@ -171,6 +484,7 @@
             <div id="tasks"></div>
             <div class="section">
                 <h2>Lösungen Speichern</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Exportiere deine Lösungen als Markdown-Datei für deine Unterlagen.</p>
                 <button class="btn-primary" onclick="exportSolutions()">Lösungen herunterladen</button>
             </div>
         </div>
@@ -178,37 +492,118 @@
         <div id="tab-database" class="tab-content">
             <div class="section">
                 <h2>Datenbank-Übersicht</h2>
+                
                 <h3>Haupttabellen</h3>
-                <div class="help-block"><h4>BERG</h4><code>B_NAME, GEBIRGE, HOEHE, JAHR, LAENGE, BREITE</code></div>
-                <div class="help-block"><h4>LAND</h4><code>L_ID, L_NAME, EINWOHNER, FLAECHE, HAUPTSTADT, LT_ID</code></div>
-                <div class="help-block"><h4>FLUSS</h4><code>F_NAME, FLUSS, SEE, MEER, LAENGE</code></div>
-                <div class="help-block"><h4>STADT</h4><code>ST_NAME, L_ID, EINWOHNER, BREITE, LAENGE</code></div>
-                <h3>Verbindungstabellen</h3>
-                <div class="help-block"><h4>GEO_BERG, GEO_FLUSS, UMFASST</h4></div>
+                
+                <div class="help-block">
+                    <h4>BERG</h4>
+                    <code>B_NAME       varchar(20)   - Bergname
+GEBIRGE      varchar(25)   - Gebirgsname
+HOEHE        double        - Höhe in Metern
+JAHR         int           - Jahr der Erstbesteigung
+LAENGE       double        - Längengrad
+BREITE       double        - Breitengrad</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>LAND</h4>
+                    <code>L_ID         varchar(4)    - Länder-ID
+L_NAME       varchar(50)   - Landesname
+EINWOHNER    double        - Einwohnerzahl
+FLAECHE      double        - Fläche in km²
+HAUPTSTADT   varchar(25)   - Hauptstadt
+LT_ID        varchar(4)    - Landteil-ID</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>FLUSS</h4>
+                    <code>F_NAME       varchar(20)   - Flussname
+FLUSS        varchar(20)   - Quellfluss
+SEE          varchar(25)   - Mündet in See
+MEER         varchar(25)   - Mündet in Meer
+LAENGE       int           - Länge in km</code>
+                </div>
+                
+                <div class="help-block">
+                    <h4>STADT</h4>
+                    <code>ST_NAME      varchar(25)   - Stadtname
+L_ID         varchar(4)    - Länder-ID
+EINWOHNER    int           - Einwohnerzahl
+BREITE       double        - Breitengrad
+LAENGE       double        - Längengrad</code>
+                </div>
+                
+                <h3>Verbindungstabellen (für JOINs)</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                    <div class="help-block">
+                        <h4>GEO_BERG</h4>
+                        <code>id           int
+L_ID         varchar(4)
+B_NAME       varchar(20)
+
+Verbindet: LAND ↔ BERG</code>
+                    </div>
+                    
+                    <div class="help-block">
+                        <h4>GEO_FLUSS</h4>
+                        <code>L_ID         varchar(4)
+F_NAME       varchar(20)
+
+Verbindet: LAND ↔ FLUSS</code>
+                    </div>
+                    
+                    <div class="help-block">
+                        <h4>UMFASST</h4>
+                        <code>K_NAME       varchar(10)
+L_ID         varchar(4)
+
+Verbindet: KONTINENT ↔ LAND</code>
+                    </div>
+                </div>
             </div>
         </div>
         
         <div id="tab-help" class="tab-content">
             <div class="section">
                 <h2>SQL Referenz</h2>
-                <div class="help-block"><h4>Aggregation</h4><code>SELECT COUNT(*) FROM LAND;</code></div>
-                <div class="help-block"><h4>JOIN</h4><code>SELECT * FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME;</code></div>
+                
+                <h3>Aggregation</h3>
+                <div class="help-block">
+                    <h4>COUNT, MAX, MIN, AVG</h4>
+                    <code>SELECT COUNT(*) FROM LAND;
+SELECT MAX(HOEHE) FROM BERG;
+SELECT AVG(FLAECHE) FROM LAND;</code>
+                </div>
+                
+                <h3>Gruppierung</h3>
+                <div class="help-block">
+                    <h4>GROUP BY & HAVING</h4>
+                    <code>SELECT GEBIRGE, COUNT(*)
+FROM BERG
+GROUP BY GEBIRGE
+HAVING COUNT(*) > 5;</code>
+                </div>
+                
+                <h3>Verknüpfung (JOINs)</h3>
+                <div class="help-block">
+                    <h4>INNER JOIN</h4>
+                    <code>SELECT b.B_NAME, l.L_NAME
+FROM BERG b
+JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME
+JOIN LAND l ON gb.L_ID = l.L_ID;</code>
+                </div>
             </div>
         </div>
 
-        <!-- Footer / Reset Section -->
         <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted);">
-            <p style="margin-bottom: 1rem; font-size: 0.9rem;">Probleme mit der Datenbank, Git LFS oder dem Fortschritt?</p>
-            <button onclick="resetApp()" style="background: #fee2e2; color: #991b1b; border-color: #fca5a5; font-size: 0.8rem; padding: 0.5rem 1rem;">
-                ⚠️ App Zurücksetzen & Cache leeren
+            <button onclick="resetApp()" style="background: #fff; color: #64748b; border: 1px solid #cbd5e1; font-size: 0.8rem; padding: 0.5rem 1rem;">
+                Cache leeren & App zurücksetzen
             </button>
         </div>
     </div>
     
     <script>
-        let db = null;
-
-        // Keine Demo-Daten mehr - nur echte Daten.
+        let db;
         const tasks = [
             { id: 'n1-1', n: 1, title: 'Anzahl Länder', desc: 'Wie viele Länder gibt es in der Datenbank?', hint: 'COUNT(*) auf LAND', sols: ['SELECT COUNT(*) FROM LAND', 'SELECT COUNT(*) AS anzahl FROM LAND', 'SELECT COUNT(L_ID) FROM LAND'] },
             { id: 'n1-2', n: 1, title: 'Größtes Land', desc: 'Wie groß ist das größte Land (nach Fläche)?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 oder MAX()', sols: ['SELECT L_NAME, FLAECHE FROM LAND ORDER BY FLAECHE DESC LIMIT 1', 'SELECT L_NAME, MAX(FLAECHE) FROM LAND', 'SELECT L_NAME, FLAECHE FROM LAND WHERE FLAECHE = (SELECT MAX(FLAECHE) FROM LAND)'] },
@@ -227,74 +622,110 @@
             { id: 'n4-2', n: 4, title: 'Höchster Durchschnitt', desc: 'Land mit höchster Durchschnittshöhe?', hint: 'AVG mit ORDER BY LIMIT 1', sols: ['SELECT l.L_NAME, AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY AVG(b.HOEHE) DESC LIMIT 1', 'SELECT l.L_NAME, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC LIMIT 1'] },
             { id: 'n4-3', n: 4, title: 'Länderstatistik', desc: 'Für jedes Land: Anzahl und Durchschnittshöhe?', hint: 'COUNT und AVG kombinieren', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME), AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC'] }
         ];
-
+        
         function switchTab(name) {
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById('tab-' + name).classList.add('active');
         }
-        
-        async function initDatabase() {
+
+        function loadLocalFile(input) {
+            const file = input.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
             const statusEl = document.getElementById('db-status');
             statusEl.style.display = 'block';
-            // Wir suchen jetzt nach der umbenannten Datei terra.sqlite
-            const dbName = 'terra.sqlite';
-            statusEl.innerHTML = `<div class="message">Lade Datenbank ${dbName}...</div>`;
-            
-            try {
-                const response = await fetch(dbName + '?t=' + Date.now());
-                
-                if (!response.ok) {
-                    throw new Error(`Konnte ${dbName} nicht laden (Status ${response.status}). Hast du die Datei umbenannt und hochgeladen?`);
-                }
-                
-                const buffer = await response.arrayBuffer();
-                
-                // DIAGNOSE: Ist es ein Git LFS Pointer?
-                const decoder = new TextDecoder("utf-8");
-                const firstBytes = decoder.decode(new Uint8Array(buffer.slice(0, 50)));
-                
-                if (firstBytes.includes("git-lfs")) {
-                    statusEl.innerHTML = `<div class="message error"><h3>Git LFS Fehler!</h3><p>Die Datei ist immer noch ein LFS Pointer.</p></div>`;
-                    return; 
-                }
-                
-                if (buffer.byteLength < 1000) {
-                     statusEl.innerHTML = `<div class="message error"><h3>Datei zu klein</h3><p>Nur ${buffer.byteLength} Bytes.</p></div>`;
-                    return;
-                }
+            statusEl.innerHTML = `<div class="message warning">Lade lokale Datei: ${file.name}...</div>`;
 
+            reader.onload = async function() {
+                try {
+                    const buffer = reader.result;
+                    await initSqlJsWithBuffer(buffer, `Lokal: ${file.name}`);
+                } catch(e) {
+                    statusEl.innerHTML = `<div class="message error">Fehler beim Lesen der lokalen Datei: ${e.message}</div>`;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function initSqlJsWithBuffer(buffer, sourceName) {
+            const statusEl = document.getElementById('db-status');
+            
+            if (buffer.byteLength < 1000) {
+                 statusEl.innerHTML = `<div class="message error"><strong>Datei zu klein:</strong> '${sourceName}' ist nur ${buffer.byteLength} Bytes groß.</div>`;
+                 return;
+            }
+
+            try {
                 const SQL = await initSqlJs({ 
                     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` 
                 });
                 
                 db = new SQL.Database(new Uint8Array(buffer));
                 
-                // Test
                 const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='LAND'");
+                
                 if (tables.length === 0) {
-                    statusEl.innerHTML = `<div class="message error">Datenbank geladen, aber Tabelle 'LAND' fehlt.</div>`;
+                    statusEl.innerHTML = `<div class="message error">Datenbank '${sourceName}' geladen, aber Tabelle 'LAND' fehlt.</div>`;
                 } else {
                     const rowCount = db.exec("SELECT count(*) FROM LAND")[0].values[0][0];
-                    statusEl.innerHTML = `<div class="message success">Erfolg! ${dbName} geladen. (${rowCount} Länder)</div>`;
-                    setTimeout(() => statusEl.style.display = 'none', 3000);
-                    runMain();
+                    if (rowCount === 0) {
+                        statusEl.innerHTML = `<div class="message error">Datenbank '${sourceName}' geladen, aber Tabelle 'LAND' ist <strong>LEER</strong> (0 Zeilen).<br>Bitte prüfe deinen Export.</div>`;
+                    } else {
+                        statusEl.innerHTML = `<div class="message success">Erfolg! '${sourceName}' geladen. (${rowCount} Länder)</div>`;
+                        setTimeout(() => statusEl.style.display = 'none', 3000);
+                        runMain();
+                    }
                 }
                 
                 renderTasks();
                 updateStats();
 
             } catch (err) {
-                statusEl.innerHTML = `<div class="message error">Fehler: ${err.message}</div>`;
-                console.error(err);
+                statusEl.innerHTML = `<div class="message error">SQL Fehler: ${err.message}</div>`;
             }
+        }
+        
+        async function initDatabase() {
+            const statusEl = document.getElementById('db-status');
+            statusEl.style.display = 'block';
+            statusEl.innerHTML = '<div class="message warning">Suche Datenbank...</div>';
+            
+            const filesToCheck = ['terra.sqlite', 'terra.db'];
+            let buffer = null;
+            let loadedName = '';
+            
+            for (let file of filesToCheck) {
+                try {
+                    const res = await fetch(file + '?t=' + Date.now());
+                    if (res.ok) {
+                        buffer = await res.arrayBuffer();
+                        loadedName = file;
+                        break; 
+                    }
+                } catch(e) {}
+            }
+            
+            if (!buffer) {
+                statusEl.innerHTML = `<div class="message warning"><strong>Keine Datenbank gefunden.</strong><br>Konnte 'terra.sqlite' nicht laden. Bitte lade deine Datei oben manuell.</div>`;
+                return;
+            }
+
+            const decoder = new TextDecoder("utf-8");
+            const firstBytes = decoder.decode(new Uint8Array(buffer.slice(0, 50)));
+            if (firstBytes.includes("git-lfs")) {
+                statusEl.innerHTML = `<div class="message error"><strong>Git LFS Fehler!</strong><br>Die Datei '${loadedName}' ist nur ein Text-Link. Bitte lade sie lokal.</div>`;
+                return; 
+            }
+
+            await initSqlJsWithBuffer(buffer, loadedName);
         }
         
         function norm(q) { return q.toUpperCase().replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').replace(/\s*=\s*/g, '=').replace(/\s*\(\s*/g, '(').replace(/\s*\)\s*/g, ')').trim().replace(/;$/, ''); }
         
         function check(q, sols) {
-            if (!db) return false;
             const nq = norm(q);
             for (let s of sols) if (nq === norm(s)) return true;
             try {
@@ -307,19 +738,16 @@
             return false;
         }
         
-        function run(q, target) {
+        function run(q, target, extraMsg = '') {
             const el = document.getElementById(target);
-            el.innerHTML = '';
-            if (!db) {
-                el.innerHTML = '<div class="message error">Datenbank nicht geladen. Siehe Status oben.</div>';
-                return;
-            }
-            if (!q.trim()) return;
-            
+            el.innerHTML = extraMsg;
+            if (!db || !q.trim()) return;
             try {
                 const res = db.exec(q);
+                if(target === 'main-result') document.getElementById('main-result-header').style.display = 'block';
+
                 if (res.length === 0) {
-                    el.innerHTML = '<div class="message success">Erfolgreich ausgeführt (Keine Ergebnisse).</div>';
+                    el.innerHTML += '<div class="message success">Query erfolgreich ausgeführt (keine Ergebnisse).</div>';
                     return;
                 }
                 const r = res[0];
@@ -328,14 +756,18 @@
                 html += r.columns.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
                 html += r.values.map(row => '<tr>' + row.map(c => '<td>' + (c === null ? '<span style="color:#aaa">NULL</span>' : c) + '</td>').join('') + '</tr>').join('');
                 html += '</tbody></table></div>';
-                el.innerHTML = html;
+                el.innerHTML += html;
             } catch (e) {
-                el.innerHTML = '<div class="message error">SQL Fehler: ' + e.message + '</div>';
+                el.innerHTML += '<div class="message error">SQL Fehler: ' + e.message + '</div>';
             }
         }
         
         function runMain() { run(document.getElementById('main-editor').value, 'main-result'); }
-        function clearMain() { document.getElementById('main-editor').value = ''; document.getElementById('main-result').innerHTML = ''; }
+        function clearMain() { 
+            document.getElementById('main-editor').value = ''; 
+            document.getElementById('main-result').innerHTML = ''; 
+            document.getElementById('main-result-header').style.display = 'none';
+        }
         
         function renderTasks() {
             const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
@@ -375,11 +807,16 @@
             const q = document.getElementById('t-' + id).value;
             const el = document.getElementById('res-' + id);
             
-            if (!q.trim()) { el.innerHTML = '<div class="message error">Bitte Query eingeben.</div>'; return; }
+            if (!q.trim()) { 
+                el.innerHTML = '<div class="message error">Bitte gib eine Query ein.</div>'; 
+                return; 
+            }
             
-            const isCorrect = check(q, task.sols);
+            let message = '';
+            let isCorrect = check(q, task.sols);
+            
             if (isCorrect) {
-                el.innerHTML = '<div class="message success">Richtig gelöst! ✓</div>';
+                message = '<div class="message success" style="margin-bottom:1rem">Richtig gelöst! ✓</div>';
                 const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
                 saved[id] = q;
                 localStorage.setItem('terra-sql', JSON.stringify(saved));
@@ -389,15 +826,16 @@
                 document.querySelector(`.task[data-id="${id}"] .badge`).innerHTML = `N${task.n} ✓`;
                 updateStats();
             } else {
-                el.innerHTML = '<div class="message error">Leider nicht korrekt.</div>';
+                 message = '<div class="message error" style="margin-bottom:1rem">Leider nicht korrekt. Versuche es nochmal oder prüfe die Ergebnisse unten.</div>';
             }
-            const tempDiv = document.createElement('div');
-            tempDiv.id = 'temp-res-' + id;
-            el.appendChild(tempDiv);
-            run(q, tempDiv.id);
+
+            run(q, 'res-' + id, message);
         }
         
-        function runTask(id) { run(document.getElementById('t-' + id).value, 'res-' + id); }
+        function runTask(id) { 
+            run(document.getElementById('t-' + id).value, 'res-' + id); 
+        }
+        
         function toggleHint(id) { document.getElementById('hint-' + id).classList.toggle('visible'); }
         
         function updateStats() {
@@ -416,14 +854,38 @@
         
         function exportSolutions() {
             const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
-            let md = '# SQL Lösungen\n\n';
-            tasks.forEach(t => {
-                const q = saved[t.id];
-                if(q) md += `### ${t.title}\n\`\`\`sql\n${q}\n\`\`\`\n\n`;
+            let md = '# SQL Übungen\n\n**Datum:** ' + new Date().toLocaleDateString('de-DE') + '\n';
+            md += '**Gelöst:** ' + document.getElementById('solved').textContent + '/' + tasks.length + '\n\n---\n\n';
+            
+            const grouped = {};
+            tasks.forEach(t => { if (!grouped[t.n]) grouped[t.n] = []; grouped[t.n].push(t); });
+            
+            Object.keys(grouped).sort().forEach(n => {
+                md += `## Niveau ${n}\n\n`;
+                grouped[n].forEach(t => {
+                    const q = saved[t.id] || '';
+                    const ok = q && check(q, t.sols);
+                    md += `### ${t.title} ${ok ? '✓' : ''}\n\n${t.desc}\n\n`;
+                    if (q) {
+                        md += '```sql\n' + q + '\n```\n\n';
+                        try {
+                            const r = db.exec(q);
+                            if (r.length && r[0].values.length <= 10) {
+                                md += '| ' + r[0].columns.join(' | ') + ' |\n';
+                                md += '|' + r[0].columns.map(() => '---').join('|') + '|\n';
+                                r[0].values.forEach(row => md += '| ' + row.map(v => v || 'NULL').join(' | ') + ' |\n');
+                                md += '\n';
+                            }
+                        } catch (e) {}
+                    }
+                    md += '---\n\n';
+                });
             });
+            
+            const blob = new Blob([md], { type: 'text/markdown' });
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([md], {type: 'text/markdown'}));
-            a.download = 'Loesungen.md';
+            a.href = URL.createObjectURL(blob);
+            a.download = 'SQL-Loesungen-' + new Date().toISOString().split('T')[0] + '.md';
             a.click();
         }
         
