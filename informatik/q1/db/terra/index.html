@@ -199,10 +199,8 @@
     
     <script>
         let db = null;
-        
-        // --- KEINE DEMO DATEN MEHR ---
-        // Wenn es fehlschlägt, dann schlägt es fehl und wir zeigen warum.
 
+        // Keine Demo-Daten mehr - nur echte Daten.
         const tasks = [
             { id: 'n1-1', n: 1, title: 'Anzahl Länder', desc: 'Wie viele Länder gibt es in der Datenbank?', hint: 'COUNT(*) auf LAND', sols: ['SELECT COUNT(*) FROM LAND', 'SELECT COUNT(*) AS anzahl FROM LAND', 'SELECT COUNT(L_ID) FROM LAND'] },
             { id: 'n1-2', n: 1, title: 'Größtes Land', desc: 'Wie groß ist das größte Land (nach Fläche)?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 oder MAX()', sols: ['SELECT L_NAME, FLAECHE FROM LAND ORDER BY FLAECHE DESC LIMIT 1', 'SELECT L_NAME, MAX(FLAECHE) FROM LAND', 'SELECT L_NAME, FLAECHE FROM LAND WHERE FLAECHE = (SELECT MAX(FLAECHE) FROM LAND)'] },
@@ -232,63 +230,48 @@
         async function initDatabase() {
             const statusEl = document.getElementById('db-status');
             statusEl.style.display = 'block';
-            statusEl.innerHTML = '<div class="message">Lade Datenbank terra.db...</div>';
+            // Wir suchen jetzt nach der umbenannten Datei terra.sqlite
+            const dbName = 'terra.sqlite';
+            statusEl.innerHTML = `<div class="message">Lade Datenbank ${dbName}...</div>`;
             
             try {
-                // 1. Fetch File
-                // Cache-Busting um sicherzugehen, dass wir nicht die alte kaputte Version laden
-                const response = await fetch('terra.db?t=' + Date.now());
+                const response = await fetch(dbName + '?t=' + Date.now());
                 
                 if (!response.ok) {
-                    throw new Error(`Netzwerkfehler: ${response.status} ${response.statusText}`);
+                    throw new Error(`Konnte ${dbName} nicht laden (Status ${response.status}). Hast du die Datei umbenannt und hochgeladen?`);
                 }
                 
                 const buffer = await response.arrayBuffer();
                 
-                // 2. DIAGNOSE: Ist es ein Git LFS Pointer?
-                // Wir schauen uns die ersten 50 Bytes als Text an.
+                // DIAGNOSE: Ist es ein Git LFS Pointer?
                 const decoder = new TextDecoder("utf-8");
                 const firstBytes = decoder.decode(new Uint8Array(buffer.slice(0, 50)));
                 
-                console.log("File size:", buffer.byteLength);
-                console.log("File start:", firstBytes);
-                
                 if (firstBytes.includes("git-lfs")) {
-                    statusEl.innerHTML = `
-                        <div class="message error">
-                            <h3>⚠️ Git LFS Fehler erkannt!</h3>
-                            <p>Die Datei 'terra.db' wurde nicht korrekt heruntergeladen. GitHub Pages liefert statt der Datenbank nur einen Text-Hinweis (Pointer) aus.</p>
-                            <p><strong>Inhalt der Datei:</strong> ${firstBytes}...</p>
-                            <p><strong>Lösung:</strong> Du musst Git LFS für diese Datei deaktivieren oder die Datei ohne LFS hochladen.</p>
-                        </div>`;
-                    return; // Abbruch
+                    statusEl.innerHTML = `<div class="message error"><h3>Git LFS Fehler!</h3><p>Die Datei ist immer noch ein LFS Pointer.</p></div>`;
+                    return; 
                 }
                 
                 if (buffer.byteLength < 1000) {
-                     statusEl.innerHTML = `
-                        <div class="message error">
-                            <h3>⚠️ Datei zu klein</h3>
-                            <p>Die geladene Datei ist nur ${buffer.byteLength} Bytes groß. Das ist keine gültige SQLite Datenbank.</p>
-                        </div>`;
+                     statusEl.innerHTML = `<div class="message error"><h3>Datei zu klein</h3><p>Nur ${buffer.byteLength} Bytes.</p></div>`;
                     return;
                 }
 
-                // 3. Init SQL.js
                 const SQL = await initSqlJs({ 
                     locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` 
                 });
                 
                 db = new SQL.Database(new Uint8Array(buffer));
                 
-                // 4. Test Query
+                // Test
                 const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='LAND'");
                 if (tables.length === 0) {
-                    statusEl.innerHTML = `<div class="message error">Datenbank geladen, aber Tabelle 'LAND' fehlt. Ist die Datei leer?</div>`;
+                    statusEl.innerHTML = `<div class="message error">Datenbank geladen, aber Tabelle 'LAND' fehlt.</div>`;
                 } else {
                     const rowCount = db.exec("SELECT count(*) FROM LAND")[0].values[0][0];
-                    statusEl.innerHTML = `<div class="message success">Datenbank erfolgreich geladen! (${rowCount} Länder gefunden)</div>`;
+                    statusEl.innerHTML = `<div class="message success">Erfolg! ${dbName} geladen. (${rowCount} Länder)</div>`;
                     setTimeout(() => statusEl.style.display = 'none', 3000);
-                    runMain(); // Erste Abfrage ausführen
+                    runMain();
                 }
                 
                 renderTasks();
@@ -400,7 +383,6 @@
             } else {
                 el.innerHTML = '<div class="message error">Leider nicht korrekt.</div>';
             }
-            // Zeige immer das Ergebnis der Query an
             const tempDiv = document.createElement('div');
             tempDiv.id = 'temp-res-' + id;
             el.appendChild(tempDiv);
