@@ -553,10 +553,39 @@ LAENGE       int           - Länge in km</code>
                 <div class="help-block">
                     <h4>STADT</h4>
                     <code>ST_NAME      varchar(25)   - Stadtname
-L_ID         varchar(4)    - Länder-ID
+L_ID         varchar(4)    - L&auml;nder-ID
 EINWOHNER    int           - Einwohnerzahl
 BREITE       double        - Breitengrad
-LAENGE       double        - Längengrad</code>
+LAENGE       double        - L&auml;ngengrad</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>SEE</h4>
+                    <code>S_NAME       varchar(25)   - Seename
+TIEFE        double        - Tiefe in Metern
+FLAECHE      double        - Fl&auml;che in km&sup2;</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>MEER</h4>
+                    <code>M_NAME       varchar(25)   - Meeresname
+TIEFE        double        - Tiefe in Metern</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>INSEL</h4>
+                    <code>I_NAME       varchar(25)   - Inselname
+INSELGRUPPE  varchar(25)   - Inselgruppe
+FLAECHE      double        - Fl&auml;che in km&sup2;
+LAENGE       double        - L&auml;ngengrad
+BREITE       double        - Breitengrad</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>WUESTE</h4>
+                    <code>W_NAME       varchar(25)   - W&uuml;stenname
+FLAECHE      double        - Fl&auml;che in km&sup2;
+WUESTENART   varchar(17)   - Art der W&uuml;ste</code>
                 </div>
                 
                 <h3>Verbindungstabellen (für JOINs)</h3>
@@ -567,7 +596,7 @@ LAENGE       double        - Längengrad</code>
 L_ID         varchar(4)
 B_NAME       varchar(20)
 
-Verbindet: LAND ↔ BERG</code>
+Verbindet: LAND &harr; BERG</code>
                     </div>
                     
                     <div class="help-block">
@@ -575,15 +604,35 @@ Verbindet: LAND ↔ BERG</code>
                         <code>L_ID         varchar(4)
 F_NAME       varchar(20)
 
-Verbindet: LAND ↔ FLUSS</code>
+Verbindet: LAND &harr; FLUSS</code>
                     </div>
                     
                     <div class="help-block">
                         <h4>UMFASST</h4>
                         <code>K_NAME       varchar(10)
 L_ID         varchar(4)
+PROZENT      double
 
-Verbindet: KONTINENT ↔ LAND</code>
+Verbindet: KONTINENT &harr; LAND</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>GEO_SEE</h4>
+                        <code>L_ID         varchar(4)
+S_NAME       varchar(25)
+
+Verbindet: LAND &harr; SEE</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>LIEGT_AN</h4>
+                        <code>ST_NAME      varchar(25)
+L_ID         varchar(4)
+F_NAME       varchar(20)  - Fluss
+S_NAME       varchar(25)  - See
+M_NAME       varchar(25)  - Meer
+
+Verbindet: STADT &harr; FLUSS/SEE/MEER</code>
                     </div>
                 </div>
             </div>
@@ -631,46 +680,76 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
     <script>
         let db;
         const tasks = [
+            // =====================================================
             // Niveau 0: Einstieg (SELECT, WHERE, ORDER BY, LIMIT)
+            // =====================================================
             { id: 'n0-1', n: 0, title: 'Alle Berge anzeigen', desc: 'Zeige alle Berge mit allen Spalten an!', hint: 'SELECT * FROM ...', sols: ['SELECT * FROM BERG'] },
-            { id: 'n0-2', n: 0, title: 'Top 5 höchste Berge', desc: 'Zeige die 5 höchsten Berge (Name und Höhe), absteigend sortiert!', hint: 'ORDER BY ... DESC und LIMIT', sols: ['SELECT B_NAME, HOEHE FROM BERG ORDER BY HOEHE DESC LIMIT 5'] },
-            { id: 'n0-3', n: 0, title: 'Achttausender', desc: 'Welche Berge sind höher als 8000 Meter? Zeige Name und Höhe!', hint: 'WHERE HOEHE > 8000', sols: ['SELECT * FROM BERG WHERE HOEHE > 8000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC', 'SELECT * FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC'] },
-            { id: 'n0-4', n: 0, title: 'Berge zwischen 4000 und 5000m', desc: 'Finde alle Berge, die zwischen 4000 und 5000 Meter hoch sind!', hint: 'BETWEEN ... AND ... oder zwei Bedingungen mit AND', sols: ['SELECT * FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000', 'SELECT * FROM BERG WHERE HOEHE >= 4000 AND HOEHE <= 5000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE >= 4000 AND HOEHE <= 5000'] },
-            { id: 'n0-5', n: 0, title: 'Berge im Himalaya', desc: 'Zeige alle Berge, die im Himalaya liegen!', hint: 'WHERE GEBIRGE = \'Himalaya\'', sols: ['SELECT * FROM BERG WHERE GEBIRGE = \'Himalaya\'', 'SELECT B_NAME, HOEHE FROM BERG WHERE GEBIRGE = \'Himalaya\'', 'SELECT B_NAME, HOEHE, GEBIRGE FROM BERG WHERE GEBIRGE = \'Himalaya\'', 'SELECT B_NAME, GEBIRGE, HOEHE FROM BERG WHERE GEBIRGE = \'Himalaya\''] },
-            { id: 'n0-6', n: 0, title: 'Mount-Berge', desc: 'Finde alle Berge, deren Name mit "Mount" beginnt!', hint: 'LIKE \'Mount%\'', sols: ['SELECT * FROM BERG WHERE B_NAME LIKE \'Mount%\'', 'SELECT B_NAME, HOEHE FROM BERG WHERE B_NAME LIKE \'Mount%\'', 'SELECT B_NAME FROM BERG WHERE B_NAME LIKE \'Mount%\''] },
-            { id: 'n0-7', n: 0, title: 'Große Länder', desc: 'Welche Länder haben mehr als 100 Millionen Einwohner? Sortiere absteigend nach Einwohnerzahl!', hint: 'WHERE EINWOHNER > 100000000 und ORDER BY', sols: ['SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC', 'SELECT * FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC', 'SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000'] },
-            { id: 'n0-8', n: 0, title: 'Lange Flüsse', desc: 'Welche Flüsse sind länger als 5000 km? Zeige Name und Länge!', hint: 'WHERE LAENGE > 5000', sols: ['SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000', 'SELECT * FROM FLUSS WHERE LAENGE > 5000', 'SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000 ORDER BY LAENGE DESC'] },
-            { id: 'n0-9', n: 0, title: 'Alpen oder Anden', desc: 'Zeige alle Berge, die in den Alpen ODER in den Anden liegen!', hint: 'WHERE ... IN (...) oder WHERE ... OR ...', sols: ['SELECT * FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')', 'SELECT B_NAME, GEBIRGE, HOEHE FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')', 'SELECT * FROM BERG WHERE GEBIRGE = \'Alpen\' OR GEBIRGE = \'Anden\'', 'SELECT B_NAME, HOEHE, GEBIRGE FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')'] },
-            { id: 'n0-10', n: 0, title: 'Kleine Berge', desc: 'Welche Berge sind NICHT höher als 2000 Meter? Sortiere aufsteigend nach Höhe!', hint: 'WHERE HOEHE <= 2000 und ORDER BY ... ASC', sols: ['SELECT * FROM BERG WHERE HOEHE <= 2000 ORDER BY HOEHE ASC', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE <= 2000 ORDER BY HOEHE ASC', 'SELECT * FROM BERG WHERE HOEHE <= 2000 ORDER BY HOEHE', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE <= 2000 ORDER BY HOEHE', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE < 2000 ORDER BY HOEHE ASC'] },
-            // Niveau 1: Aggregation
-            { id: 'n1-1', n: 1, title: 'Anzahl Länder', desc: 'Wie viele Länder gibt es in der Datenbank?', hint: 'COUNT(*) auf LAND', sols: ['SELECT COUNT(*) FROM LAND', 'SELECT COUNT(*) AS anzahl FROM LAND', 'SELECT COUNT(L_ID) FROM LAND'] },
-            { id: 'n1-2', n: 1, title: 'Größtes Land', desc: 'Wie groß ist das größte Land (nach Fläche)?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 oder MAX()', sols: ['SELECT L_NAME, FLAECHE FROM LAND ORDER BY FLAECHE DESC LIMIT 1', 'SELECT L_NAME, MAX(FLAECHE) FROM LAND', 'SELECT L_NAME, FLAECHE FROM LAND WHERE FLAECHE = (SELECT MAX(FLAECHE) FROM LAND)'] },
-            { id: 'n1-3', n: 1, title: 'Bevölkerungsreichstes Land', desc: 'Wie viele Einwohner hat das bevölkerungsreichste Land?', hint: 'MAX(EINWOHNER)', sols: ['SELECT MAX(EINWOHNER) FROM LAND', 'SELECT L_NAME, EINWOHNER FROM LAND ORDER BY EINWOHNER DESC LIMIT 1', 'SELECT EINWOHNER FROM LAND WHERE EINWOHNER = (SELECT MAX(EINWOHNER) FROM LAND)'] },
-            { id: 'n1-4', n: 1, title: 'Längster Fluss', desc: 'Wie lang ist der längste Fluss?', hint: 'MAX(LAENGE) auf FLUSS', sols: ['SELECT MAX(LAENGE) FROM FLUSS', 'SELECT F_NAME, LAENGE FROM FLUSS ORDER BY LAENGE DESC LIMIT 1', 'SELECT LAENGE FROM FLUSS WHERE LAENGE = (SELECT MAX(LAENGE) FROM FLUSS)'] },
+            { id: 'n0-2', n: 0, title: 'Alle L\u00e4nder', desc: 'Zeige alle L\u00e4nder mit Name und Hauptstadt an!', hint: 'SELECT spalte1, spalte2 FROM ...', sols: ['SELECT L_NAME, HAUPTSTADT FROM LAND', 'SELECT L_NAME, HAUPTSTADT FROM LAND ORDER BY L_NAME'] },
+            { id: 'n0-3', n: 0, title: 'Wo liegt Berlin?', desc: 'Zeige Breitengrad und L\u00e4ngengrad von Berlin! (Tabelle: STADT)', hint: 'WHERE ST_NAME = \'Berlin\'', sols: ['SELECT ST_NAME, BREITE, LAENGE FROM STADT WHERE ST_NAME = \'Berlin\'', 'SELECT * FROM STADT WHERE ST_NAME = \'Berlin\'', 'SELECT BREITE, LAENGE FROM STADT WHERE ST_NAME = \'Berlin\''] },
+            { id: 'n0-4', n: 0, title: 'Top 5 h\u00f6chste Berge', desc: 'Zeige die 5 h\u00f6chsten Berge (Name und H\u00f6he), absteigend sortiert!', hint: 'ORDER BY ... DESC und LIMIT', sols: ['SELECT B_NAME, HOEHE FROM BERG ORDER BY HOEHE DESC LIMIT 5'] },
+            { id: 'n0-5', n: 0, title: 'Achttausender', desc: 'Welche Berge sind h\u00f6her als 8000 Meter? Zeige Name und H\u00f6he!', hint: 'WHERE HOEHE > 8000', sols: ['SELECT * FROM BERG WHERE HOEHE > 8000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC', 'SELECT * FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC'] },
+            { id: 'n0-6', n: 0, title: 'Berge im Himalaya', desc: 'Zeige alle Berge, die im Himalaya liegen!', hint: 'WHERE GEBIRGE = \'Himalaya\'', sols: ['SELECT * FROM BERG WHERE GEBIRGE = \'Himalaya\'', 'SELECT B_NAME, HOEHE FROM BERG WHERE GEBIRGE = \'Himalaya\'', 'SELECT B_NAME, HOEHE, GEBIRGE FROM BERG WHERE GEBIRGE = \'Himalaya\''] },
+            { id: 'n0-7', n: 0, title: 'Mount-Berge', desc: 'Finde alle Berge, deren Name mit "Mount" beginnt!', hint: 'LIKE \'Mount%\'', sols: ['SELECT * FROM BERG WHERE B_NAME LIKE \'Mount%\'', 'SELECT B_NAME, HOEHE FROM BERG WHERE B_NAME LIKE \'Mount%\'', 'SELECT B_NAME FROM BERG WHERE B_NAME LIKE \'Mount%\''] },
+            { id: 'n0-8', n: 0, title: 'Gro\u00dfe L\u00e4nder', desc: 'Welche L\u00e4nder haben mehr als 100 Millionen Einwohner? Sortiere absteigend!', hint: 'WHERE EINWOHNER > 100000000 und ORDER BY', sols: ['SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC', 'SELECT * FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC', 'SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000'] },
+            { id: 'n0-9', n: 0, title: 'Lange Fl\u00fcsse', desc: 'Welche Fl\u00fcsse sind l\u00e4nger als 5000 km? Zeige Name und L\u00e4nge!', hint: 'WHERE LAENGE > 5000', sols: ['SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000', 'SELECT * FROM FLUSS WHERE LAENGE > 5000', 'SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000 ORDER BY LAENGE DESC'] },
+            { id: 'n0-10', n: 0, title: 'St\u00e4dte in Deutschland', desc: 'Zeige alle St\u00e4dte in Deutschland mit Einwohnerzahl! (L_ID = \'D\')', hint: 'WHERE L_ID = \'D\' auf Tabelle STADT', sols: ['SELECT ST_NAME, EINWOHNER FROM STADT WHERE L_ID = \'D\'', 'SELECT * FROM STADT WHERE L_ID = \'D\'', 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE L_ID = \'D\' ORDER BY EINWOHNER DESC'] },
+            { id: 'n0-11', n: 0, title: 'Millionenst\u00e4dte', desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner?', hint: 'WHERE EINWOHNER > 5000000 auf STADT', sols: ['SELECT ST_NAME, EINWOHNER FROM STADT WHERE EINWOHNER > 5000000 ORDER BY EINWOHNER DESC', 'SELECT * FROM STADT WHERE EINWOHNER > 5000000 ORDER BY EINWOHNER DESC', 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE EINWOHNER > 5000000'] },
+            { id: 'n0-12', n: 0, title: 'Sandw\u00fcsten', desc: 'Zeige alle W\u00fcsten vom Typ "Sand"! (Tabelle: WUESTE, Spalte: WUESTENART)', hint: 'WHERE WUESTENART = \'Sand\'', sols: ['SELECT * FROM WUESTE WHERE WUESTENART = \'Sand\'', 'SELECT W_NAME, FLAECHE FROM WUESTE WHERE WUESTENART = \'Sand\'', 'SELECT W_NAME, FLAECHE, WUESTENART FROM WUESTE WHERE WUESTENART = \'Sand\''] },
+            { id: 'n0-13', n: 0, title: 'Gro\u00dfe Inseln', desc: 'Welche Inseln sind gr\u00f6\u00dfer als 100.000 km\u00b2? (Tabelle: INSEL)', hint: 'WHERE FLAECHE > 100000', sols: ['SELECT I_NAME, FLAECHE FROM INSEL WHERE FLAECHE > 100000', 'SELECT * FROM INSEL WHERE FLAECHE > 100000', 'SELECT I_NAME, FLAECHE FROM INSEL WHERE FLAECHE > 100000 ORDER BY FLAECHE DESC'] },
+            { id: 'n0-14', n: 0, title: 'Tiefe Meere', desc: 'Zeige alle Meere sortiert nach Tiefe (tiefstes zuerst)! (Tabelle: MEER)', hint: 'ORDER BY TIEFE DESC', sols: ['SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC', 'SELECT * FROM MEER ORDER BY TIEFE DESC'] },
+            { id: 'n0-15', n: 0, title: 'Hauptstadt mit A', desc: 'Welche L\u00e4nder haben eine Hauptstadt, die mit "A" anf\u00e4ngt?', hint: 'WHERE HAUPTSTADT LIKE \'A%\'', sols: ['SELECT L_NAME, HAUPTSTADT FROM LAND WHERE HAUPTSTADT LIKE \'A%\'', 'SELECT * FROM LAND WHERE HAUPTSTADT LIKE \'A%\''] },
+            { id: 'n0-16', n: 0, title: 'Berge zwischen 4000 und 5000m', desc: 'Finde alle Berge zwischen 4000 und 5000 Meter H\u00f6he!', hint: 'BETWEEN ... AND ... oder zwei Bedingungen mit AND', sols: ['SELECT * FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000', 'SELECT * FROM BERG WHERE HOEHE >= 4000 AND HOEHE <= 5000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE >= 4000 AND HOEHE <= 5000'] },
+            { id: 'n0-17', n: 0, title: 'Alpen oder Anden', desc: 'Zeige alle Berge in den Alpen ODER den Anden!', hint: 'WHERE ... IN (...) oder WHERE ... OR ...', sols: ['SELECT * FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')', 'SELECT B_NAME, GEBIRGE, HOEHE FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')', 'SELECT * FROM BERG WHERE GEBIRGE = \'Alpen\' OR GEBIRGE = \'Anden\''] },
+            { id: 'n0-18', n: 0, title: 'Seen mit gro\u00dfer Fl\u00e4che', desc: 'Welche Seen haben eine Fl\u00e4che von mehr als 10.000 km\u00b2? (Tabelle: SEE)', hint: 'WHERE FLAECHE > 10000', sols: ['SELECT S_NAME, FLAECHE FROM SEE WHERE FLAECHE > 10000', 'SELECT * FROM SEE WHERE FLAECHE > 10000', 'SELECT S_NAME, FLAECHE FROM SEE WHERE FLAECHE > 10000 ORDER BY FLAECHE DESC'] },
+
+            // =====================================================
+            // Niveau 1: Aggregation (COUNT, MAX, MIN, AVG, SUM)
+            // =====================================================
+            { id: 'n1-1', n: 1, title: 'Anzahl L\u00e4nder', desc: 'Wie viele L\u00e4nder gibt es in der Datenbank?', hint: 'COUNT(*) auf LAND', sols: ['SELECT COUNT(*) FROM LAND', 'SELECT COUNT(*) AS anzahl FROM LAND', 'SELECT COUNT(L_ID) FROM LAND'] },
+            { id: 'n1-2', n: 1, title: 'Gr\u00f6\u00dftes Land', desc: 'Welches Land hat die gr\u00f6\u00dfte Fl\u00e4che? Zeige Name und Fl\u00e4che!', hint: 'ORDER BY FLAECHE DESC LIMIT 1 oder MAX()', sols: ['SELECT L_NAME, FLAECHE FROM LAND ORDER BY FLAECHE DESC LIMIT 1', 'SELECT L_NAME, MAX(FLAECHE) FROM LAND', 'SELECT L_NAME, FLAECHE FROM LAND WHERE FLAECHE = (SELECT MAX(FLAECHE) FROM LAND)'] },
+            { id: 'n1-3', n: 1, title: 'Bev\u00f6lkerungsreichstes Land', desc: 'Wie viele Einwohner hat das bev\u00f6lkerungsreichste Land?', hint: 'MAX(EINWOHNER)', sols: ['SELECT MAX(EINWOHNER) FROM LAND', 'SELECT L_NAME, EINWOHNER FROM LAND ORDER BY EINWOHNER DESC LIMIT 1', 'SELECT EINWOHNER FROM LAND WHERE EINWOHNER = (SELECT MAX(EINWOHNER) FROM LAND)'] },
+            { id: 'n1-4', n: 1, title: 'L\u00e4ngster Fluss', desc: 'Wie lang ist der l\u00e4ngste Fluss?', hint: 'MAX(LAENGE) auf FLUSS', sols: ['SELECT MAX(LAENGE) FROM FLUSS', 'SELECT F_NAME, LAENGE FROM FLUSS ORDER BY LAENGE DESC LIMIT 1', 'SELECT LAENGE FROM FLUSS WHERE LAENGE = (SELECT MAX(LAENGE) FROM FLUSS)'] },
             { id: 'n1-5', n: 1, title: 'Anzahl Gebirge', desc: 'Wie viele verschiedene Gebirge gibt es?', hint: 'COUNT(DISTINCT GEBIRGE)', sols: ['SELECT COUNT(DISTINCT GEBIRGE) FROM BERG', 'SELECT COUNT(DISTINCT GEBIRGE) AS anzahl FROM BERG'] },
-            { id: 'n1-6', n: 1, title: 'Durchschnittliche Berghöhe', desc: 'Durchschnittliche Höhe aller Berge?', hint: 'AVG(HOEHE)', sols: ['SELECT AVG(HOEHE) FROM BERG', 'SELECT AVG(HOEHE) AS durchschnitt FROM BERG', 'SELECT ROUND(AVG(HOEHE), 0) FROM BERG'] },
+            { id: 'n1-6', n: 1, title: 'Durchschnittliche Bergh\u00f6he', desc: 'Durchschnittliche H\u00f6he aller Berge?', hint: 'AVG(HOEHE)', sols: ['SELECT AVG(HOEHE) FROM BERG', 'SELECT AVG(HOEHE) AS durchschnitt FROM BERG', 'SELECT ROUND(AVG(HOEHE), 0) FROM BERG'] },
+            { id: 'n1-7', n: 1, title: 'Anzahl St\u00e4dte', desc: 'Wie viele St\u00e4dte enth\u00e4lt die Datenbank?', hint: 'COUNT(*) auf STADT', sols: ['SELECT COUNT(*) FROM STADT', 'SELECT COUNT(*) AS anzahl FROM STADT'] },
+            { id: 'n1-8', n: 1, title: 'Tiefster See', desc: 'Wie hei\u00dft der tiefste See und wie tief ist er?', hint: 'ORDER BY TIEFE DESC LIMIT 1', sols: ['SELECT S_NAME, TIEFE FROM SEE ORDER BY TIEFE DESC LIMIT 1', 'SELECT S_NAME, MAX(TIEFE) FROM SEE', 'SELECT MAX(TIEFE) FROM SEE'] },
+            { id: 'n1-9', n: 1, title: 'Gr\u00f6\u00dfte Insel', desc: 'Welche Insel hat die gr\u00f6\u00dfte Fl\u00e4che?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 auf INSEL', sols: ['SELECT I_NAME, FLAECHE FROM INSEL ORDER BY FLAECHE DESC LIMIT 1', 'SELECT I_NAME, MAX(FLAECHE) FROM INSEL'] },
+            { id: 'n1-10', n: 1, title: 'Tiefstes Meer', desc: 'Welches Meer ist am tiefsten?', hint: 'ORDER BY TIEFE DESC LIMIT 1 auf MEER', sols: ['SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC LIMIT 1', 'SELECT M_NAME, MAX(TIEFE) FROM MEER'] },
+            { id: 'n1-11', n: 1, title: 'Anzahl W\u00fcsten', desc: 'Wie viele W\u00fcsten gibt es in der Datenbank?', hint: 'COUNT(*) auf WUESTE', sols: ['SELECT COUNT(*) FROM WUESTE', 'SELECT COUNT(*) AS anzahl FROM WUESTE'] },
+
+            // =====================================================
             // Niveau 2: GROUP BY & HAVING
+            // =====================================================
             { id: 'n2-1', n: 2, title: 'Berge pro Gebirge', desc: 'Wie viele Berge pro Gebirge? (sortiert)', hint: 'GROUP BY GEBIRGE', sols: ['SELECT GEBIRGE, COUNT(*) FROM BERG GROUP BY GEBIRGE ORDER BY COUNT(*) DESC', 'SELECT GEBIRGE, COUNT(*) AS anzahl FROM BERG GROUP BY GEBIRGE ORDER BY anzahl DESC'] },
             { id: 'n2-2', n: 2, title: 'Gebirge mit >10 Bergen', desc: 'Welche Gebirge haben mehr als 10 Berge?', hint: 'HAVING COUNT(*) > 10', sols: ['SELECT GEBIRGE, COUNT(*) FROM BERG GROUP BY GEBIRGE HAVING COUNT(*) > 10', 'SELECT GEBIRGE, COUNT(*) AS anzahl FROM BERG GROUP BY GEBIRGE HAVING COUNT(*) > 10'] },
-            { id: 'n2-3', n: 2, title: 'Durchschnitt pro Gebirge', desc: 'Durchschnittliche Höhe pro Gebirge?', hint: 'AVG(HOEHE) mit GROUP BY', sols: ['SELECT GEBIRGE, AVG(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, ROUND(AVG(HOEHE), 0) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, AVG(HOEHE) AS durchschnitt FROM BERG GROUP BY GEBIRGE ORDER BY durchschnitt DESC'] },
-            { id: 'n2-4', n: 2, title: 'Max/Min pro Gebirge', desc: 'Höchster und niedrigster Berg pro Gebirge?', hint: 'MAX() und MIN() mit GROUP BY', sols: ['SELECT GEBIRGE, MAX(HOEHE), MIN(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, MAX(HOEHE) AS hoechster, MIN(HOEHE) AS niedrigster FROM BERG GROUP BY GEBIRGE'] },
-            { id: 'n2-5', n: 2, title: 'Hohe Gebirge', desc: 'Welche Gebirge haben eine durchschnittliche Höhe über 4000m?', hint: 'HAVING AVG(HOEHE) > 4000', sols: ['SELECT GEBIRGE, AVG(HOEHE) FROM BERG GROUP BY GEBIRGE HAVING AVG(HOEHE) > 4000', 'SELECT GEBIRGE, ROUND(AVG(HOEHE), 0) AS durchschnitt FROM BERG GROUP BY GEBIRGE HAVING AVG(HOEHE) > 4000', 'SELECT GEBIRGE, AVG(HOEHE) AS durchschnitt FROM BERG GROUP BY GEBIRGE HAVING durchschnitt > 4000'] },
-            { id: 'n2-6', n: 2, title: 'Länder pro Kontinent', desc: 'Wie viele Länder gibt es pro Kontinent? (Tabelle UMFASST verwenden)', hint: 'GROUP BY K_NAME auf UMFASST', sols: ['SELECT K_NAME, COUNT(*) FROM UMFASST GROUP BY K_NAME', 'SELECT K_NAME, COUNT(*) AS anzahl FROM UMFASST GROUP BY K_NAME', 'SELECT K_NAME, COUNT(*) AS anzahl FROM UMFASST GROUP BY K_NAME ORDER BY anzahl DESC', 'SELECT K_NAME, COUNT(L_ID) FROM UMFASST GROUP BY K_NAME'] },
+            { id: 'n2-3', n: 2, title: 'Durchschnitt pro Gebirge', desc: 'Durchschnittliche H\u00f6he pro Gebirge?', hint: 'AVG(HOEHE) mit GROUP BY', sols: ['SELECT GEBIRGE, AVG(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, ROUND(AVG(HOEHE), 0) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, AVG(HOEHE) AS durchschnitt FROM BERG GROUP BY GEBIRGE ORDER BY durchschnitt DESC'] },
+            { id: 'n2-4', n: 2, title: 'Max/Min pro Gebirge', desc: 'H\u00f6chster und niedrigster Berg pro Gebirge?', hint: 'MAX() und MIN() mit GROUP BY', sols: ['SELECT GEBIRGE, MAX(HOEHE), MIN(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, MAX(HOEHE) AS hoechster, MIN(HOEHE) AS niedrigster FROM BERG GROUP BY GEBIRGE'] },
+            { id: 'n2-5', n: 2, title: 'W\u00fcstenarten', desc: 'Wie viele W\u00fcsten gibt es pro W\u00fcstenart?', hint: 'GROUP BY WUESTENART auf WUESTE', sols: ['SELECT WUESTENART, COUNT(*) FROM WUESTE GROUP BY WUESTENART', 'SELECT WUESTENART, COUNT(*) AS anzahl FROM WUESTE GROUP BY WUESTENART', 'SELECT WUESTENART, COUNT(*) AS anzahl FROM WUESTE GROUP BY WUESTENART ORDER BY anzahl DESC'] },
+            { id: 'n2-6', n: 2, title: 'L\u00e4nder pro Kontinent', desc: 'Wie viele L\u00e4nder gibt es pro Kontinent? (Tabelle: UMFASST)', hint: 'GROUP BY K_NAME auf UMFASST', sols: ['SELECT K_NAME, COUNT(*) FROM UMFASST GROUP BY K_NAME', 'SELECT K_NAME, COUNT(*) AS anzahl FROM UMFASST GROUP BY K_NAME', 'SELECT K_NAME, COUNT(*) AS anzahl FROM UMFASST GROUP BY K_NAME ORDER BY anzahl DESC'] },
+            { id: 'n2-7', n: 2, title: 'Inseln pro Inselgruppe', desc: 'Wie viele Inseln geh\u00f6ren zu jeder Inselgruppe? (Nur Gruppen mit >1 Insel)', hint: 'GROUP BY INSELGRUPPE mit HAVING', sols: ['SELECT INSELGRUPPE, COUNT(*) FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1', 'SELECT INSELGRUPPE, COUNT(*) AS anzahl FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1', 'SELECT INSELGRUPPE, COUNT(*) AS anzahl FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1 ORDER BY anzahl DESC'] },
+
+            // =====================================================
             // Niveau 3: JOINs
-            { id: 'n3-1', n: 3, title: 'Top 10 Berge + Länder', desc: 'Die 10 höchsten Berge mit ihren Ländern?', hint: 'JOIN über 3 Tabellen: BERG → GEO_BERG → LAND', sols: ['SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10', 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b INNER JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME INNER JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10'] },
-            { id: 'n3-2', n: 3, title: 'Länder mit >6000m Bergen', desc: 'Welche Länder haben Berge über 6000m? (Jedes Land nur einmal!)', hint: 'JOIN mit WHERE HOEHE > 6000 und DISTINCT', sols: ['SELECT DISTINCT l.L_NAME FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 6000', 'SELECT DISTINCT l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE b.HOEHE > 6000'] },
-            { id: 'n3-3', n: 3, title: 'Länder + Berganzahl', desc: 'Alle Länder mit Anzahl ihrer Berge (nur Länder mit Bergen)?', hint: 'LEFT JOIN mit GROUP BY und HAVING', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME) FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0 ORDER BY anzahl DESC'] },
-            { id: 'n3-4', n: 3, title: 'Mount Everest — Land?', desc: 'In welchem Land liegt der Mount Everest?', hint: 'JOIN mit WHERE B_NAME = \'Mount_Everest\'', sols: ['SELECT l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE b.B_NAME = \'Mount_Everest\'', 'SELECT l.L_NAME FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.B_NAME = \'Mount_Everest\'', 'SELECT l.L_NAME FROM GEO_BERG gb JOIN LAND l ON gb.L_ID = l.L_ID WHERE gb.B_NAME = \'Mount_Everest\''] },
-            { id: 'n3-5', n: 3, title: 'Berge in Deutschland', desc: 'Zeige alle Berge in Deutschland mit Höhe und Gebirge! (L_ID = \'D\')', hint: 'JOIN über GEO_BERG mit WHERE L_ID = \'D\'', sols: ['SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME WHERE gb.L_ID = \'D\'', 'SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE l.L_ID = \'D\'', 'SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b INNER JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME WHERE gb.L_ID = \'D\''] },
-            { id: 'n3-6', n: 3, title: 'Flüsse in Frankreich', desc: 'Welche Flüsse fließen durch Frankreich? (L_ID = \'F\') Zeige Name und Länge!', hint: 'FLUSS → GEO_FLUSS mit WHERE L_ID = \'F\'', sols: ['SELECT f.F_NAME, f.LAENGE FROM FLUSS f JOIN GEO_FLUSS gf ON f.F_NAME = gf.F_NAME WHERE gf.L_ID = \'F\'', 'SELECT f.F_NAME, f.LAENGE FROM FLUSS f JOIN GEO_FLUSS gf ON f.F_NAME = gf.F_NAME WHERE gf.L_ID = \'F\' ORDER BY f.LAENGE DESC'] },
-            { id: 'n3-7', n: 3, title: 'Welches Land hat die meisten Berge?', desc: 'Finde das Land mit den meisten Bergen (Name und Anzahl)!', hint: 'JOIN + GROUP BY + ORDER BY + LIMIT 1', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 1', 'SELECT l.L_NAME, COUNT(gb.B_NAME) AS anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 1', 'SELECT l.L_NAME, COUNT(*) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY COUNT(*) DESC LIMIT 1'] },
+            // =====================================================
+            { id: 'n3-1', n: 3, title: 'Top 10 Berge + L\u00e4nder', desc: 'Die 10 h\u00f6chsten Berge mit ihren L\u00e4ndern?', hint: 'JOIN \u00fcber 3 Tabellen: BERG \u2192 GEO_BERG \u2192 LAND', sols: ['SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10', 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b INNER JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME INNER JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10'] },
+            { id: 'n3-2', n: 3, title: 'L\u00e4nder mit >6000m Bergen', desc: 'Welche L\u00e4nder haben Berge \u00fcber 6000m? (Jedes Land nur einmal!)', hint: 'JOIN mit WHERE und DISTINCT', sols: ['SELECT DISTINCT l.L_NAME FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 6000', 'SELECT DISTINCT l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE b.HOEHE > 6000'] },
+            { id: 'n3-3', n: 3, title: 'L\u00e4nder + Berganzahl', desc: 'Alle L\u00e4nder mit Anzahl ihrer Berge (nur L\u00e4nder mit Bergen)?', hint: 'JOIN mit GROUP BY und HAVING', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME) FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0 ORDER BY anzahl DESC'] },
+            { id: 'n3-4', n: 3, title: 'Berge in Deutschland', desc: 'Zeige alle Berge in Deutschland mit H\u00f6he und Gebirge! (L_ID = \'D\')', hint: 'BERG \u2192 GEO_BERG mit WHERE L_ID = \'D\'', sols: ['SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME WHERE gb.L_ID = \'D\'', 'SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE l.L_ID = \'D\''] },
+            { id: 'n3-5', n: 3, title: 'Fl\u00fcsse in Frankreich', desc: 'Welche Fl\u00fcsse flie\u00dfen durch Frankreich? (L_ID = \'F\') Zeige Name und L\u00e4nge!', hint: 'FLUSS \u2192 GEO_FLUSS mit WHERE L_ID = \'F\'', sols: ['SELECT f.F_NAME, f.LAENGE FROM FLUSS f JOIN GEO_FLUSS gf ON f.F_NAME = gf.F_NAME WHERE gf.L_ID = \'F\'', 'SELECT f.F_NAME, f.LAENGE FROM FLUSS f JOIN GEO_FLUSS gf ON f.F_NAME = gf.F_NAME WHERE gf.L_ID = \'F\' ORDER BY f.LAENGE DESC'] },
+            { id: 'n3-6', n: 3, title: 'Seen in Russland', desc: 'Welche Seen liegen in Russland? (L_ID = \'RUS\') Zeige Name und Tiefe! (GEO_SEE)', hint: 'SEE \u2192 GEO_SEE mit WHERE L_ID = \'RUS\'', sols: ['SELECT s.S_NAME, s.TIEFE FROM SEE s JOIN GEO_SEE gs ON s.S_NAME = gs.S_NAME WHERE gs.L_ID = \'RUS\'', 'SELECT s.S_NAME, s.TIEFE FROM SEE s JOIN GEO_SEE gs ON s.S_NAME = gs.S_NAME WHERE gs.L_ID = \'RUS\' ORDER BY s.TIEFE DESC'] },
+            { id: 'n3-7', n: 3, title: 'Land mit den meisten Bergen', desc: 'Welches Land hat die meisten Berge? (Name und Anzahl)', hint: 'JOIN + GROUP BY + ORDER BY + LIMIT 1', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 1', 'SELECT l.L_NAME, COUNT(gb.B_NAME) AS anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 1', 'SELECT l.L_NAME, COUNT(*) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY COUNT(*) DESC LIMIT 1'] },
+            { id: 'n3-8', n: 3, title: 'St\u00e4dte am Rhein', desc: 'Welche St\u00e4dte liegen am Rhein? (Tabelle: LIEGT_AN, Spalte: F_NAME)', hint: 'STADT \u2192 LIEGT_AN mit WHERE F_NAME = \'Rhein\'', sols: ['SELECT s.ST_NAME, s.EINWOHNER FROM STADT s JOIN LIEGT_AN la ON s.ST_NAME = la.ST_NAME AND s.L_ID = la.L_ID WHERE la.F_NAME = \'Rhein\'', 'SELECT la.ST_NAME FROM LIEGT_AN la WHERE la.F_NAME = \'Rhein\'', 'SELECT DISTINCT la.ST_NAME FROM LIEGT_AN la WHERE la.F_NAME = \'Rhein\''] },
+
+            // =====================================================
             // Niveau 4: Kombination (JOIN + GROUP BY + HAVING)
-            { id: 'n4-1', n: 4, title: 'Anzahl Länder >5000m', desc: 'Wie viele Länder haben mindestens einen Berg über 5000m?', hint: 'COUNT(DISTINCT) mit JOIN und WHERE', sols: ['SELECT COUNT(DISTINCT l.L_ID) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000', 'SELECT COUNT(DISTINCT l.L_NAME) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000'] },
-            { id: 'n4-2', n: 4, title: 'Höchster Durchschnitt', desc: 'Welches Land hat die höchste durchschnittliche Berghöhe?', hint: 'AVG mit GROUP BY, ORDER BY und LIMIT 1', sols: ['SELECT l.L_NAME, AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY AVG(b.HOEHE) DESC LIMIT 1', 'SELECT l.L_NAME, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC LIMIT 1'] },
-            { id: 'n4-3', n: 4, title: 'Länderstatistik', desc: 'Für jedes Land: Anzahl und Durchschnittshöhe der Berge?', hint: 'COUNT und AVG kombinieren mit JOIN und GROUP BY', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME), AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC'] },
-            { id: 'n4-4', n: 4, title: 'Bergstarke Länder', desc: 'Welche Länder haben mehr als 5 Berge UND eine Durchschnittshöhe über 3000m?', hint: 'HAVING mit COUNT und AVG', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 5 AND AVG(b.HOEHE) > 3000', 'SELECT l.L_NAME, COUNT(*) AS anzahl, AVG(b.HOEHE) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(*) > 5 AND AVG(b.HOEHE) > 3000'] },
-            { id: 'n4-5', n: 4, title: 'Top 5 nach Berghöhen-Summe', desc: 'Zeige die Top 5 Länder nach Summe aller Berghöhen!', hint: 'SUM(HOEHE) mit JOIN, GROUP BY und LIMIT 5', sols: ['SELECT l.L_NAME, SUM(b.HOEHE) AS summe FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY summe DESC LIMIT 5', 'SELECT l.L_NAME, SUM(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY SUM(b.HOEHE) DESC LIMIT 5'] },
-            { id: 'n4-6', n: 4, title: 'Europäische Berge', desc: 'Zeige alle Berge in europäischen Ländern mit Ländername! (K_NAME = \'Europa\' in UMFASST)', hint: 'Braucht 4 Tabellen: BERG → GEO_BERG → LAND + UMFASST', sols: ['SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\'', 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\' ORDER BY b.HOEHE DESC'] }
+            // =====================================================
+            { id: 'n4-1', n: 4, title: 'Anzahl L\u00e4nder >5000m', desc: 'Wie viele L\u00e4nder haben mindestens einen Berg \u00fcber 5000m?', hint: 'COUNT(DISTINCT) mit JOIN und WHERE', sols: ['SELECT COUNT(DISTINCT l.L_ID) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000', 'SELECT COUNT(DISTINCT l.L_NAME) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000'] },
+            { id: 'n4-2', n: 4, title: 'H\u00f6chster Durchschnitt', desc: 'Welches Land hat die h\u00f6chste durchschnittliche Bergh\u00f6he?', hint: 'AVG mit GROUP BY, ORDER BY und LIMIT 1', sols: ['SELECT l.L_NAME, AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY AVG(b.HOEHE) DESC LIMIT 1', 'SELECT l.L_NAME, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC LIMIT 1'] },
+            { id: 'n4-3', n: 4, title: 'L\u00e4nderstatistik', desc: 'F\u00fcr jedes Land: Anzahl und Durchschnittsh\u00f6he der Berge?', hint: 'COUNT und AVG kombinieren mit JOIN und GROUP BY', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME), AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC'] },
+            { id: 'n4-4', n: 4, title: 'Bergstarke L\u00e4nder', desc: 'Welche L\u00e4nder haben mehr als 5 Berge UND eine Durchschnittsh\u00f6he \u00fcber 3000m?', hint: 'HAVING mit zwei Bedingungen (COUNT und AVG)', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 5 AND AVG(b.HOEHE) > 3000', 'SELECT l.L_NAME, COUNT(*) AS anzahl, AVG(b.HOEHE) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(*) > 5 AND AVG(b.HOEHE) > 3000'] },
+            { id: 'n4-5', n: 4, title: 'Fl\u00fcsse pro Land', desc: 'Wie viele Fl\u00fcsse flie\u00dfen durch jedes Land? Top 10!', hint: 'LAND \u2192 GEO_FLUSS mit GROUP BY und LIMIT 10', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_FLUSS gf ON l.L_ID = gf.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 10', 'SELECT l.L_NAME, COUNT(gf.F_NAME) AS anzahl FROM LAND l JOIN GEO_FLUSS gf ON l.L_ID = gf.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 10'] },
+            { id: 'n4-6', n: 4, title: 'Europ\u00e4ische Berge', desc: 'Zeige alle Berge in europ\u00e4ischen L\u00e4ndern mit L\u00e4ndername! (K_NAME = \'Europa\' in UMFASST)', hint: '4 Tabellen: BERG \u2192 GEO_BERG \u2192 LAND + UMFASST', sols: ['SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\'', 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\' ORDER BY b.HOEHE DESC'] },
+            { id: 'n4-7', n: 4, title: 'Seen pro Land', desc: 'Welche L\u00e4nder haben die meisten Seen? Top 5! (GEO_SEE)', hint: 'LAND \u2192 GEO_SEE mit GROUP BY und LIMIT', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_SEE gs ON l.L_ID = gs.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 5', 'SELECT l.L_NAME, COUNT(gs.S_NAME) AS anzahl FROM LAND l JOIN GEO_SEE gs ON l.L_ID = gs.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 5'] }
         ];
         
         function switchTab(name) {
@@ -743,7 +822,6 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             statusEl.style.display = 'block';
             statusEl.innerHTML = '<div class="message warning">Suche Datenbank...</div>';
             
-            // HIER IST DER FALLBACK LINK JETZT MIT DABEI:
             const filesToCheck = ['https://lkirchne.github.io/gynesa/informatik/q1/db/terra/terra2023.db','/informatik/q1/db/terra/terra2023.db'];
             let buffer = null;
             let loadedName = '';
@@ -832,7 +910,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             let html = '';
             Object.keys(grouped).sort().forEach(n => {
                 const label = niveauLabels[n] || '';
-                html += '<div class="section"><h2>Niveau ' + n + (label ? ' — ' + label : '') + '</h2>';
+                html += '<div class="section"><h2>Niveau ' + n + (label ? ' \u2014 ' + label : '') + '</h2>';
                 grouped[n].forEach(t => {
                     const q = saved[t.id] || '';
                     const solved = q && check(q, t.sols);
