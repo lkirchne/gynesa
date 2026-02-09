@@ -752,11 +752,19 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             { id: 'n4-7', n: 4, title: 'Seen pro Land', desc: 'Welche L\u00e4nder haben die meisten Seen? Top 5! (GEO_SEE)', hint: 'LAND \u2192 GEO_SEE mit GROUP BY und LIMIT', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_SEE gs ON l.L_ID = gs.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 5', 'SELECT l.L_NAME, COUNT(gs.S_NAME) AS anzahl FROM LAND l JOIN GEO_SEE gs ON l.L_ID = gs.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 5'] }
         ];
         
+        const tabScrollPositions = {};
+        let currentTab = 'editor';
+
         function switchTab(name) {
+            tabScrollPositions[currentTab] = window.scrollY;
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById('tab-' + name).classList.add('active');
+            currentTab = name;
+            requestAnimationFrame(() => {
+                window.scrollTo(0, tabScrollPositions[name] || 0);
+            });
         }
 
         function loadLocalFile(input) {
@@ -883,11 +891,31 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                     return;
                 }
                 const r = res[0];
-                let html = `<div class="result-info">${r.values.length} Ergebnisse</div>`;
+                const maxVisible = 10;
+                const total = r.values.length;
+                let html = `<div class="result-info">${total} Ergebnisse</div>`;
                 html += '<div class="table-wrapper"><table><thead><tr>';
                 html += r.columns.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
-                html += r.values.map(row => '<tr>' + row.map(c => '<td>' + (c === null ? '<span style="color:#aaa">NULL</span>' : c) + '</td>').join('') + '</tr>').join('');
+                r.values.forEach((row, i) => {
+                    const hidden = i >= maxVisible ? ' style="display:none" class="extra-row"' : '';
+                    html += '<tr' + hidden + '>' + row.map(c => '<td>' + (c === null ? '<span style="color:#aaa">NULL</span>' : c) + '</td>').join('') + '</tr>';
+                });
                 html += '</tbody></table></div>';
+                if (total > maxVisible) {
+                    html += `<button class="show-more-btn" style="margin-top:0.5rem;font-size:0.85rem;" onclick="
+                        this.parentElement.querySelectorAll('.extra-row').forEach(r => r.style.display = '');
+                        var less = document.createElement('button');
+                        less.style = 'margin-top:0.5rem;font-size:0.85rem;';
+                        less.textContent = 'Weniger anzeigen';
+                        less.onclick = function() {
+                            this.parentElement.querySelectorAll('.extra-row').forEach(r => r.style.display = 'none');
+                            this.parentElement.querySelector('.show-more-btn').style.display = '';
+                            this.remove();
+                        };
+                        this.parentElement.insertBefore(less, this.nextSibling);
+                        this.style.display = 'none';
+                    ">Alle ${total} Zeilen anzeigen</button>`;
+                }
                 el.innerHTML += html;
             } catch (e) {
                 el.innerHTML += '<div class="message error">SQL Fehler: ' + e.message + '</div>';
