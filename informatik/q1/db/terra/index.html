@@ -533,106 +533,224 @@ BREITE       double        - Breitengrad</code>
                 
                 <div class="help-block">
                     <h4>LAND</h4>
-                    <code>L_ID         varchar(4)    - Länder-ID
+                    <code>L_ID         varchar(4)    - Länder-ID (PK)
 L_NAME       varchar(50)   - Landesname
 EINWOHNER    double        - Einwohnerzahl
 FLAECHE      double        - Fläche in km²
 HAUPTSTADT   varchar(25)   - Hauptstadt
 LT_ID        varchar(4)    - Landteil-ID</code>
                 </div>
-                
+
                 <div class="help-block">
-                    <h4>FLUSS</h4>
-                    <code>F_NAME       varchar(20)   - Flussname
-FLUSS        varchar(20)   - Quellfluss
-SEE          varchar(25)   - Mündet in See
-MEER         varchar(25)   - Mündet in Meer
-LAENGE       int           - Länge in km</code>
+                    <h4>LANDTEIL</h4>
+                    <code>id           int           - ID (PK)
+LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+LT_NAME      varchar(50)   - Name des Landesteils
+EINWOHNER    double        - Einwohnerzahl
+LAGE         char(2)       - Lage
+HAUPTSTADT   varchar(25)   - Hauptstadt</code>
                 </div>
                 
                 <div class="help-block">
                     <h4>STADT</h4>
-                    <code>ST_NAME      varchar(25)   - Stadtname
-L_ID         varchar(4)    - L&auml;nder-ID
+                    <code>ST_NAME      varchar(25)   - Stadtname (PK)
+L_ID         varchar(4)    - Länder-ID
+LT_ID        varchar(4)    - Landteil-ID
 EINWOHNER    int           - Einwohnerzahl
 BREITE       double        - Breitengrad
-LAENGE       double        - L&auml;ngengrad</code>
+LAENGE       double        - Längengrad</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>FLUSS</h4>
+                    <code>F_NAME       varchar(20)   - Flussname (PK)
+FLUSS        varchar(20)   - Quellfluss
+SEE          varchar(25)   - Mündet in See
+MEER         varchar(25)   - Mündet in Meer
+LAENGE       int           - Länge in km
+LAENGEU      double        - Längengrad Ursprung
+BREITEU      double        - Breitengrad Ursprung
+LAENGEM      double        - Längengrad Mündung
+BREITEM      double        - Breitengrad Mündung</code>
                 </div>
 
                 <div class="help-block">
                     <h4>SEE</h4>
                     <code>S_NAME       varchar(25)   - Seename
 TIEFE        double        - Tiefe in Metern
-FLAECHE      double        - Fl&auml;che in km&sup2;</code>
+FLAECHE      double        - Fläche in km²</code>
                 </div>
 
                 <div class="help-block">
                     <h4>MEER</h4>
-                    <code>M_NAME       varchar(25)   - Meeresname
+                    <code>M_NAME       varchar(25)   - Meeresname (PK)
 TIEFE        double        - Tiefe in Metern</code>
                 </div>
 
                 <div class="help-block">
                     <h4>INSEL</h4>
-                    <code>I_NAME       varchar(25)   - Inselname
+                    <code>I_NAME       varchar(25)   - Inselname (PK)
 INSELGRUPPE  varchar(25)   - Inselgruppe
-FLAECHE      double        - Fl&auml;che in km&sup2;
-LAENGE       double        - L&auml;ngengrad
+FLAECHE      double        - Fläche in km²
+LAENGE       double        - Längengrad
 BREITE       double        - Breitengrad</code>
                 </div>
 
                 <div class="help-block">
                     <h4>WUESTE</h4>
-                    <code>W_NAME       varchar(25)   - W&uuml;stenname
-FLAECHE      double        - Fl&auml;che in km&sup2;
-WUESTENART   varchar(17)   - Art der W&uuml;ste</code>
+                    <code>id           int           - ID (PK)
+W_NAME       varchar(25)   - Wüstenname
+FLAECHE      double        - Fläche in km²
+WUESTENART   varchar(17)   - Art der Wüste</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>EBENE</h4>
+                    <code>E_NAME       varchar(25)   - Ebenenname
+HOEHE        double        - Höhe in Metern
+FLAECHE      double        - Fläche in km²</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>KONTINENT</h4>
+                    <code>K_NAME       varchar(10)   - Kontinentname (PK)
+FLAECHE      double        - Fläche in km²</code>
+                </div>
+
+                <div class="help-block">
+                    <h4>ORGANISATION</h4>
+                    <code>id           int           - ID (PK)
+O_NAME       varchar(70)   - Name der Organisation
+ABKUERZUNG   varchar(20)   - Abkürzung</code>
                 </div>
                 
                 <h3>Verbindungstabellen (für JOINs)</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                     <div class="help-block">
                         <h4>GEO_BERG</h4>
-                        <code>id           int
-L_ID         varchar(4)
-B_NAME       varchar(20)
+                        <code>id           int           - ID (PK)
+L_ID         varchar(4)    - Länder-ID
+LT_ID        varchar(4)    - Landteil-ID
+B_NAME       varchar(20)   - Bergname
 
-Verbindet: LAND &harr; BERG</code>
+Verbindet: LAND ↔ BERG</code>
                     </div>
                     
                     <div class="help-block">
                         <h4>GEO_FLUSS</h4>
-                        <code>L_ID         varchar(4)
-F_NAME       varchar(20)
+                        <code>id           int           - ID (PK)
+L_ID         varchar(4)    - Länder-ID
+LT_ID        varchar(50)   - Landteil-ID
+F_NAME       varchar(20)   - Flussname
 
-Verbindet: LAND &harr; FLUSS</code>
-                    </div>
-                    
-                    <div class="help-block">
-                        <h4>UMFASST</h4>
-                        <code>K_NAME       varchar(10)
-L_ID         varchar(4)
-PROZENT      double
-
-Verbindet: KONTINENT &harr; LAND</code>
+Verbindet: LAND ↔ FLUSS</code>
                     </div>
 
                     <div class="help-block">
                         <h4>GEO_SEE</h4>
-                        <code>L_ID         varchar(4)
-S_NAME       varchar(25)
+                        <code>id           int           - ID (PK)
+LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+S_NAME       varchar(25)   - Seename
 
-Verbindet: LAND &harr; SEE</code>
+Verbindet: LAND ↔ SEE</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>GEO_MEER</h4>
+                        <code>id           int           - ID (PK)
+LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+M_NAME       varchar(25)   - Meeresname
+
+Verbindet: LAND ↔ MEER</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>GEO_INSEL</h4>
+                        <code>LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+I_NAME       varchar(25)   - Inselname
+
+Verbindet: LAND ↔ INSEL</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>GEO_WUESTE</h4>
+                        <code>LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+W_NAME       varchar(25)   - Wüstenname
+
+Verbindet: LAND ↔ WUESTE</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>GEO_EBENE</h4>
+                        <code>LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+E_NAME       varchar(25)   - Ebenenname
+
+Verbindet: LAND ↔ EBENE</code>
+                    </div>
+                    
+                    <div class="help-block">
+                        <h4>UMFASST</h4>
+                        <code>id           int           - ID (PK)
+L_ID         varchar(4)    - Länder-ID
+K_NAME       varchar(10)   - Kontinent
+PROZENT      double        - Anteil in %
+
+Verbindet: LAND ↔ KONTINENT</code>
                     </div>
 
                     <div class="help-block">
                         <h4>LIEGT_AN</h4>
-                        <code>ST_NAME      varchar(25)
-L_ID         varchar(4)
-F_NAME       varchar(20)  - Fluss
-S_NAME       varchar(25)  - See
-M_NAME       varchar(25)  - Meer
+                        <code>id           int           - ID (PK)
+ST_NAME      varchar(25)   - Stadtname
+LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+F_NAME       varchar(20)   - Fluss
+S_NAME       varchar(25)   - See
+M_NAME       varchar(25)   - Meer
 
-Verbindet: STADT &harr; FLUSS/SEE/MEER</code>
+Verbindet: STADT ↔ FLUSS/SEE/MEER</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>IST_BENACHBART_ZU</h4>
+                        <code>id           int           - ID (PK)
+LAND1        varchar(4)    - Länder-ID 1
+LAND2        varchar(4)    - Länder-ID 2
+
+Verbindet: LAND ↔ LAND</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>IST_MITGLIED_VON</h4>
+                        <code>L_ID         varchar(4)    - Länder-ID
+ABKUERZUNG   varchar(20)   - Organisations-Abk.
+ART          varchar(25)   - Mitgliedschaftsart
+
+Verbindet: LAND ↔ ORGANISATION</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>HAT_SITZ_IN</h4>
+                        <code>ST_NAME      varchar(25)   - Stadtname
+LT_ID        varchar(4)    - Landteil-ID
+L_ID         varchar(4)    - Länder-ID
+ABKUERZUNG   varchar(20)   - Organisations-Abk.
+
+Verbindet: STADT ↔ ORGANISATION</code>
+                    </div>
+
+                    <div class="help-block">
+                        <h4>GEHT_UEBER_IN</h4>
+                        <code>MEER1        varchar(25)   - Meer 1
+MEER2        varchar(25)   - Meer 2
+
+Verbindet: MEER ↔ MEER</code>
                     </div>
                 </div>
             </div>
