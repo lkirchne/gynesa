@@ -1033,6 +1033,12 @@ const INITIAL_TREE = {
   }
 };
 
+const CLEAR_TREE = {
+  question: "Kommt die Person aus Deutschland?",
+  yes: { name: "Herr Kirchner" },
+  no: { name: "Seniorita Gynesa" },
+};
+
 let tree    = loadTree() || copy(INITIAL_TREE);
 let curNode = null;
 let history = [];
@@ -1122,7 +1128,7 @@ function learnNewCharacter() {
 
 function resetAll() {
   if (!confirm('Wirklich alle gelernten Personen löschen und neu starten?')) return;
-  tree = copy(INITIAL_TREE);
+  tree = copy(CLEAR_TREE);
   localStorage.removeItem(STORAGE_KEY);
   updateBadge();
   showScreen('START');
