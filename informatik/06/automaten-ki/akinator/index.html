@@ -29,7 +29,6 @@ body {
   margin: 0 auto;
 }
 
-/* ── HEADER ──────────────────────────────── */
 .site-header {
   display: flex;
   align-items: baseline;
@@ -57,7 +56,6 @@ body {
   color: #888;
 }
 
-/* ── TABS ────────────────────────────────── */
 .tabs {
   display: flex;
   border-bottom: 2px solid #000;
@@ -86,7 +84,6 @@ body {
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
-/* ── GAME ────────────────────────────────── */
 .game-inner { max-width: 460px; }
 
 .card {
@@ -222,7 +219,6 @@ body {
   margin-top: 0.35rem;
 }
 
-/* ── BUTTONS ─────────────────────────────── */
 .btn {
   font-family: var(--heading);
   font-weight: 700;
@@ -277,7 +273,6 @@ body {
   color: #666;
 }
 
-/* ── TREE OVERLAY ────────────────────────── */
 .tree-overlay {
   display: none;
   position: fixed;
@@ -339,6 +334,67 @@ body {
 
 .legend-q { width: 22px; height: 14px; border: 2px solid #000; background: #fff; flex-shrink: 0; }
 .legend-a { width: 22px; height: 14px; background: #000; flex-shrink: 0; }
+
+/* ── CLOSE ARROW ─────────────────────────── */
+.close-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.close-arrow {
+  width: 28px;
+  height: 36px;
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 4px);
+  transform: translateX(-50%);
+  animation: bounce-arrow 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes bounce-arrow {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(-5px); }
+}
+
+#import-file { display: none; }
+
+/* ── EDIT PANEL ──────────────────────────── */
+.edit-panel {
+  flex-shrink: 0;
+  border-top: 2px solid #000;
+  background: #fff;
+  padding: 1rem 1.5rem;
+  display: none;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.edit-panel.open { display: flex; }
+
+.edit-panel input {
+  flex: 1;
+  border: 2px solid #000;
+  padding: 0.6rem 0.75rem;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  outline: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+
+.edit-panel input:focus { outline: 3px solid #000; outline-offset: 2px; }
+
+.edit-panel-label {
+  font-family: var(--heading);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #aaa;
+  white-space: nowrap;
+}
 
 /* ══════════════════════════════════════════
    ARBEITSBLATT
@@ -531,118 +587,12 @@ body {
   border-bottom: 1.5px solid #000;
 }
 
-.ws-discussion {
-  border: 2px solid #000;
-  padding: 1.4rem;
-  margin-top: 2.5rem;
-}
-
-.ws-discussion-label {
-  font-family: var(--heading);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #aaa;
-  margin-bottom: 0.6rem;
-  display: block;
-}
-
-.ws-discussion-title {
-  font-family: var(--heading);
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.8rem;
-}
-
-.ws-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.ws-chip {
-  font-family: var(--heading);
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: 1.5px solid #000;
-  padding: 0.35rem 0.7rem;
-}
-
 @media (max-width: 480px) {
   .card { padding: 1.4rem; }
   .big-title { font-size: 2.2rem; }
   .result-name { font-size: 2rem; }
   .tab-btn { padding: 0.75rem 0.9rem; }
   .ws-table td:first-child { width: 35%; }
-}
-
-
-
-/* ── CLOSE ARROW ─────────────────────────── */
-.close-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.close-arrow {
-  width: 28px;
-  height: 36px;
-  position: absolute;
-  left: 50%;
-  top: calc(100% + 4px);
-  transform: translateX(-50%);
-  animation: bounce-arrow 1.2s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes bounce-arrow {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%       { transform: translateX(-50%) translateY(-5px); }
-}
-
-/* ── IMPORT HIDDEN INPUT ─────────────────── */
-#import-file { display: none; }
-
-/* ── EDIT PANEL ──────────────────────────── */
-.edit-panel {
-  flex-shrink: 0;
-  border-top: 2px solid #000;
-  background: #fff;
-  padding: 1rem 1.5rem;
-  display: none;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.edit-panel.open { display: flex; }
-
-.edit-panel input {
-  flex: 1;
-  border: 2px solid #000;
-  padding: 0.6rem 0.75rem;
-  font-family: var(--body);
-  font-size: 0.95rem;
-  outline: none;
-  border-radius: 0;
-  -webkit-appearance: none;
-}
-
-.edit-panel input:focus { outline: 3px solid #000; outline-offset: 2px; }
-
-.edit-panel-label {
-  font-family: var(--heading);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #aaa;
-  white-space: nowrap;
 }
 
 /* ══════════════════════════════════════════
@@ -687,12 +637,6 @@ body {
   .ws-q-num { font-size: 7pt; }
   .ws-q-text { font-size: 10pt; }
   .ws-q-hint { font-size: 9pt; }
-
-  .ws-discussion { padding: 0.8rem 1rem; margin-top: 1.2rem; }
-  .ws-discussion-label { font-size: 7pt; }
-  .ws-discussion-title { font-size: 10pt; margin-bottom: 0.5rem; }
-  .ws-chips { gap: 0.35rem; }
-  .ws-chip { font-size: 7pt; padding: 0.2rem 0.5rem; }
 
   .ws-logo-slot { border-color: #bbb; }
 
@@ -804,7 +748,6 @@ body {
     <div class="ws-section">
       <p class="ws-section-label">Teil 1 — Vorwissen aktivieren</p>
       <h3 class="ws-section-title">Was wir schon wissen</h3>
-
       <p class="ws-text">
         In der letzten Stunde habt ihr <strong>Entscheidungsbäume</strong> kennengelernt.
         Sie helfen dabei, Dinge anhand von Merkmalen zu sortieren:
@@ -822,22 +765,18 @@ body {
     <div class="ws-section">
       <p class="ws-section-label">Teil 2 — Neues Konzept</p>
       <h3 class="ws-section-title">Was ist ein Expertensystem?</h3>
-
       <p class="ws-text">
         Ein <strong>Expertensystem</strong> ist ein Computerprogramm,
         das so tut, als wäre es ein Fachmann auf einem bestimmten Gebiet.
         Es beantwortet Fragen und löst Aufgaben – aber nicht, weil es selbst nachdenkt.
         Ein Mensch hat ihm vorher alle nötigen Regeln und Fragen einprogrammiert.
       </p>
-
       <div class="ws-box">
         <span class="ws-box-label">Merksatz</span>
         Ein Expertensystem folgt Regeln, die von Menschen eingegeben wurden.
         Es kann nur das, was ihm jemand beigebracht hat – nicht mehr und nicht weniger.
       </div>
-
       <p class="ws-text">Jedes Expertensystem hat zwei wichtige Teile:</p>
-
       <table class="ws-table">
         <thead>
           <tr><th>Teil</th><th>Was bedeutet das?</th><th>Bei unserem Akinator …</th></tr>
@@ -861,7 +800,6 @@ body {
     <div class="ws-section">
       <p class="ws-section-label">Teil 3 — Vergleich und Einordnung</p>
       <h3 class="ws-section-title">Ist das wirklich Künstliche Intelligenz?</h3>
-
       <p class="ws-text">
         Expertensysteme sind eine <strong>frühe Form von Künstlicher Intelligenz</strong>.
         Sie wurden schon in den 1980er Jahren eingesetzt – zum Beispiel, um Krankheiten zu
@@ -871,7 +809,6 @@ body {
         sondern durch das Auswerten von <strong>riesigen Datenmengen</strong> –
         ähnlich wie ein Mensch durch Erfahrung lernt.
       </p>
-
       <table class="ws-table">
         <thead>
           <tr><th>Merkmal</th><th>Expertensystem (unser Akinator)</th><th>Moderne KI (z.B. ChatGPT)</th></tr>
@@ -905,47 +842,38 @@ body {
     <div class="ws-section">
       <p class="ws-section-label">Aufgaben</p>
       <h3 class="ws-section-title">Schreib deine Antworten ins Heft</h3>
-
       <p class="ws-text" style="font-style:italic; color:#666; margin-bottom:1.5rem">
         Nummeriere deine Antworten genauso wie die Aufgaben (1–5).
         Schreib in ganzen Sätzen, wenn nichts anderes angegeben ist.
       </p>
-
       <ol class="ws-questions">
-
         <li>
           <span class="ws-q-num">Aufgabe 1 &nbsp;·&nbsp; <span class="ws-q-klp">Vergleichen</span></span>
           <span class="ws-q-text">Ihr habt gerade selbst Fragen für den Akinator überlegt – genauso wie ihr letzte Stunde Fragen für den Tier-Baum überlegt habt. Was ist also der Unterschied zwischen eurem Tier-Baum und dem Akinator? Oder gibt es keine Unterschiede?</span>
           <span class="ws-q-hint">Schau dir dazu den Baum unseres Akinators an: Klicke im Spiel-Tab oben auf „Baum anzeigen".</span>
         </li>
-
         <li>
           <span class="ws-q-num">Aufgabe 2 &nbsp;·&nbsp; <span class="ws-q-klp">Erläutern &amp; Analysieren</span></span>
           <span class="ws-q-text">Du hast unserem Akinator gerade eine neue Sache (z. B. Person) beigebracht. Beschreibe in zwei Sätzen, was du dafür tun musstest. Hätte der Akinator selbst herausfinden können, welche Frage er stellen soll?</span>
           <span class="ws-q-hint">Überlege: Hat das Programm selbst nachgedacht – oder hast du das für es entschieden?</span>
         </li>
-
         <li>
           <span class="ws-q-num">Aufgabe 3 &nbsp;·&nbsp; <span class="ws-q-klp">Beispiele nennen</span></span>
           <span class="ws-q-text">Nenne zwei Beispiele aus deinem Alltag, bei denen KI eingesetzt wird. Erkläre bei einem der beiden Beispiele in einem Satz, was die KI dort genau macht.</span>
           <span class="ws-q-hint">Denk z.B. an dein Handy, Streaming-Apps oder Suchmaschinen.</span>
         </li>
-
         <li>
           <span class="ws-q-num">Aufgabe 4 &nbsp;·&nbsp; <span class="ws-q-klp">Informatik &amp; Gesellschaft</span></span>
           <span class="ws-q-text">TikTok und YouTube nutzen KI, um zu entscheiden, welche Videos dir als nächstes angezeigt werden. Nenne einen möglichen Vorteil und einen möglichen Nachteil davon.</span>
           <span class="ws-q-hint">Was ist praktisch daran – und was könnte dabei schiefgehen oder dich einschränken?</span>
         </li>
-
         <li>
           <span class="ws-q-num">Aufgabe 5 &nbsp;·&nbsp; <span class="ws-q-klp">Weiterdenken</span></span>
           <span class="ws-q-text">Stell dir vor, du könntest unseren Akinator verbessern. Was würdest du ändern oder ergänzen, damit er mehr Sachen erkennt oder schwerer zu überlisten ist?</span>
           <span class="ws-q-hint">Denk z.B. an die Fragen, die Anzahl der Sachen oder daran, was passiert, wenn das Programm falsch rät.</span>
         </li>
-
       </ol>
     </div>
-
 
   </div><!-- /tab-arbeitsblatt -->
 
@@ -973,7 +901,7 @@ body {
     <span class="legend-item"><span class="legend-a"></span>Sache (Blatt)</span>
   </div>
   <div class="edit-panel" id="edit-panel">
-    <span class="edit-panel-label">Frage&shy;text</span>
+    <span class="edit-panel-label" id="edit-panel-label">Fragetext</span>
     <input type="text" id="edit-input" autocomplete="off">
     <button class="btn btn-solid btn-sm" onclick="saveEdit()">Speichern</button>
     <button class="btn btn-sm btn-muted" onclick="cancelEdit()">Abbrechen</button>
@@ -1065,7 +993,7 @@ function countLeaves(node) {
 function updateBadge() {
   const n = countLeaves(tree);
   document.getElementById('char-count').textContent =
-    n + (n === 1 ? ' Eintrag bekannt' : ' Einträge bekannt');
+    n + (n === 1 ? ' Eintrag im Baum' : ' Einträge im Baum');
 }
 
 function escXML(s) {
@@ -1133,6 +1061,9 @@ function resetAll() {
   if (!confirm(msg)) return;
   tree = copy(CLEAR_TREE);
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem('akinator_close_seen');
+  const arrow = document.querySelector('.close-arrow');
+  if (arrow) arrow.style.display = '';
   updateBadge();
   showScreen('START');
 }
@@ -1232,6 +1163,10 @@ function buildSVG() {
       nodeSVG.push(`<rect x="${cx-LW/2}" y="${top}" width="${LW}" height="${LH}" fill="#000"/>`);
       const nm = n.node.name.length > 17 ? n.node.name.slice(0,16)+'…' : n.node.name;
       nodeSVG.push(`<text x="${cx}" y="${top+LH/2+4}" text-anchor="middle" fill="#fff" font-family="Montserrat,sans-serif" font-weight="700" font-size="11">${escXML(nm)}</text>`);
+      // pencil icon on leaf (dunkel auf schwarz)
+      const lpx = cx + LW/2 - 12, lpy = top + 13;
+      nodeSVG.push(`<rect x="${lpx-8}" y="${lpy-11}" width="18" height="16" rx="3" fill="#333" style="cursor:pointer" onclick="editLeaf('${n.path}')"/>`);
+      nodeSVG.push(`<text x="${lpx}" y="${lpy}" text-anchor="middle" font-size="10" style="cursor:pointer;user-select:none" onclick="editLeaf('${n.path}')" fill="#aaa">✎</text>`);
     } else {
       nodeSVG.push(`<rect x="${cx-NW/2}" y="${top}" width="${NW}" height="${NH}" fill="#fff" stroke="#000" stroke-width="2"/>`);
       const lines  = wrapText(n.node.question, NW-14, 11);
@@ -1240,7 +1175,7 @@ function buildSVG() {
       lines.forEach((line, i) => {
         nodeSVG.push(`<text x="${cx}" y="${startY+i*lineH}" text-anchor="middle" fill="#000" font-family="Libre Baskerville,serif" font-size="11">${escXML(line)}</text>`);
       });
-      // pencil icon top-right corner
+      // pencil icon on question node
       const px = cx + NW/2 - 12, py = top + 13;
       nodeSVG.push(`<rect x="${px-8}" y="${py-11}" width="18" height="16" rx="3" fill="#f0f0f0" style="cursor:pointer" onclick="editNode('${n.path}')"/>`);
       nodeSVG.push(`<text x="${px}" y="${py}" text-anchor="middle" font-size="10" style="cursor:pointer;user-select:none" onclick="editNode('${n.path}')" fill="#888">✎</text>`);
@@ -1290,8 +1225,7 @@ function saveTreeAsSVG() {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-
-// ── FRAGE BEARBEITEN ─────────────────────────────────
+// ── BEARBEITEN ────────────────────────────────────────
 let _editPath = null;
 
 function getNodeAtPath(path) {
@@ -1303,8 +1237,20 @@ function getNodeAtPath(path) {
 function editNode(path) {
   _editPath = path;
   const node = getNodeAtPath(path);
+  document.getElementById('edit-panel-label').textContent = 'Fragetext';
   const inp = document.getElementById('edit-input');
   inp.value = node.question;
+  document.getElementById('edit-panel').classList.add('open');
+  inp.focus();
+  inp.select();
+}
+
+function editLeaf(path) {
+  _editPath = path;
+  const node = getNodeAtPath(path);
+  document.getElementById('edit-panel-label').textContent = 'Name';
+  const inp = document.getElementById('edit-input');
+  inp.value = node.name;
   document.getElementById('edit-panel').classList.add('open');
   inp.focus();
   inp.select();
@@ -1314,7 +1260,11 @@ function saveEdit() {
   const val = document.getElementById('edit-input').value.trim();
   if (!val) return;
   const node = getNodeAtPath(_editPath);
-  node.question = val;
+  if (node.name !== undefined) {
+    node.name = val;
+  } else {
+    node.question = val;
+  }
   saveTree();
   cancelEdit();
   openTree();
