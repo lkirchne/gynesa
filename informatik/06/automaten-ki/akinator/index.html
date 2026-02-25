@@ -350,7 +350,6 @@ body {
   margin-bottom: 2rem;
 }
 
-
 .ws-header-top {
   display: flex;
   align-items: center;
@@ -376,12 +375,6 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #ccc;
-}
-
-@media print {
-  .ws-logo-slot {
-    border-color: #bbb;
-  }
 }
 
 .ws-kicker {
@@ -588,6 +581,70 @@ body {
   .ws-table td:first-child { width: 35%; }
 }
 
+
+
+/* ── CLOSE ARROW ─────────────────────────── */
+.close-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.close-arrow {
+  width: 28px;
+  height: 36px;
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 4px);
+  transform: translateX(-50%);
+  animation: bounce-arrow 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes bounce-arrow {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* ── IMPORT HIDDEN INPUT ─────────────────── */
+#import-file { display: none; }
+
+/* ── EDIT PANEL ──────────────────────────── */
+.edit-panel {
+  flex-shrink: 0;
+  border-top: 2px solid #000;
+  background: #fff;
+  padding: 1rem 1.5rem;
+  display: none;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.edit-panel.open { display: flex; }
+
+.edit-panel input {
+  flex: 1;
+  border: 2px solid #000;
+  padding: 0.6rem 0.75rem;
+  font-family: var(--body);
+  font-size: 0.95rem;
+  outline: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+
+.edit-panel input:focus { outline: 3px solid #000; outline-offset: 2px; }
+
+.edit-panel-label {
+  font-family: var(--heading);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #aaa;
+  white-space: nowrap;
+}
+
 /* ══════════════════════════════════════════
    DRUCK-ANSICHT
 ══════════════════════════════════════════ */
@@ -599,66 +656,22 @@ body {
 }
 
 @media print {
-  /* Alles ausblenden außer dem Arbeitsblatt */
   .site-header,
   .tabs,
   #tab-spiel,
   .tree-overlay,
   .print-btn-bar { display: none !important; }
 
-  /* Arbeitsblatt immer sichtbar beim Drucken */
   #tab-arbeitsblatt { display: block !important; }
 
-  body {
-    padding: 0;
-    font-size: 11pt;
-    color: #000;
-    background: #fff;
-  }
-
+  body { padding: 0; font-size: 11pt; color: #000; background: #fff; }
   .wrap { max-width: 100%; }
 
-  /* Header */
   .ws-header { padding-bottom: 0.8rem; margin-bottom: 1.4rem; }
-  
-.ws-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.3rem;
-}
-
-.ws-logo-slot {
-  width: 80px;
-  height: 40px;
-  border: 1.5px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.ws-logo-slot::after {
-  content: 'Logo';
-  font-family: var(--heading);
-  font-size: 0.55rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #ccc;
-}
-
-@media print {
-  .ws-logo-slot {
-    border-color: #bbb;
-  }
-}
-
-.ws-kicker { font-size: 7pt; }
+  .ws-kicker { font-size: 7pt; }
   .ws-title { font-size: 18pt; line-height: 1.15; margin-bottom: 0.4rem; }
   .ws-meta { font-size: 10pt; }
 
-  /* Abschnitte */
   .ws-section { margin-bottom: 1.4rem; }
   .ws-section-label { font-size: 7pt; }
   .ws-section-title { font-size: 10pt; padding-bottom: 0.3rem; margin-bottom: 0.7rem; }
@@ -666,29 +679,24 @@ body {
   .ws-box { padding: 0.6rem 0.8rem; font-size: 10pt; margin: 0.7rem 0; }
   .ws-box-label { font-size: 7pt; }
 
-  /* Tabellen */
   .ws-table { font-size: 9pt; margin: 0.7rem 0; }
   .ws-table th { padding: 0.35rem 0.5rem; font-size: 7pt; }
   .ws-table td { padding: 0.4rem 0.5rem; }
 
-  /* Aufgaben */
   .ws-questions li { margin-bottom: 1.1rem; page-break-inside: avoid; }
   .ws-q-num { font-size: 7pt; }
   .ws-q-text { font-size: 10pt; }
   .ws-q-hint { font-size: 9pt; }
 
-  /* Diskussions-Kasten */
   .ws-discussion { padding: 0.8rem 1rem; margin-top: 1.2rem; }
   .ws-discussion-label { font-size: 7pt; }
   .ws-discussion-title { font-size: 10pt; margin-bottom: 0.5rem; }
   .ws-chips { gap: 0.35rem; }
   .ws-chip { font-size: 7pt; padding: 0.2rem 0.5rem; }
 
-  /* Seitenränder */
-  @page {
-    margin: 1.8cm 2cm;
-    size: A4;
-  }
+  .ws-logo-slot { border-color: #bbb; }
+
+  @page { margin: 1.8cm 2cm; size: A4; }
 }
 </style>
 </head>
@@ -766,6 +774,9 @@ body {
 
       <div class="toolbar">
         <button class="btn btn-sm" onclick="openTree()">Baum anzeigen</button>
+        <button class="btn btn-sm btn-muted" onclick="exportTree()">Exportieren</button>
+        <button class="btn btn-sm btn-muted" onclick="document.getElementById('import-file').click()">Importieren</button>
+        <input type="file" id="import-file" accept=".json" onchange="importTree(event)">
         <button class="btn btn-sm btn-muted" onclick="resetAll()">Zurücksetzen</button>
         <button class="btn btn-sm btn-muted" id="cancel-btn" style="display:none" onclick="showScreen('START')">Abbrechen</button>
       </div>
@@ -789,7 +800,7 @@ body {
     <div class="ws-header">
       <div class="ws-header-top">
         <p class="ws-kicker">Informatik · Klasse 6 · Automaten und KI &nbsp;·&nbsp;</p>
-        <img width="100px" src="logo.png">
+        <img width="100px" src="logo.png" alt="Logo">
       </div>
       <h2 class="ws-title">Unser Akinator</h2>
       <p class="ws-meta">Name: _________________________________ &nbsp;&nbsp; Datum: _______________</p>
@@ -916,8 +927,8 @@ body {
 
         <li>
           <span class="ws-q-num">Aufgabe 2 &nbsp;·&nbsp; <span class="ws-q-klp">Erläutern &amp; Analysieren</span></span>
-          <span class="ws-q-text">Erkläre mit eigenen Worten, was das Programm macht, wenn du auf „Ja" oder „Nein" klickst. Woher „weiß" es dabei, welche Frage als nächstes kommt – und wer hat das eigentlich festgelegt?</span>
-          <span class="ws-q-hint">Überlege: Hat das Programm selbst nachgedacht – oder steckt da jemand dahinter?</span>
+          <span class="ws-q-text">Du hast unserem Akinator gerade eine neue Person beigebracht. Beschreibe in zwei Sätzen, was du dafür tun musstest. Hätte der Akinator selbst herausfinden können, welche Frage er stellen soll?</span>
+          <span class="ws-q-hint">Überlege: Hat das Programm selbst nachgedacht – oder hast du das für es entschieden?</span>
         </li>
 
         <li>
@@ -941,22 +952,6 @@ body {
       </ol>
     </div>
 
-    <!-- Diskussions-Kasten -->
-    <div class="ws-discussion">
-      <span class="ws-discussion-label">Für die Klasse</span>
-      <p class="ws-discussion-title">Das besprechen wir gemeinsam im Plenum</p>
-      <p class="ws-text" style="margin-bottom:0; max-width:none">
-        Nach der Einzelarbeit tauscht ihr eure Antworten aus.
-        Folgende Fragen stehen dabei im Mittelpunkt:
-      </p>
-      <div class="ws-chips">
-        <span class="ws-chip">Wie bringt man einem Programm etwas bei?</span>
-        <span class="ws-chip">Kann der Akinator wirklich lernen?</span>
-        <span class="ws-chip">Wann nennen wir ein Programm „intelligent"?</span>
-        <span class="ws-chip">Was fehlt dem Akinator im Vergleich zu ChatGPT?</span>
-        <span class="ws-chip">Wer trägt Verantwortung für KI-Entscheidungen?</span>
-      </div>
-    </div>
 
   </div><!-- /tab-arbeitsblatt -->
 
@@ -968,14 +963,26 @@ body {
     <span class="tree-topbar-title">Entscheidungsbaum</span>
     <div class="tree-topbar-right">
       <span class="tree-hint">← → scrollen wenn nötig</span>
-      <button class="btn btn-sm" onclick="saveTreeAsPNG()">Als Bild speichern</button>
-      <button class="btn btn-sm" onclick="closeTree()">Schlie&szlig;en &times;</button>
+      <button class="btn btn-sm" onclick="saveTreeAsSVG()">Als Bild speichern</button>
+      <div class="close-wrap">
+        <svg class="close-arrow" viewBox="0 0 40 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 48 C22 30, 18 20, 20 8" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <polyline points="14,15 20,6 26,15" stroke="#000" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <button class="btn btn-sm btn-solid" onclick="closeTree()">Schlie&szlig;en &times;</button>
+      </div>
     </div>
   </div>
   <div class="tree-scroll" id="tree-scroll"></div>
   <div class="tree-legend">
     <span class="legend-item"><span class="legend-q"></span>Frage</span>
     <span class="legend-item"><span class="legend-a"></span>Person (Blatt)</span>
+  </div>
+  <div class="edit-panel" id="edit-panel">
+    <span class="edit-panel-label">Frage&shy;text</span>
+    <input type="text" id="edit-input" autocomplete="off">
+    <button class="btn btn-solid btn-sm" onclick="saveEdit()">Speichern</button>
+    <button class="btn btn-sm btn-muted" onclick="cancelEdit()">Abbrechen</button>
   </div>
 </div>
 
@@ -1036,7 +1043,7 @@ const INITIAL_TREE = {
 const CLEAR_TREE = {
   question: "Ist die Person männlich?",
   yes: { name: "Herr Kirchner" },
-  no: { name: "Frau Kop" },
+  no:  { name: "Frau Kop" }
 };
 
 let tree    = loadTree() || copy(INITIAL_TREE);
@@ -1127,11 +1134,47 @@ function learnNewCharacter() {
 }
 
 function resetAll() {
-  if (!confirm('Wirklich alle gelernten Personen löschen und neu starten?')) return;
+  const n = countLeaves(tree);
+  const msg = `⚠️ Achtung: Alle ${n} Personen werden unwiderruflich gelöscht!\n\nDer Baum wird auf den Anfangszustand zurückgesetzt.\nDiese Aktion kann nicht rückgängig gemacht werden.\n\nWirklich fortfahren?`;
+  if (!confirm(msg)) return;
   tree = copy(CLEAR_TREE);
   localStorage.removeItem(STORAGE_KEY);
   updateBadge();
   showScreen('START');
+}
+
+function exportTree() {
+  const json = JSON.stringify(tree, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'akinator-baum.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+function importTree(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.question && !parsed.name) throw new Error('Ungültiges Format');
+      tree = parsed;
+      saveTree();
+      updateBadge();
+      showScreen('START');
+      alert('Baum erfolgreich importiert!');
+    } catch {
+      alert('Fehler: Die Datei konnte nicht importiert werden. Bitte nur gültige Akinator-JSON-Dateien verwenden.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 }
 
 function showScreen(name) {
@@ -1143,17 +1186,17 @@ function showScreen(name) {
 // ── BAUM-VISUALISIERUNG ───────────────────────────────
 const NW = 192, NH = 58, LW = 130, LH = 40, HGAP = 30, VGAP = 68;
 
-function layoutTree(node, depth, counter) {
+function layoutTree(node, depth, counter, path = '') {
   if (node.name) {
     const cx = counter.n * (LW + HGAP) + HGAP / 2 + LW / 2;
     counter.n++;
-    return { type: 'leaf', cx, top: depth * (NH + VGAP), node };
+    return { type: 'leaf', cx, top: depth * (NH + VGAP), node, path };
   }
-  const left  = layoutTree(node.yes, depth + 1, counter);
-  const right = layoutTree(node.no,  depth + 1, counter);
+  const left  = layoutTree(node.yes, depth + 1, counter, path + 'y');
+  const right = layoutTree(node.no,  depth + 1, counter, path + 'n');
   return {
     type: 'question', cx: (left.cx + right.cx) / 2,
-    top: depth * (NH + VGAP), node,
+    top: depth * (NH + VGAP), node, path,
     children: [{ layout: left, label: 'JA' }, { layout: right, label: 'NEIN' }]
   };
 }
@@ -1203,6 +1246,10 @@ function buildSVG() {
       lines.forEach((line, i) => {
         nodeSVG.push(`<text x="${cx}" y="${startY+i*lineH}" text-anchor="middle" fill="#000" font-family="Libre Baskerville,serif" font-size="11">${escXML(line)}</text>`);
       });
+      // pencil icon top-right corner
+      const px = cx + NW/2 - 12, py = top + 13;
+      nodeSVG.push(`<rect x="${px-8}" y="${py-11}" width="18" height="16" rx="3" fill="#f0f0f0" style="cursor:pointer" onclick="editNode('${n.path}')"/>`);
+      nodeSVG.push(`<text x="${px}" y="${py}" text-anchor="middle" font-size="10" style="cursor:pointer;user-select:none" onclick="editNode('${n.path}')" fill="#888">✎</text>`);
       for (const { layout: child, label } of n.children) {
         const fromY = top + NH;
         const midCX = (cx + child.cx) * 0.5;
@@ -1224,132 +1271,20 @@ function buildSVG() {
 function openTree() {
   document.getElementById('tree-scroll').innerHTML = buildSVG();
   document.getElementById('tree-overlay').classList.add('open');
+  const arrow = document.querySelector('.close-arrow');
+  if (arrow) arrow.style.display = localStorage.getItem('akinator_close_seen') ? 'none' : '';
 }
 
 function closeTree() {
   document.getElementById('tree-overlay').classList.remove('open');
+  localStorage.setItem('akinator_close_seen', '1');
+  const arrow = document.querySelector('.close-arrow');
+  if (arrow) arrow.style.display = 'none';
 }
 
-// ── BAUM SPEICHERN (iPad-kompatibel) ─────────────────
-function saveTreeAsPNG() {
-  // SVG generieren
+// ── BAUM SPEICHERN ────────────────────────────────────
+function saveTreeAsSVG() {
   const svgStr = buildSVG();
-
-  // Fonts inline einbetten damit der Export sauber aussieht
-  const svgWithFont = svgStr.replace(
-    '<svg',
-    `<svg xmlns:xlink="http://www.w3.org/1999/xlink"`
-  ).replace(
-    '</svg>',
-    `<defs><style>
-      @import url('https://fonts.bunny.net/css?family=montserrat:700,800|libre-baskerville:400');
-    
-/* ══════════════════════════════════════════
-   DRUCK-ANSICHT
-══════════════════════════════════════════ */
-
-.print-btn-bar {
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-@media print {
-  /* Alles ausblenden außer dem Arbeitsblatt */
-  .site-header,
-  .tabs,
-  #tab-spiel,
-  .tree-overlay,
-  .print-btn-bar { display: none !important; }
-
-  /* Arbeitsblatt immer sichtbar beim Drucken */
-  #tab-arbeitsblatt { display: block !important; }
-
-  body {
-    padding: 0;
-    font-size: 11pt;
-    color: #000;
-    background: #fff;
-  }
-
-  .wrap { max-width: 100%; }
-
-  /* Header */
-  .ws-header { padding-bottom: 0.8rem; margin-bottom: 1.4rem; }
-  
-.ws-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.3rem;
-}
-
-.ws-logo-slot {
-  width: 80px;
-  height: 40px;
-  border: 1.5px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.ws-logo-slot::after {
-  content: 'Logo';
-  font-family: var(--heading);
-  font-size: 0.55rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #ccc;
-}
-
-@media print {
-  .ws-logo-slot {
-    border-color: #bbb;
-  }
-}
-
-.ws-kicker { font-size: 7pt; }
-  .ws-title { font-size: 18pt; line-height: 1.15; margin-bottom: 0.4rem; }
-  .ws-meta { font-size: 10pt; }
-
-  /* Abschnitte */
-  .ws-section { margin-bottom: 1.4rem; }
-  .ws-section-label { font-size: 7pt; }
-  .ws-section-title { font-size: 10pt; padding-bottom: 0.3rem; margin-bottom: 0.7rem; }
-  .ws-text { font-size: 10pt; line-height: 1.6; margin-bottom: 0.6rem; }
-  .ws-box { padding: 0.6rem 0.8rem; font-size: 10pt; margin: 0.7rem 0; }
-  .ws-box-label { font-size: 7pt; }
-
-  /* Tabellen */
-  .ws-table { font-size: 9pt; margin: 0.7rem 0; }
-  .ws-table th { padding: 0.35rem 0.5rem; font-size: 7pt; }
-  .ws-table td { padding: 0.4rem 0.5rem; }
-
-  /* Aufgaben */
-  .ws-questions li { margin-bottom: 1.1rem; page-break-inside: avoid; }
-  .ws-q-num { font-size: 7pt; }
-  .ws-q-text { font-size: 10pt; }
-  .ws-q-hint { font-size: 9pt; }
-
-  /* Diskussions-Kasten */
-  .ws-discussion { padding: 0.8rem 1rem; margin-top: 1.2rem; }
-  .ws-discussion-label { font-size: 7pt; }
-  .ws-discussion-title { font-size: 10pt; margin-bottom: 0.5rem; }
-  .ws-chips { gap: 0.35rem; }
-  .ws-chip { font-size: 7pt; padding: 0.2rem 0.5rem; }
-
-  /* Seitenränder */
-  @page {
-    margin: 1.8cm 2cm;
-    size: A4;
-  }
-}
-</style></defs></svg>`
-  );
-
-  // Als SVG-Datei anbieten (funktioniert auf iPad Safari über Teilen-Menü)
   const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -1359,6 +1294,41 @@ function saveTreeAsPNG() {
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+
+// ── FRAGE BEARBEITEN ─────────────────────────────────
+let _editPath = null;
+
+function getNodeAtPath(path) {
+  let node = tree;
+  for (const c of path) node = c === 'y' ? node.yes : node.no;
+  return node;
+}
+
+function editNode(path) {
+  _editPath = path;
+  const node = getNodeAtPath(path);
+  const inp = document.getElementById('edit-input');
+  inp.value = node.question;
+  document.getElementById('edit-panel').classList.add('open');
+  inp.focus();
+  inp.select();
+}
+
+function saveEdit() {
+  const val = document.getElementById('edit-input').value.trim();
+  if (!val) return;
+  const node = getNodeAtPath(_editPath);
+  node.question = val;
+  saveTree();
+  cancelEdit();
+  openTree();
+}
+
+function cancelEdit() {
+  _editPath = null;
+  document.getElementById('edit-panel').classList.remove('open');
 }
 
 // ── INIT ──────────────────────────────────────────────
