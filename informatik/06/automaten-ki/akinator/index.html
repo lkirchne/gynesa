@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unser Akinator</title>
+<style>
+@import url('https://fonts.bunny.net/css?family=montserrat:700,800|libre-baskerville:400,400i,700');
+
+:root {
+  --heading: 'Montserrat', sans-serif;
+  --body: 'Libre Baskerville', serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--body);
+  background: #fff;
+  color: #000;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 1.75rem 1.25rem 5rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── HEADER ──────────────────────────────── */
+.site-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 3px solid #000;
+  padding-bottom: 0.8rem;
+}
+
+.site-header h1 {
+  font-family: var(--heading);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.badge {
+  font-family: var(--heading);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+/* ── TABS ────────────────────────────────── */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #000;
+  margin-bottom: 2rem;
+}
+
+.tab-btn {
+  font-family: var(--heading);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  padding: 0.85rem 1.25rem;
+  cursor: pointer;
+  color: #bbb;
+  transition: color 0.15s;
+}
+
+.tab-btn:hover { color: #555; }
+.tab-btn.active { color: #000; border-bottom-color: #000; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── GAME ────────────────────────────────── */
+.game-inner { max-width: 460px; }
+
+.card {
+  border: 2px solid #000;
+  padding: 2rem;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; flex: 1; }
+
+.start-head { flex: 1; }
+
+.big-title {
+  font-family: var(--heading);
+  font-size: clamp(2.4rem, 9vw, 3.6rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+
+.lead {
+  font-size: 1rem;
+  color: #555;
+  font-style: italic;
+  max-width: 36ch;
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  font-family: var(--heading);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+
+.question-text {
+  font-family: var(--heading);
+  font-size: clamp(1.1rem, 4vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  min-height: 90px;
+}
+
+.btn-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+.result-top { flex: 1; }
+
+.result-label {
+  font-size: 0.88rem;
+  color: #777;
+  font-style: italic;
+  margin-bottom: 0.2rem;
+}
+
+.result-name {
+  font-family: var(--heading);
+  font-size: clamp(2.2rem, 10vw, 3.8rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid #000;
+  margin-bottom: 1.75rem;
+}
+
+.btn-stack { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.learn-top { flex: 1; }
+
+.learn-title {
+  font-family: var(--heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.learn-sub {
+  font-size: 0.88rem;
+  color: #666;
+  font-style: italic;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 1.5rem;
+}
+
+.field { margin-bottom: 1.2rem; }
+
+.field label {
+  display: block;
+  font-family: var(--heading);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #777;
+  margin-bottom: 0.35rem;
+}
+
+.field input {
+  width: 100%;
+  border: 2px solid #000;
+  padding: 0.7rem 0.75rem;
+  font-family: var(--body);
+  font-size: 1rem;
+  outline: none;
+  background: #fff;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+
+.field input:focus { outline: 3px solid #000; outline-offset: 2px; }
+
+.field-note {
+  font-size: 0.78rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 0.35rem;
+}
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn {
+  font-family: var(--heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 2px solid #000;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+  background: #fff;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  line-height: 1;
+  transition: opacity 0.1s;
+  border-radius: 0;
+}
+
+.btn:active { opacity: 0.65; }
+.btn-solid  { background: #000; color: #fff; }
+.btn-answer { font-size: 1.05rem; padding: 1.1rem; }
+.btn-muted  { border-color: #ccc; color: #999; }
+.btn-sm     { font-size: 0.65rem; padding: 0.55rem 0.75rem; letter-spacing: 0.06em; }
+
+.toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
+
+.meta-row {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.meta-label {
+  font-family: var(--heading);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #bbb;
+  text-decoration: underline;
+  text-decoration-color: #000;
+  margin-bottom: 0.15rem;
+}
+
+.meta-val {
+  font-family: var(--heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666;
+}
+
+/* ── TREE OVERLAY ────────────────────────── */
+.tree-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 300;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tree-overlay.open { display: flex; }
+
+.tree-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #000;
+  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+}
+
+.tree-topbar-title {
+  font-family: var(--heading);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.tree-topbar-right { display: flex; align-items: center; gap: 1rem; }
+.tree-hint { font-size: 0.72rem; color: #aaa; font-style: italic; }
+
+.tree-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 2rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tree-legend {
+  display: flex;
+  gap: 2rem;
+  padding: 0.9rem 1.5rem;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--heading);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #888;
+}
+
+.legend-q { width: 22px; height: 14px; border: 2px solid #000; background: #fff; flex-shrink: 0; }
+.legend-a { width: 22px; height: 14px; background: #000; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════
+   ARBEITSBLATT
+══════════════════════════════════════════ */
+
+.ws-header {
+  border-bottom: 3px solid #000;
+  padding-bottom: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+
+.ws-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.ws-logo-slot {
+  width: 80px;
+  height: 40px;
+  border: 1.5px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ws-logo-slot::after {
+  content: 'Logo';
+  font-family: var(--heading);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ccc;
+}
+
+@media print {
+  .ws-logo-slot {
+    border-color: #bbb;
+  }
+}
+
+.ws-kicker {
+  font-family: var(--heading);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin-bottom: 0.3rem;
+}
+
+.ws-title {
+  font-family: var(--heading);
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.7rem;
+}
+
+.ws-meta { font-size: 0.85rem; color: #777; }
+
+.ws-section { margin-bottom: 2.5rem; }
+
+.ws-section-label {
+  font-family: var(--heading);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin-bottom: 0.2rem;
+}
+
+.ws-section-title {
+  font-family: var(--heading);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.5rem;
+  border-bottom: 1.5px solid #000;
+  margin-bottom: 1.1rem;
+}
+
+.ws-text {
+  font-size: 0.97rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  max-width: 62ch;
+}
+
+.ws-intro {
+  font-size: 0.97rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+  border-left: 3px solid #000;
+  padding-left: 1.25rem;
+}
+
+.ws-box {
+  border: 2px solid #000;
+  padding: 1rem 1.25rem;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.ws-box-label {
+  font-family: var(--heading);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #777;
+}
+
+.ws-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 1.2rem 0;
+}
+
+.ws-table th {
+  font-family: var(--heading);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  background: #000;
+  color: #fff;
+}
+
+.ws-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid #e8e8e8;
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.ws-table tr:last-child td { border-bottom: none; }
+
+.ws-table td:first-child {
+  font-family: var(--heading);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-right: 1px solid #e8e8e8;
+  width: 28%;
+}
+
+.ws-questions { list-style: none; }
+
+.ws-questions li { margin-bottom: 1.75rem; }
+
+.ws-q-num {
+  font-family: var(--heading);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #aaa;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.ws-q-text {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.ws-q-hint {
+  font-size: 0.82rem;
+  color: #888;
+  font-style: italic;
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.ws-q-klp {
+  font-weight: 700;
+  color: #000;
+  border-bottom: 1.5px solid #000;
+}
+
+.ws-discussion {
+  border: 2px solid #000;
+  padding: 1.4rem;
+  margin-top: 2.5rem;
+}
+
+.ws-discussion-label {
+  font-family: var(--heading);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.ws-discussion-title {
+  font-family: var(--heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.8rem;
+}
+
+.ws-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.ws-chip {
+  font-family: var(--heading);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1.5px solid #000;
+  padding: 0.35rem 0.7rem;
+}
+
+@media (max-width: 480px) {
+  .card { padding: 1.4rem; }
+  .big-title { font-size: 2.2rem; }
+  .result-name { font-size: 2rem; }
+  .tab-btn { padding: 0.75rem 0.9rem; }
+  .ws-table td:first-child { width: 35%; }
+}
+
+/* ══════════════════════════════════════════
+   DRUCK-ANSICHT
+══════════════════════════════════════════ */
+
+.print-btn-bar {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media print {
+  /* Alles ausblenden außer dem Arbeitsblatt */
+  .site-header,
+  .tabs,
+  #tab-spiel,
+  .tree-overlay,
+  .print-btn-bar { display: none !important; }
+
+  /* Arbeitsblatt immer sichtbar beim Drucken */
+  #tab-arbeitsblatt { display: block !important; }
+
+  body {
+    padding: 0;
+    font-size: 11pt;
+    color: #000;
+    background: #fff;
+  }
+
+  .wrap { max-width: 100%; }
+
+  /* Header */
+  .ws-header { padding-bottom: 0.8rem; margin-bottom: 1.4rem; }
+  
+.ws-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.ws-logo-slot {
+  width: 80px;
+  height: 40px;
+  border: 1.5px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ws-logo-slot::after {
+  content: 'Logo';
+  font-family: var(--heading);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ccc;
+}
+
+@media print {
+  .ws-logo-slot {
+    border-color: #bbb;
+  }
+}
+
+.ws-kicker { font-size: 7pt; }
+  .ws-title { font-size: 18pt; line-height: 1.15; margin-bottom: 0.4rem; }
+  .ws-meta { font-size: 10pt; }
+
+  /* Abschnitte */
+  .ws-section { margin-bottom: 1.4rem; }
+  .ws-section-label { font-size: 7pt; }
+  .ws-section-title { font-size: 10pt; padding-bottom: 0.3rem; margin-bottom: 0.7rem; }
+  .ws-text { font-size: 10pt; line-height: 1.6; margin-bottom: 0.6rem; }
+  .ws-box { padding: 0.6rem 0.8rem; font-size: 10pt; margin: 0.7rem 0; }
+  .ws-box-label { font-size: 7pt; }
+
+  /* Tabellen */
+  .ws-table { font-size: 9pt; margin: 0.7rem 0; }
+  .ws-table th { padding: 0.35rem 0.5rem; font-size: 7pt; }
+  .ws-table td { padding: 0.4rem 0.5rem; }
+
+  /* Aufgaben */
+  .ws-questions li { margin-bottom: 1.1rem; page-break-inside: avoid; }
+  .ws-q-num { font-size: 7pt; }
+  .ws-q-text { font-size: 10pt; }
+  .ws-q-hint { font-size: 9pt; }
+
+  /* Diskussions-Kasten */
+  .ws-discussion { padding: 0.8rem 1rem; margin-top: 1.2rem; }
+  .ws-discussion-label { font-size: 7pt; }
+  .ws-discussion-title { font-size: 10pt; margin-bottom: 0.5rem; }
+  .ws-chips { gap: 0.35rem; }
+  .ws-chip { font-size: 7pt; padding: 0.2rem 0.5rem; }
+
+  /* Seitenränder */
+  @page {
+    margin: 1.8cm 2cm;
+    size: A4;
+  }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site-header">
+    <h1>Unser Akinator</h1>
+    <span class="badge" id="char-count">—</span>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="switchTab('spiel', this)">Spiel</button>
+    <button class="tab-btn" onclick="switchTab('arbeitsblatt', this)">Arbeitsblatt</button>
+  </nav>
+
+  <!-- ═══ TAB: SPIEL ═══ -->
+  <div class="tab-panel active" id="tab-spiel">
+    <div class="game-inner">
+
+      <div class="card">
+
+        <div class="screen" id="screen-START">
+          <div class="start-head">
+            <p class="big-title">Bereit<br>für die<br>Challenge?</p>
+            <p class="lead">Denk dir eine Person aus. Ich versuche sie zu erraten – oder ich muss von dir lernen.</p>
+          </div>
+          <button class="btn btn-solid" onclick="startGame()">Spiel starten &rarr;</button>
+        </div>
+
+        <div class="screen" id="screen-PLAYING">
+          <p class="eyebrow">Meine Frage</p>
+          <p class="question-text" id="question-text"></p>
+          <div class="btn-pair">
+            <button class="btn btn-solid btn-answer" onclick="handleAnswer(true)">Ja</button>
+            <button class="btn btn-answer" onclick="handleAnswer(false)">Nein</button>
+          </div>
+        </div>
+
+        <div class="screen" id="screen-RESULT">
+          <div class="result-top">
+            <p class="result-label">Meine Vermutung:</p>
+            <p class="result-name" id="guessed-name"></p>
+          </div>
+          <div class="btn-stack">
+            <button class="btn btn-solid" onclick="startGame()">&#10003;&nbsp; Richtig geraten!</button>
+            <button class="btn" id="wrong-btn" onclick="goLearn()">Falsch! Bitte lerne…</button>
+          </div>
+        </div>
+
+        <div class="screen" id="screen-LEARN">
+          <div class="learn-top">
+            <p class="learn-title">Neue Person beibringen</p>
+            <p class="learn-sub">
+              Ich dachte: <strong id="learn-guessed"></strong>.<br>
+              Wer war es wirklich – und wie erkenne ich sie beim nächsten Mal?
+            </p>
+            <div class="field">
+              <label>Wer war es?</label>
+              <input type="text" id="inp-name" placeholder="Name der Person" autocomplete="off">
+            </div>
+            <div class="field">
+              <label>Unterscheidungsfrage</label>
+              <input type="text" id="inp-question" placeholder="z.B. Trägt die Person eine Maske?" autocomplete="off">
+              <p class="field-note">
+                Beantworte diese Frage mit <strong>JA</strong> für deine Person
+                und mit <strong>NEIN</strong> für „<span id="note-wrong"></span>".
+              </p>
+            </div>
+          </div>
+          <button class="btn btn-solid" onclick="learnNewCharacter()">Wissen einspeisen &rarr;</button>
+        </div>
+
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-sm" onclick="openTree()">Baum anzeigen</button>
+        <button class="btn btn-sm btn-muted" onclick="resetAll()">Zurücksetzen</button>
+        <button class="btn btn-sm btn-muted" id="cancel-btn" style="display:none" onclick="showScreen('START')">Abbrechen</button>
+      </div>
+
+      <div class="meta-row">
+        <div><p class="meta-label">Inhaltsfeld</p><p class="meta-val">KI &amp; Daten</p></div>
+        <div><p class="meta-label">Kompetenz</p><p class="meta-val">Modellieren</p></div>
+        <div><p class="meta-label">Klasse</p><p class="meta-val">5 – 7</p></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ TAB: ARBEITSBLATT ═══ -->
+  <div class="tab-panel" id="tab-arbeitsblatt">
+
+    <div class="print-btn-bar">
+      <button class="btn btn-sm" onclick="window.print()">&#128438;&nbsp; Druckansicht</button>
+    </div>
+
+    <div class="ws-header">
+      <div class="ws-header-top">
+        <p class="ws-kicker">Informatik · Klasse 6 · Automaten und KI &nbsp;·&nbsp;</p>
+        <img width="100px" src="logo.png">
+      </div>
+      <h2 class="ws-title">Unser Akinator</h2>
+      <p class="ws-meta">Name: _________________________________ &nbsp;&nbsp; Datum: _______________</p>
+    </div>
+
+    <!-- Teil 1 -->
+    <div class="ws-section">
+      <p class="ws-section-label">Teil 1 — Vorwissen aktivieren</p>
+      <h3 class="ws-section-title">Was wir schon wissen</h3>
+
+      <p class="ws-text">
+        In der letzten Stunde habt ihr <strong>Entscheidungsbäume</strong> kennengelernt.
+        Sie helfen dabei, Dinge anhand von Merkmalen zu sortieren:
+        Man beantwortet immer nur <strong>Ja-oder-Nein-Fragen</strong>,
+        bis man am Ende bei einer Antwort ankommt.
+      </p>
+      <p class="ws-text">
+        Das Programm, das ihr gerade gespielt habt, macht genau das Gleiche –
+        nur läuft der Entscheidungsbaum jetzt automatisch auf dem Computer ab.
+        So ein Programm hat in der Informatik sogar einen eigenen Namen.
+      </p>
+    </div>
+
+    <!-- Teil 2 -->
+    <div class="ws-section">
+      <p class="ws-section-label">Teil 2 — Neues Konzept</p>
+      <h3 class="ws-section-title">Was ist ein Expertensystem?</h3>
+
+      <p class="ws-text">
+        Ein <strong>Expertensystem</strong> ist ein Computerprogramm,
+        das so tut, als wäre es ein Fachmann auf einem bestimmten Gebiet.
+        Es beantwortet Fragen und löst Aufgaben – aber nicht, weil es selbst nachdenkt.
+        Ein Mensch hat ihm vorher alle nötigen Regeln und Fragen einprogrammiert.
+      </p>
+
+      <div class="ws-box">
+        <span class="ws-box-label">Merksatz</span>
+        Ein Expertensystem folgt Regeln, die von Menschen eingegeben wurden.
+        Es kann nur das, was ihm jemand beigebracht hat – nicht mehr und nicht weniger.
+      </div>
+
+      <p class="ws-text">Jedes Expertensystem hat zwei wichtige Teile:</p>
+
+      <table class="ws-table">
+        <thead>
+          <tr><th>Teil</th><th>Was bedeutet das?</th><th>Bei unserem Akinator …</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Wissens&shy;basis</td>
+            <td>Alle Regeln und Fragen, die ein Mensch vorher einprogrammiert hat.</td>
+            <td>… sind das die Fragen wie „Kommt die Person aus dem deutschsprachigen Raum?"</td>
+          </tr>
+          <tr>
+            <td>Entscheidungs&shy;logik</td>
+            <td>Der Teil des Programms, der die Fragen stellt und je nach Antwort den richtigen Ast des Baums weitergeht.</td>
+            <td>… ist das der unsichtbare Teil, der nach jedem Klick entscheidet, welche Frage als Nächstes kommt.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Teil 3 -->
+    <div class="ws-section">
+      <p class="ws-section-label">Teil 3 — Vergleich und Einordnung</p>
+      <h3 class="ws-section-title">Ist das wirklich Künstliche Intelligenz?</h3>
+
+      <p class="ws-text">
+        Expertensysteme sind eine <strong>frühe Form von Künstlicher Intelligenz</strong>.
+        Sie wurden schon in den 1980er Jahren eingesetzt – zum Beispiel, um Krankheiten zu
+        erkennen oder Fehler in Maschinen zu finden.
+        Moderne KI-Systeme wie Sprachassistenten oder ChatGPT funktionieren
+        aber ganz anders: Sie lernen nicht durch fest einprogrammierte Regeln,
+        sondern durch das Auswerten von <strong>riesigen Datenmengen</strong> –
+        ähnlich wie ein Mensch durch Erfahrung lernt.
+      </p>
+
+      <table class="ws-table">
+        <thead>
+          <tr><th>Merkmal</th><th>Expertensystem (unser Akinator)</th><th>Moderne KI (z.B. ChatGPT)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Wie lernt es?</td>
+            <td>Ein Mensch gibt alle Regeln ein.</td>
+            <td>Das System lernt selbst aus vielen Beispielen.</td>
+          </tr>
+          <tr>
+            <td>Neue Personen</td>
+            <td>Jemand muss das Programm manuell anpassen.</td>
+            <td>Das System kann durch weiteres Training dazulernen.</td>
+          </tr>
+          <tr>
+            <td>Unbekannte Fälle</td>
+            <td>Kommt nicht damit zurecht, gibt auf.</td>
+            <td>Kann auch mit völlig neuen Situationen umgehen.</td>
+          </tr>
+          <tr>
+            <td>Nachvoll&shy;ziehbarkeit</td>
+            <td>Jede Entscheidung ist erklärbar – man kann den Baum anschauen.</td>
+            <td>Oft schwer zu sagen, warum genau eine bestimmte Antwort kam.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Aufgaben -->
+    <div class="ws-section">
+      <p class="ws-section-label">Aufgaben</p>
+      <h3 class="ws-section-title">Schreib deine Antworten ins Heft</h3>
+
+      <p class="ws-text" style="font-style:italic; color:#666; margin-bottom:1.5rem">
+        Nummeriere deine Antworten genauso wie die Aufgaben (1–6).
+        Schreib in ganzen Sätzen, wenn nichts anderes angegeben ist.
+      </p>
+
+      <ol class="ws-questions">
+
+        <li>
+          <span class="ws-q-num">Aufgabe 1 &nbsp;·&nbsp; <span class="ws-q-klp">Vergleichen</span></span>
+          <span class="ws-q-text">Ihr habt gerade selbst Fragen für den Akinator überlegt – genauso wie ihr letzte Stunde Fragen für den Tier-Baum überlegt habt. Was ist also der Unterschied zwischen eurem Tier-Baum und dem Akinator? Oder gibt es keine Unterschiede?</span>
+          <span class="ws-q-hint">Schau dir dazu den Baum unseres Akinators an: Klicke im Spiel-Tab oben auf „Baum anzeigen".</span>
+        </li>
+
+        <li>
+          <span class="ws-q-num">Aufgabe 2 &nbsp;·&nbsp; <span class="ws-q-klp">Erläutern &amp; Analysieren</span></span>
+          <span class="ws-q-text">Erkläre mit eigenen Worten, was das Programm macht, wenn du auf „Ja" oder „Nein" klickst. Woher „weiß" es dabei, welche Frage als nächstes kommt – und wer hat das eigentlich festgelegt?</span>
+          <span class="ws-q-hint">Überlege: Hat das Programm selbst nachgedacht – oder steckt da jemand dahinter?</span>
+        </li>
+
+        <li>
+          <span class="ws-q-num">Aufgabe 3 &nbsp;·&nbsp; <span class="ws-q-klp">Beispiele nennen</span></span>
+          <span class="ws-q-text">Nenne zwei Beispiele aus deinem Alltag, bei denen KI eingesetzt wird. Erkläre bei einem der beiden Beispiele in einem Satz, was die KI dort genau macht.</span>
+          <span class="ws-q-hint">Denk z.B. an dein Handy, Streaming-Apps oder Suchmaschinen.</span>
+        </li>
+
+        <li>
+          <span class="ws-q-num">Aufgabe 4 &nbsp;·&nbsp; <span class="ws-q-klp">Informatik &amp; Gesellschaft</span></span>
+          <span class="ws-q-text">TikTok und YouTube nutzen KI, um zu entscheiden, welche Videos dir als nächstes angezeigt werden. Nenne einen möglichen Vorteil und einen möglichen Nachteil davon.</span>
+          <span class="ws-q-hint">Was ist praktisch daran – und was könnte dabei schiefgehen oder dich einschränken?</span>
+        </li>
+
+        <li>
+          <span class="ws-q-num">Aufgabe 5 &nbsp;·&nbsp; <span class="ws-q-klp">Weiterdenken</span></span>
+          <span class="ws-q-text">Stell dir vor, du könntest unseren Akinator verbessern. Was würdest du ändern oder ergänzen, damit er mehr Personen erkennt oder schwerer zu überlisten ist?</span>
+          <span class="ws-q-hint">Denk z.B. an die Fragen, die Anzahl der Personen oder daran, was passiert, wenn das Programm falsch rät.</span>
+        </li>
+
+      </ol>
+    </div>
+
+    <!-- Diskussions-Kasten -->
+    <div class="ws-discussion">
+      <span class="ws-discussion-label">Für die Klasse</span>
+      <p class="ws-discussion-title">Das besprechen wir gemeinsam im Plenum</p>
+      <p class="ws-text" style="margin-bottom:0; max-width:none">
+        Nach der Einzelarbeit tauscht ihr eure Antworten aus.
+        Folgende Fragen stehen dabei im Mittelpunkt:
+      </p>
+      <div class="ws-chips">
+        <span class="ws-chip">Wie bringt man einem Programm etwas bei?</span>
+        <span class="ws-chip">Kann der Akinator wirklich lernen?</span>
+        <span class="ws-chip">Wann nennen wir ein Programm „intelligent"?</span>
+        <span class="ws-chip">Was fehlt dem Akinator im Vergleich zu ChatGPT?</span>
+        <span class="ws-chip">Wer trägt Verantwortung für KI-Entscheidungen?</span>
+      </div>
+    </div>
+
+  </div><!-- /tab-arbeitsblatt -->
+
+</div><!-- /wrap -->
+
+<!-- TREE OVERLAY -->
+<div class="tree-overlay" id="tree-overlay">
+  <div class="tree-topbar">
+    <span class="tree-topbar-title">Entscheidungsbaum</span>
+    <div class="tree-topbar-right">
+      <span class="tree-hint">← → scrollen wenn nötig</span>
+      <button class="btn btn-sm" onclick="saveTreeAsPNG()">Als Bild speichern</button>
+      <button class="btn btn-sm" onclick="closeTree()">Schlie&szlig;en &times;</button>
+    </div>
+  </div>
+  <div class="tree-scroll" id="tree-scroll"></div>
+  <div class="tree-legend">
+    <span class="legend-item"><span class="legend-q"></span>Frage</span>
+    <span class="legend-item"><span class="legend-a"></span>Person (Blatt)</span>
+  </div>
+</div>
+
+<script>
+// ── TABS ──────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── PERSISTENZ ────────────────────────────────────────
+const STORAGE_KEY = 'klassen_akinator_v1';
+
+const INITIAL_TREE = {
+  question: "Kommt die Person aus dem deutschsprachigen Raum (D/A/CH)?",
+  yes: {
+    question: "Ist die Person weiblich?",
+    yes: {
+      question: "Macht sie hauptsächlich Beauty- und Lifestyle-Videos?",
+      yes: { name: "Bibi (BibisBeautyPalace)" },
+      no:  { name: "Kelly MissesVlog" }
+    },
+    no: {
+      question: "Ist er vor allem für Minecraft-Videos bekannt?",
+      yes: { name: "Paluten" },
+      no: {
+        question: "Macht er Comedy-, Tanz- und Musik-Videos (kein reines Gaming)?",
+        yes: { name: "Julien Bam" },
+        no:  { name: "Gronkh" }
+      }
+    }
+  },
+  no: {
+    question: "Ist die Person weiblich?",
+    yes: { name: "Aphmau" },
+    no: {
+      question: "Ist er vor allem für riesige Challenges und Spendenaktionen bekannt?",
+      yes: { name: "MrBeast" },
+      no: {
+        question: "Spielte er Minecraft und war er lange Zeit anonym (Maske)?",
+        yes: { name: "Dream" },
+        no: {
+          question: "Wurde er hauptsächlich durch Fortnite und Twitch berühmt?",
+          yes: { name: "Ninja" },
+          no: {
+            question: "War er lange Zeit der meistabonnierte Solo-Creator auf YouTube?",
+            yes: { name: "PewDiePie" },
+            no:  { name: "Markiplier" }
+          }
+        }
+      }
+    }
+  }
+};
+
+let tree    = loadTree() || copy(INITIAL_TREE);
+let curNode = null;
+let history = [];
+
+function loadTree() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; }
+  catch { return null; }
+}
+
+function saveTree() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tree)); } catch {}
+}
+
+function copy(o) { return JSON.parse(JSON.stringify(o)); }
+
+// ── HILFSFUNKTIONEN ───────────────────────────────────
+function countLeaves(node) {
+  if (!node) return 0;
+  if (node.name) return 1;
+  return countLeaves(node.yes) + countLeaves(node.no);
+}
+
+function updateBadge() {
+  const n = countLeaves(tree);
+  document.getElementById('char-count').textContent =
+    n + (n === 1 ? ' Person bekannt' : ' Personen bekannt');
+}
+
+function escXML(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── SPIEL ─────────────────────────────────────────────
+function startGame() {
+  curNode = tree;
+  history = [];
+  document.getElementById('question-text').textContent = curNode.question;
+  showScreen('PLAYING');
+}
+
+function handleAnswer(isYes) {
+  const dir  = isYes ? 'yes' : 'no';
+  history.push({ direction: dir });
+  const next = curNode[dir];
+  if (next.name) {
+    curNode = next;
+    document.getElementById('guessed-name').textContent = next.name;
+    document.getElementById('wrong-btn').textContent    = `Falsch! „${next.name}" war es nicht.`;
+    showScreen('RESULT');
+  } else {
+    curNode = next;
+    document.getElementById('question-text').textContent = curNode.question;
+  }
+}
+
+function goLearn() {
+  document.getElementById('learn-guessed').textContent = curNode.name;
+  document.getElementById('note-wrong').textContent    = curNode.name;
+  document.getElementById('inp-name').value     = '';
+  document.getElementById('inp-question').value = '';
+  showScreen('LEARN');
+}
+
+function learnNewCharacter() {
+  const newName = document.getElementById('inp-name').value.trim();
+  const newQ    = document.getElementById('inp-question').value.trim();
+  if (!newName) { document.getElementById('inp-name').focus(); return; }
+  if (!newQ)    { document.getElementById('inp-question').focus(); return; }
+
+  const newNode = { question: newQ, yes: { name: newName }, no: copy(curNode) };
+
+  if (history.length === 0) {
+    tree = newNode;
+  } else {
+    const newTree = copy(tree);
+    let ptr = newTree;
+    for (let i = 0; i < history.length - 1; i++) ptr = ptr[history[i].direction];
+    ptr[history[history.length - 1].direction] = newNode;
+    tree = newTree;
+  }
+
+  saveTree();
+  updateBadge();
+  showScreen('START');
+}
+
+function resetAll() {
+  if (!confirm('Wirklich alle gelernten Personen löschen und neu starten?')) return;
+  tree = copy(INITIAL_TREE);
+  localStorage.removeItem(STORAGE_KEY);
+  updateBadge();
+  showScreen('START');
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('cancel-btn').style.display = name !== 'START' ? 'flex' : 'none';
+}
+
+// ── BAUM-VISUALISIERUNG ───────────────────────────────
+const NW = 192, NH = 58, LW = 130, LH = 40, HGAP = 30, VGAP = 68;
+
+function layoutTree(node, depth, counter) {
+  if (node.name) {
+    const cx = counter.n * (LW + HGAP) + HGAP / 2 + LW / 2;
+    counter.n++;
+    return { type: 'leaf', cx, top: depth * (NH + VGAP), node };
+  }
+  const left  = layoutTree(node.yes, depth + 1, counter);
+  const right = layoutTree(node.no,  depth + 1, counter);
+  return {
+    type: 'question', cx: (left.cx + right.cx) / 2,
+    top: depth * (NH + VGAP), node,
+    children: [{ layout: left, label: 'JA' }, { layout: right, label: 'NEIN' }]
+  };
+}
+
+function maxDepth(node, d = 0) {
+  if (node.name) return d;
+  return Math.max(maxDepth(node.yes, d + 1), maxDepth(node.no, d + 1));
+}
+
+function wrapText(text, maxW, fs) {
+  const maxChars = Math.floor(maxW / (fs * 0.5));
+  const words = text.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const t = cur ? cur + ' ' + w : w;
+    if (t.length > maxChars && cur) { lines.push(cur); cur = w; } else cur = t;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function buildSVG() {
+  const counter = { n: 0 };
+  const layout  = layoutTree(tree, 0, counter);
+  const leaves  = counter.n;
+  const depth   = maxDepth(tree);
+  const svgW    = leaves * (LW + HGAP) + HGAP;
+  const svgH    = depth * (NH + VGAP) + LH + VGAP + 16;
+  const PAD     = 20;
+  const edgeSVG = [], nodeSVG = [];
+
+  function draw(n, parentCX, parentBottomY) {
+    const { cx, top } = n;
+    if (parentCX !== null) {
+      edgeSVG.push(`<line x1="${parentCX}" y1="${parentBottomY}" x2="${cx}" y2="${top}" stroke="#000" stroke-width="1.5"/>`);
+    }
+    if (n.type === 'leaf') {
+      nodeSVG.push(`<rect x="${cx-LW/2}" y="${top}" width="${LW}" height="${LH}" fill="#000"/>`);
+      const nm = n.node.name.length > 17 ? n.node.name.slice(0,16)+'…' : n.node.name;
+      nodeSVG.push(`<text x="${cx}" y="${top+LH/2+4}" text-anchor="middle" fill="#fff" font-family="Montserrat,sans-serif" font-weight="700" font-size="11">${escXML(nm)}</text>`);
+    } else {
+      nodeSVG.push(`<rect x="${cx-NW/2}" y="${top}" width="${NW}" height="${NH}" fill="#fff" stroke="#000" stroke-width="2"/>`);
+      const lines  = wrapText(n.node.question, NW-14, 11);
+      const lineH  = 14;
+      const startY = top + (NH - lines.length * lineH) / 2 + lineH - 1;
+      lines.forEach((line, i) => {
+        nodeSVG.push(`<text x="${cx}" y="${startY+i*lineH}" text-anchor="middle" fill="#000" font-family="Libre Baskerville,serif" font-size="11">${escXML(line)}</text>`);
+      });
+      for (const { layout: child, label } of n.children) {
+        const fromY = top + NH;
+        const midCX = (cx + child.cx) * 0.5;
+        const midY  = fromY + (child.top - fromY) * 0.42;
+        const lw    = label === 'JA' ? 30 : 42;
+        draw(child, cx, fromY);
+        nodeSVG.push(`<rect x="${midCX-lw/2-2}" y="${midY-9}" width="${lw+4}" height="17" fill="#fff"/>`);
+        nodeSVG.push(`<text x="${midCX}" y="${midY+5}" text-anchor="middle" fill="#000" font-family="Montserrat,sans-serif" font-weight="700" font-size="9" letter-spacing="0.08em">${label}</text>`);
+      }
+    }
+  }
+
+  draw(layout, null, null);
+
+  return `<svg width="${svgW+PAD*2}" height="${svgH+PAD*2}" xmlns="http://www.w3.org/2000/svg" style="display:block">
+  <g transform="translate(${PAD},${PAD})">${edgeSVG.join('')}${nodeSVG.join('')}</g></svg>`;
+}
+
+function openTree() {
+  document.getElementById('tree-scroll').innerHTML = buildSVG();
+  document.getElementById('tree-overlay').classList.add('open');
+}
+
+function closeTree() {
+  document.getElementById('tree-overlay').classList.remove('open');
+}
+
+// ── BAUM SPEICHERN (iPad-kompatibel) ─────────────────
+function saveTreeAsPNG() {
+  // SVG generieren
+  const svgStr = buildSVG();
+
+  // Fonts inline einbetten damit der Export sauber aussieht
+  const svgWithFont = svgStr.replace(
+    '<svg',
+    `<svg xmlns:xlink="http://www.w3.org/1999/xlink"`
+  ).replace(
+    '</svg>',
+    `<defs><style>
+      @import url('https://fonts.bunny.net/css?family=montserrat:700,800|libre-baskerville:400');
+    
+/* ══════════════════════════════════════════
+   DRUCK-ANSICHT
+══════════════════════════════════════════ */
+
+.print-btn-bar {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media print {
+  /* Alles ausblenden außer dem Arbeitsblatt */
+  .site-header,
+  .tabs,
+  #tab-spiel,
+  .tree-overlay,
+  .print-btn-bar { display: none !important; }
+
+  /* Arbeitsblatt immer sichtbar beim Drucken */
+  #tab-arbeitsblatt { display: block !important; }
+
+  body {
+    padding: 0;
+    font-size: 11pt;
+    color: #000;
+    background: #fff;
+  }
+
+  .wrap { max-width: 100%; }
+
+  /* Header */
+  .ws-header { padding-bottom: 0.8rem; margin-bottom: 1.4rem; }
+  
+.ws-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.ws-logo-slot {
+  width: 80px;
+  height: 40px;
+  border: 1.5px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ws-logo-slot::after {
+  content: 'Logo';
+  font-family: var(--heading);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ccc;
+}
+
+@media print {
+  .ws-logo-slot {
+    border-color: #bbb;
+  }
+}
+
+.ws-kicker { font-size: 7pt; }
+  .ws-title { font-size: 18pt; line-height: 1.15; margin-bottom: 0.4rem; }
+  .ws-meta { font-size: 10pt; }
+
+  /* Abschnitte */
+  .ws-section { margin-bottom: 1.4rem; }
+  .ws-section-label { font-size: 7pt; }
+  .ws-section-title { font-size: 10pt; padding-bottom: 0.3rem; margin-bottom: 0.7rem; }
+  .ws-text { font-size: 10pt; line-height: 1.6; margin-bottom: 0.6rem; }
+  .ws-box { padding: 0.6rem 0.8rem; font-size: 10pt; margin: 0.7rem 0; }
+  .ws-box-label { font-size: 7pt; }
+
+  /* Tabellen */
+  .ws-table { font-size: 9pt; margin: 0.7rem 0; }
+  .ws-table th { padding: 0.35rem 0.5rem; font-size: 7pt; }
+  .ws-table td { padding: 0.4rem 0.5rem; }
+
+  /* Aufgaben */
+  .ws-questions li { margin-bottom: 1.1rem; page-break-inside: avoid; }
+  .ws-q-num { font-size: 7pt; }
+  .ws-q-text { font-size: 10pt; }
+  .ws-q-hint { font-size: 9pt; }
+
+  /* Diskussions-Kasten */
+  .ws-discussion { padding: 0.8rem 1rem; margin-top: 1.2rem; }
+  .ws-discussion-label { font-size: 7pt; }
+  .ws-discussion-title { font-size: 10pt; margin-bottom: 0.5rem; }
+  .ws-chips { gap: 0.35rem; }
+  .ws-chip { font-size: 7pt; padding: 0.2rem 0.5rem; }
+
+  /* Seitenränder */
+  @page {
+    margin: 1.8cm 2cm;
+    size: A4;
+  }
+}
+</style></defs></svg>`
+  );
+
+  // Als SVG-Datei anbieten (funktioniert auf iPad Safari über Teilen-Menü)
+  const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'entscheidungsbaum.svg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+// ── INIT ──────────────────────────────────────────────
+updateBadge();
+showScreen('START');
+</script>
+</body>
+</html>
