@@ -722,7 +722,7 @@ body {
         <div class="screen" id="screen-START">
           <div class="start-head">
             <p class="big-title">Bereit<br>für die<br>Challenge?</p>
-            <p class="lead">Denk dir eine Person aus. Ich versuche sie zu erraten – oder ich muss von dir lernen.</p>
+            <p class="lead">Denk dir etwas aus. Ich versuche es erraten – oder ich muss von dir lernen.</p>
           </div>
           <button class="btn btn-solid" onclick="startGame()">Spiel starten &rarr;</button>
         </div>
@@ -749,20 +749,20 @@ body {
 
         <div class="screen" id="screen-LEARN">
           <div class="learn-top">
-            <p class="learn-title">Neue Person beibringen</p>
+            <p class="learn-title">Neue Sachen beibringen</p>
             <p class="learn-sub">
               Ich dachte: <strong id="learn-guessed"></strong>.<br>
               Wer war es wirklich – und wie erkenne ich sie beim nächsten Mal?
             </p>
             <div class="field">
               <label>Wer war es?</label>
-              <input type="text" id="inp-name" placeholder="Name der Person" autocomplete="off">
+              <input type="text" id="inp-name" placeholder="Name der Sache" autocomplete="off">
             </div>
             <div class="field">
               <label>Unterscheidungsfrage</label>
               <input type="text" id="inp-question" placeholder="z.B. Trägt die Person eine Maske?" autocomplete="off">
               <p class="field-note">
-                Beantworte diese Frage mit <strong>JA</strong> für deine Person
+                Beantworte diese Frage mit <strong>JA</strong> für deine Sache
                 und mit <strong>NEIN</strong> für „<span id="note-wrong"></span>".
               </p>
             </div>
@@ -921,7 +921,7 @@ body {
 
         <li>
           <span class="ws-q-num">Aufgabe 2 &nbsp;·&nbsp; <span class="ws-q-klp">Erläutern &amp; Analysieren</span></span>
-          <span class="ws-q-text">Du hast unserem Akinator gerade eine neue Person beigebracht. Beschreibe in zwei Sätzen, was du dafür tun musstest. Hätte der Akinator selbst herausfinden können, welche Frage er stellen soll?</span>
+          <span class="ws-q-text">Du hast unserem Akinator gerade eine neue Sache (z. B. Person) beigebracht. Beschreibe in zwei Sätzen, was du dafür tun musstest. Hätte der Akinator selbst herausfinden können, welche Frage er stellen soll?</span>
           <span class="ws-q-hint">Überlege: Hat das Programm selbst nachgedacht – oder hast du das für es entschieden?</span>
         </li>
 
@@ -939,8 +939,8 @@ body {
 
         <li>
           <span class="ws-q-num">Aufgabe 5 &nbsp;·&nbsp; <span class="ws-q-klp">Weiterdenken</span></span>
-          <span class="ws-q-text">Stell dir vor, du könntest unseren Akinator verbessern. Was würdest du ändern oder ergänzen, damit er mehr Personen erkennt oder schwerer zu überlisten ist?</span>
-          <span class="ws-q-hint">Denk z.B. an die Fragen, die Anzahl der Personen oder daran, was passiert, wenn das Programm falsch rät.</span>
+          <span class="ws-q-text">Stell dir vor, du könntest unseren Akinator verbessern. Was würdest du ändern oder ergänzen, damit er mehr Sachen erkennt oder schwerer zu überlisten ist?</span>
+          <span class="ws-q-hint">Denk z.B. an die Fragen, die Anzahl der Sachen oder daran, was passiert, wenn das Programm falsch rät.</span>
         </li>
 
       </ol>
@@ -970,7 +970,7 @@ body {
   <div class="tree-scroll" id="tree-scroll"></div>
   <div class="tree-legend">
     <span class="legend-item"><span class="legend-q"></span>Frage</span>
-    <span class="legend-item"><span class="legend-a"></span>Person (Blatt)</span>
+    <span class="legend-item"><span class="legend-a"></span>Sache (Blatt)</span>
   </div>
   <div class="edit-panel" id="edit-panel">
     <span class="edit-panel-label">Frage&shy;text</span>
@@ -1065,7 +1065,7 @@ function countLeaves(node) {
 function updateBadge() {
   const n = countLeaves(tree);
   document.getElementById('char-count').textContent =
-    n + (n === 1 ? ' Person bekannt' : ' Personen bekannt');
+    n + (n === 1 ? ' Eintrag bekannt' : ' Einträge bekannt');
 }
 
 function escXML(s) {
@@ -1129,7 +1129,7 @@ function learnNewCharacter() {
 
 function resetAll() {
   const n = countLeaves(tree);
-  const msg = `⚠️ Achtung: Alle ${n} Personen werden unwiderruflich gelöscht!\n\nDer Baum wird auf den Anfangszustand zurückgesetzt.\nDiese Aktion kann nicht rückgängig gemacht werden.\n\nWirklich fortfahren?`;
+  const msg = `Achtung: Alle ${n} Einträge werden unwiderruflich gelöscht!\n\nDer Baum wird auf den Anfangszustand zurückgesetzt.\nDiese Aktion kann nicht rückgängig gemacht werden.\n\nWirklich fortfahren?`;
   if (!confirm(msg)) return;
   tree = copy(CLEAR_TREE);
   localStorage.removeItem(STORAGE_KEY);
