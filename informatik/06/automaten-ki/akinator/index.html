@@ -966,7 +966,11 @@ const INITIAL_TREE = {
   }
 };
 
-const CLEAR_TREE = {};
+const CLEAR_TREE = {
+  question: "Fragestellung? Bearbeiten >",
+  yes: { name: "Ja Bearbeiten >" }
+  no: { name: "Nein Bearbeiten >"  }
+};
 
 let tree    = loadTree() || copy(INITIAL_TREE);
 let curNode = null;
