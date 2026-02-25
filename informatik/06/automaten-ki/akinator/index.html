@@ -993,52 +993,52 @@ function switchTab(id, btn) {
 const STORAGE_KEY = 'unserAkinator_1.0';
 
 const INITIAL_TREE = {
-  question: "Kommt die Person aus dem deutschsprachigen Raum (D/A/CH)?",
+  question: "Ist es ein herzhaftes Gericht (kein Süßes, kein Dessert)?",
   yes: {
-    question: "Ist die Person weiblich?",
+    question: "Kommt es hauptsächlich aus Deutschland oder der Region?",
     yes: {
-      question: "Macht sie hauptsächlich Beauty- und Lifestyle-Videos?",
-      yes: { name: "Bibi (BibisBeautyPalace)" },
-      no:  { name: "Kelly MissesVlog" }
+      question: "Ist es eine Suppe oder ein Eintopf?",
+      yes: { name: "Tomatensuppe" },
+      no: {
+        question: "Ist es ein Gericht mit Brot oder Brötchen?",
+        yes: { name: "Döner" },
+        no:  { name: "Schnitzel" }
+      }
     },
     no: {
-      question: "Ist er vor allem für Minecraft-Videos bekannt?",
-      yes: { name: "Paluten" },
+      question: "Kommt es aus Italien?",
+      yes: {
+        question: "Wird es hauptsächlich mit Käse und Soße gegessen (keine Pizza)?",
+        yes: { name: "Pasta" },
+        no:  { name: "Pizza" }
+      },
       no: {
-        question: "Macht er Comedy-, Tanz- und Musik-Videos (kein reines Gaming)?",
-        yes: { name: "Julien Bam" },
-        no:  { name: "Gronkh" }
+        question: "Wird es in einer Schüssel mit Reis oder Nudeln serviert?",
+        yes: { name: "Curryreis" },
+        no:  { name: "Burger" }
       }
     }
   },
   no: {
-    question: "Ist die Person weiblich?",
-    yes: { name: "Aphmau" },
+    question: "Muss es gebacken oder erhitzt werden?",
+    yes: {
+      question: "Ist es ein Kuchen oder Gebäck?",
+      yes: { name: "Schokoladenkuchen" },
+      no:  { name: "Pfannkuchen" }
+    },
     no: {
-      question: "Ist er vor allem für riesige Challenges und Spendenaktionen bekannt?",
-      yes: { name: "MrBeast" },
+      question: "Kommt es aus der Tiefkühltruhe oder Packung (z.B. Eis)?",
+      yes: { name: "Eis" },
       no: {
-        question: "Spielte er Minecraft und war er lange Zeit anonym (Maske)?",
-        yes: { name: "Dream" },
-        no: {
-          question: "Wurde er hauptsächlich durch Fortnite und Twitch berühmt?",
-          yes: { name: "Ninja" },
-          no: {
-            question: "War er lange Zeit der meistabonnierte Solo-Creator auf YouTube?",
-            yes: { name: "PewDiePie" },
-            no:  { name: "Markiplier" }
-          }
-        }
+        question: "Ist es ein Müsli oder Joghurt?",
+        yes: { name: "Müsli" },
+        no:  { name: "Obst" }
       }
     }
   }
 };
 
-const CLEAR_TREE = {
-  question: "Ist die Person männlich?",
-  yes: { name: "Herr Kirchner" },
-  no:  { name: "Frau Kop" }
-};
+const CLEAR_TREE = {};
 
 let tree    = loadTree() || copy(INITIAL_TREE);
 let curNode = null;
