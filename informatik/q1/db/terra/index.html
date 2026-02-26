@@ -355,7 +355,7 @@
         .task.solved .task-body { display: none; }
         .task.solved.expanded .task-body { display: block; }
 
-        .task.solved .task-header { cursor: pointer; margin-bottom: 0; }
+        .task.solved .task-header { cursor: pointer; margin-bottom: 0; user-select: none; }
         .task.solved.expanded .task-header { margin-bottom: 0.75rem; }
 
         .task-header {
@@ -1271,8 +1271,8 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                 nTasks.forEach(t => {
                     const q = saved[t.id] || '';
                     const solved = q && isSolved(t, q);
-                    html += `<div class="task ${cssClass} ${solved ? 'solved' : ''}" data-id="${t.id}" ${solved ? 'onclick="toggleSolved(this)"' : ''}>
-                        <div class="task-header">
+                    html += `<div class="task ${cssClass} ${solved ? 'solved' : ''}" data-id="${t.id}">
+                        <div class="task-header" ${solved ? 'onclick="toggleSolved(this.parentElement)"' : ''}>
                             <div class="task-title">${t.title}<span class="expand-hint">(klicken zum Aufklappen)</span></div>
                             <span class="badge ${solved ? 'solved' : ''}">N${t.n}</span>
                         </div>
@@ -1347,7 +1347,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                 localStorage.setItem('terra-sql', JSON.stringify(saved));
                 const taskEl = document.querySelector(`.task[data-id="${id}"]`);
                 taskEl.classList.add('solved', 'expanded');
-                taskEl.setAttribute('onclick', 'toggleSolved(this)');
+                taskEl.querySelector('.task-header').setAttribute('onclick', 'toggleSolved(this.parentElement)');
                 const badge = taskEl.querySelector('.badge');
                 badge.classList.add('solved');
                 badge.innerHTML = `N${task.n}`;
