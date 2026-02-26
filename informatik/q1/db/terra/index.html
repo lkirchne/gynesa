@@ -827,8 +827,15 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             { id: 'n2-7', n: '2', title: 'Inseln pro Inselgruppe', desc: 'Wie viele Inseln geh\u00f6ren zu jeder Inselgruppe? (Nur Gruppen mit >1 Insel)', hint: 'GROUP BY INSELGRUPPE mit HAVING', sol: 'SELECT INSELGRUPPE, COUNT(*) AS Anzahl FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1 ORDER BY Anzahl DESC' },
 
             // =====================================================
-            // Niveau 3a: Einfache JOINs (2 Tabellen: STADT ↔ LAND)
+            // Niveau 3a: Einfache JOINs (2 Tabellen)
+            // Phase 1: Erste JOINs (STADT ↔ LAND)
+            // Phase 2: LEFT JOIN einführen
+            // Phase 3: Neue Tabellenpaare (FLUSS ↔ MEER/SEE)
+            // Phase 4: WHERE auf die andere Tabelle
+            // Phase 5: JOIN + Aggregation
             // =====================================================
+
+            // -- Phase 1: Erste JOINs --
             { id: 'n3a-1', n: '3a', title: 'St\u00e4dte mit L\u00e4ndername',
               desc: 'Zeige alle St\u00e4dte mit dem Namen ihres Landes! STADT und LAND teilen sich die Spalte <code class="inline">L_ID</code> \u2014 das ist dein erster JOIN.',
               hint: 'SELECT s.ST_NAME, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID',
@@ -836,7 +843,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             { id: 'n3a-2', n: '3a', title: 'Deutsche St\u00e4dte mit Land',
               desc: 'Zeige alle St\u00e4dte in Deutschland mit ihrem L\u00e4ndernamen! (L_ID = \'D\')',
-              hint: 'JOIN wie oben, dann WHERE s.L_ID = \'D\'',
+              hint: 'JOIN wie vorher, dann WHERE s.L_ID = \'D\'',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE s.L_ID = \'D\' ORDER BY s.EINWOHNER DESC' },
 
             { id: 'n3a-3', n: '3a', title: 'Top 10 gr\u00f6\u00dfte St\u00e4dte + Land',
@@ -844,29 +851,58 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
               hint: 'JOIN + ORDER BY s.EINWOHNER DESC LIMIT 10',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID ORDER BY s.EINWOHNER DESC LIMIT 10' },
 
+            // -- Phase 2: LEFT JOIN einführen --
+            { id: 'n3a-14', n: '3a', title: 'LEFT JOIN: L\u00e4nder ohne St\u00e4dte',
+              desc: 'Welche L\u00e4nder haben <em>keine einzige</em> Stadt in der Datenbank? Ein normaler JOIN zeigt nur L\u00e4nder <em>mit</em> St\u00e4dten. Ein <code class="inline">LEFT JOIN</code> beh\u00e4lt alle L\u00e4nder \u2014 auch die ohne Partner. Filtere dann auf <code class="inline">WHERE s.ST_NAME IS NULL</code>.',
+              hint: 'FROM LAND l LEFT JOIN STADT s ON l.L_ID = s.L_ID WHERE s.ST_NAME IS NULL',
+              sol: 'SELECT l.L_NAME FROM LAND l LEFT JOIN STADT s ON l.L_ID = s.L_ID WHERE s.ST_NAME IS NULL ORDER BY l.L_NAME' },
+
             { id: 'n3a-4', n: '3a', title: 'Millionenst\u00e4dte mit Land',
               desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner? Zeige Stadt, Einwohner und L\u00e4ndername!',
               hint: 'JOIN + WHERE s.EINWOHNER > 5000000',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE s.EINWOHNER > 5000000 ORDER BY s.EINWOHNER DESC' },
 
+            // -- Phase 3: Neue Tabellenpaare --
+            { id: 'n3a-11', n: '3a', title: 'Fl\u00fcsse und ihre Meere',
+              desc: 'Nicht nur STADT und LAND lassen sich verbinden! Die Tabelle FLUSS hat eine Spalte <code class="inline">MEER</code>, die Tabelle MEER hat <code class="inline">M_NAME</code>. Zeige Flussname, Flussl\u00e4nge und Meeresname!',
+              hint: 'FROM FLUSS f JOIN MEER m ON f.MEER = m.M_NAME',
+              sol: 'SELECT f.F_NAME, f.LAENGE, m.M_NAME FROM FLUSS f JOIN MEER m ON f.MEER = m.M_NAME ORDER BY f.LAENGE DESC' },
+
+            { id: 'n3a-12', n: '3a', title: 'Fl\u00fcsse in Seen',
+              desc: 'Welche Fl\u00fcsse m\u00fcnden in einen See? Zeige Flussname, Seename und Seefl\u00e4che! (FLUSS hat Spalte <code class="inline">SEE</code>, SEE hat <code class="inline">S_NAME</code>)',
+              hint: 'FROM FLUSS f JOIN SEE s ON f.SEE = s.S_NAME',
+              sol: 'SELECT f.F_NAME, s.S_NAME, s.FLAECHE FROM FLUSS f JOIN SEE s ON f.SEE = s.S_NAME' },
+
+            { id: 'n3a-15', n: '3a', title: 'LEFT JOIN: Meere ohne Zufluss',
+              desc: 'Welche Meere haben <em>keinen</em> Fluss-Zufluss in der Datenbank? Gleiches Prinzip wie bei den L\u00e4ndern ohne St\u00e4dte!',
+              hint: 'FROM MEER m LEFT JOIN FLUSS f ON m.M_NAME = f.MEER WHERE f.F_NAME IS NULL',
+              sol: 'SELECT m.M_NAME FROM MEER m LEFT JOIN FLUSS f ON m.M_NAME = f.MEER WHERE f.F_NAME IS NULL ORDER BY m.M_NAME' },
+
+            // -- Phase 4: WHERE auf die andere Tabelle --
             { id: 'n3a-5', n: '3a', title: 'St\u00e4dte in gro\u00dfen L\u00e4ndern',
-              desc: 'Zeige alle St\u00e4dte in L\u00e4ndern mit mehr als 100 Millionen Einwohnern! (Stadtname, Landesname, Einwohner des Landes)',
+              desc: 'Zeige alle St\u00e4dte in L\u00e4ndern mit mehr als 100 Millionen Einwohnern! Beachte: Die Bedingung gilt f\u00fcr die <em>Land</em>-Tabelle, nicht f\u00fcr die Stadt.',
               hint: 'JOIN + WHERE l.EINWOHNER > 100000000',
               sol: 'SELECT s.ST_NAME, l.L_NAME, l.EINWOHNER FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.EINWOHNER > 100000000 ORDER BY l.EINWOHNER DESC' },
+
+            { id: 'n3a-13', n: '3a', title: 'Fl\u00fcsse in tiefe Meere',
+              desc: 'Zeige alle Fl\u00fcsse, die in ein Meer tiefer als 3000m m\u00fcnden! (Flussname, Meeresname, Tiefe)',
+              hint: 'FLUSS JOIN MEER + WHERE m.TIEFE > 3000',
+              sol: 'SELECT f.F_NAME, m.M_NAME, m.TIEFE FROM FLUSS f JOIN MEER m ON f.MEER = m.M_NAME WHERE m.TIEFE > 3000 ORDER BY m.TIEFE DESC' },
 
             { id: 'n3a-6', n: '3a', title: 'St\u00e4dte in Riesenl\u00e4ndern',
               desc: 'Welche St\u00e4dte liegen in L\u00e4ndern mit mehr als 5 Millionen km\u00b2 Fl\u00e4che?',
               hint: 'JOIN + WHERE l.FLAECHE > 5000000',
               sol: 'SELECT s.ST_NAME, l.L_NAME, l.FLAECHE FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.FLAECHE > 5000000' },
 
+            // -- Phase 5: JOIN + Aggregation --
             { id: 'n3a-7', n: '3a', title: 'Anzahl St\u00e4dte pro Land',
-              desc: 'Wie viele St\u00e4dte hat jedes Land in der Datenbank? Zeige L\u00e4ndername und Anzahl, sortiert!',
+              desc: 'Wie viele St\u00e4dte hat jedes Land in der Datenbank? Zeige L\u00e4ndername und Anzahl, sortiert! Hier kombinierst du JOIN mit GROUP BY.',
               hint: 'JOIN + GROUP BY l.L_NAME + COUNT(*)',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC' },
 
             { id: 'n3a-8', n: '3a', title: 'L\u00e4nder mit >5 St\u00e4dten',
               desc: 'Welche L\u00e4nder haben mehr als 5 St\u00e4dte in der Datenbank?',
-              hint: 'Wie oben, aber mit HAVING COUNT(*) > 5',
+              hint: 'Wie vorher, aber mit HAVING COUNT(*) > 5',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME HAVING COUNT(*) > 5 ORDER BY Anzahl DESC' },
 
             { id: 'n3a-9', n: '3a', title: 'Durchschnittliche Stadtgr\u00f6\u00dfe pro Land',
@@ -876,7 +912,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             { id: 'n3a-10', n: '3a', title: 'Land mit den meisten St\u00e4dten',
               desc: 'Welches Land hat die meisten St\u00e4dte in der Datenbank?',
-              hint: 'Wie Aufgabe 7, aber mit LIMIT 1',
+              hint: 'GROUP BY + ORDER BY + LIMIT 1',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 1' },
 
             // =====================================================
