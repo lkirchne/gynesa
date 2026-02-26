@@ -938,7 +938,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
               hint: 'FROM FLUSS f JOIN SEE s ON f.SEE = s.S_NAME',
               sol: 'SELECT f.F_NAME, s.S_NAME, s.FLAECHE FROM FLUSS f JOIN SEE s ON f.SEE = s.S_NAME' },
 
-            { id: 'n3a-15', n: '3a', title: 'LEFT JOIN: Meere ohne Zufluss',
+            { id: 'n3a-15', n: '3a', title: 'Meere ohne Zufluss',
               desc: 'Welche Meere haben <em>keinen</em> Fluss-Zufluss in der Datenbank? Gleiches Prinzip wie bei den L\u00e4ndern ohne St\u00e4dte!',
               hint: 'FROM MEER m LEFT JOIN FLUSS f ON m.M_NAME = f.MEER WHERE f.F_NAME IS NULL',
               sol: 'SELECT m.M_NAME FROM MEER m LEFT JOIN FLUSS f ON m.M_NAME = f.MEER WHERE f.F_NAME IS NULL ORDER BY m.M_NAME' },
