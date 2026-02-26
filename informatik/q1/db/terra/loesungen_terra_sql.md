@@ -213,9 +213,11 @@ ORDER BY Anzahl DESC;
 
 ---
 
-## Niveau 3a — Einfache JOINs (2 Tabellen: STADT ↔ LAND)
+## Niveau 3a — Einfache JOINs (2 Tabellen)
 
-> STADT und LAND teilen sich die Spalte `L_ID` — hier braucht man keine Verbindungstabelle.
+> STADT und LAND teilen sich `L_ID`, FLUSS hat direkte Spalten `MEER` und `SEE` — hier braucht man keine Verbindungstabelle.
+
+**Phase 1: Erste JOINs (STADT ↔ LAND)**
 
 ### 3a-1: Städte mit Ländername
 ```sql
@@ -242,6 +244,17 @@ ORDER BY s.EINWOHNER DESC
 LIMIT 10;
 ```
 
+**Phase 2: LEFT JOIN einführen**
+
+### 3a-14: LEFT JOIN — Länder ohne Städte
+```sql
+SELECT l.L_NAME
+FROM LAND l
+LEFT JOIN STADT s ON l.L_ID = s.L_ID
+WHERE s.ST_NAME IS NULL
+ORDER BY l.L_NAME;
+```
+
 ### 3a-4: Millionenstädte mit Land
 ```sql
 SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME
@@ -250,6 +263,34 @@ JOIN LAND l ON s.L_ID = l.L_ID
 WHERE s.EINWOHNER > 5000000
 ORDER BY s.EINWOHNER DESC;
 ```
+
+**Phase 3: Neue Tabellenpaare (FLUSS ↔ MEER/SEE)**
+
+### 3a-11: Flüsse und ihre Meere
+```sql
+SELECT f.F_NAME, f.LAENGE, m.M_NAME
+FROM FLUSS f
+JOIN MEER m ON f.MEER = m.M_NAME
+ORDER BY f.LAENGE DESC;
+```
+
+### 3a-12: Flüsse in Seen
+```sql
+SELECT f.F_NAME, s.S_NAME, s.FLAECHE
+FROM FLUSS f
+JOIN SEE s ON f.SEE = s.S_NAME;
+```
+
+### 3a-15: LEFT JOIN — Meere ohne Zufluss
+```sql
+SELECT m.M_NAME
+FROM MEER m
+LEFT JOIN FLUSS f ON m.M_NAME = f.MEER
+WHERE f.F_NAME IS NULL
+ORDER BY m.M_NAME;
+```
+
+**Phase 4: WHERE auf die andere Tabelle**
 
 ### 3a-5: Städte in großen Ländern
 ```sql
@@ -260,6 +301,15 @@ WHERE l.EINWOHNER > 100000000
 ORDER BY l.EINWOHNER DESC;
 ```
 
+### 3a-13: Flüsse in tiefe Meere
+```sql
+SELECT f.F_NAME, m.M_NAME, m.TIEFE
+FROM FLUSS f
+JOIN MEER m ON f.MEER = m.M_NAME
+WHERE m.TIEFE > 3000
+ORDER BY m.TIEFE DESC;
+```
+
 ### 3a-6: Städte in Riesenländern
 ```sql
 SELECT s.ST_NAME, l.L_NAME, l.FLAECHE
@@ -267,6 +317,8 @@ FROM STADT s
 JOIN LAND l ON s.L_ID = l.L_ID
 WHERE l.FLAECHE > 5000000;
 ```
+
+**Phase 5: JOIN + Aggregation**
 
 ### 3a-7: Anzahl Städte pro Land
 ```sql
