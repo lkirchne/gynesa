@@ -11,29 +11,23 @@
             --font-display: 'Bangers', cursive;
             --font-body: 'Outfit', sans-serif;
             --mono: 'JetBrains Mono', monospace;
-
             --green-dark: #14532d;
             --green-bg: #f0fdf4;
             --green: #16a34a;
             --orange: #ea580c;
             --orange-bg: #fff7ed;
-
             --tbl-left: #dbeafe;
             --tbl-left-head: #bfdbfe;
+            --tbl-left-strong: #3b82f6;
             --tbl-right: #dcfce7;
             --tbl-right-head: #bbf7d0;
-
+            --tbl-right-strong: #22c55e;
             --text: #1a1a1a;
             --text-muted: #666;
-            --border: #e5e5e5;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
+        html, body { height: 100%; overflow: hidden; }
 
         body {
             font-family: var(--font-body);
@@ -45,7 +39,6 @@
             flex-direction: column;
         }
 
-        /* ---- Header ---- */
         header {
             background: var(--green-dark);
             color: #fff;
@@ -72,7 +65,6 @@
             font-weight: 500;
         }
 
-        /* ---- Hint ---- */
         .hint-bar {
             background: var(--orange-bg);
             border-bottom: 2px solid var(--orange);
@@ -92,7 +84,6 @@
             font-size: 0.72rem;
         }
 
-        /* ---- Grid: fills remaining height ---- */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1.5fr 1fr;
@@ -134,7 +125,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* ---- Tables ---- */
         table { width: 100%; border-collapse: collapse; }
 
         th {
@@ -159,11 +149,7 @@
             font-size: 0.78rem;
         }
 
-        .src td:first-child {
-            font-family: var(--mono);
-            font-size: 0.74rem;
-        }
-
+        .src td:first-child { font-family: var(--mono); font-size: 0.74rem; }
         .src td { transition: all 0.3s; }
         .src tr.match td { font-weight: 700; }
         .src tr.out td { opacity: 0.15; text-decoration: line-through; }
@@ -179,7 +165,6 @@
             font-family: var(--mono);
         }
 
-        /* ---- Editor ---- */
         .ed-label {
             font-size: 0.64rem;
             font-weight: 700;
@@ -204,17 +189,9 @@
             border-radius: 0;
         }
 
-        textarea:focus {
-            outline: none;
-            box-shadow: 2px 2px 0 var(--green-dark);
-        }
+        textarea:focus { outline: none; box-shadow: 2px 2px 0 var(--green-dark); }
 
-        .btns {
-            display: flex;
-            gap: 0.25rem;
-            margin-top: 0.3rem;
-            flex-wrap: wrap;
-        }
+        .btns { display: flex; gap: 0.25rem; margin-top: 0.3rem; flex-wrap: wrap; }
 
         .b {
             padding: 0.35rem 0.65rem;
@@ -231,11 +208,7 @@
             touch-action: manipulation;
         }
 
-        .b:hover {
-            box-shadow: 2px 2px 0 var(--green-dark);
-            transform: translate(-1px,-1px);
-        }
-
+        .b:hover { box-shadow: 2px 2px 0 var(--green-dark); transform: translate(-1px,-1px); }
         .b:active { box-shadow: none; transform: none; }
         .b-go { background: var(--green-dark); color: #4ade80; }
         .b-go:hover { background: #166534; }
@@ -259,25 +232,60 @@
             margin-bottom: 0.15rem;
         }
 
-        .expl {
+        /* ---- Explanation + Venn ---- */
+        .expl-wrap {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+            margin-top: 0.35rem;
+        }
+
+        .expl-text {
             background: var(--green-bg);
             border-left: 3px solid var(--green);
             padding: 0.4rem 0.6rem;
-            margin-top: 0.35rem;
             font-size: 0.76rem;
             color: #333;
             line-height: 1.45;
+            flex: 1;
         }
 
-        .expl strong { font-weight: 700; color: var(--green-dark); }
+        .expl-text strong { font-weight: 700; color: var(--green-dark); }
 
-        .expl code {
+        .expl-text code {
             font-family: var(--mono);
             background: #fff;
             padding: 0.05rem 0.2rem;
             border: 1px solid #d4d4d4;
             font-size: 0.72rem;
         }
+
+        .venn-box {
+            flex-shrink: 0;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .venn-box svg {
+            width: 120px;
+            height: 75px;
+        }
+
+        .venn-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.56rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 1px;
+            padding: 0 0.2rem;
+        }
+
+        .venn-labels .vl { color: var(--tbl-left-strong); }
+        .venn-labels .vr { color: var(--tbl-right-strong); }
 
         .err {
             background: #fef2f2;
@@ -296,7 +304,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* ---- iPad landscape (1180x820) — more room ---- */
         @media (min-width: 1000px) and (max-height: 900px) {
             header { padding: 0.45rem 1rem; }
             header h1 { font-size: 1.4rem; }
@@ -304,7 +311,6 @@
             textarea { min-height: 70px; }
         }
 
-        /* ---- Stacked fallback for phones ---- */
         @media (max-width: 600px) {
             .grid { grid-template-columns: 1fr; }
             .col-left, .col-right { border: 2px solid var(--green-dark); }
@@ -369,11 +375,11 @@ let db;
 
 const B = [
     [101,1,'Margherita',8.50],
-    [102,2,'Salami',9.50],
-    [103,3,'Quattro Formaggi',11.00],
-    [104,1,'Hawaii',10.00],
-    [105,2,'Diavola',9.00],
-    [106,99,'Tonno',10.50],
+    [102,2,'Funghi',9.50],
+    [103,3,'Salami',11.00],
+    [104,1,'Verdura',10.00],
+    [105,2,'Spinaci',9.00],
+    [106,99,'Vegana',10.50],
 ];
 
 const KU = [
@@ -387,26 +393,83 @@ const KU = [
 const LC = new Set(['B_ID','PIZZA','PREIS']);
 const RC = new Set(['NAME','STADTTEIL']);
 
+/* ---- Venn SVGs ---- */
+/* Circles: left center (38,38) r=28, right center (82,38) r=28 */
+/* clipPath approach: left-only, intersection, right-only */
+function venn(hl, hi, hr) {
+    /* hl = highlight left-only, hi = intersection, hr = right-only */
+    const lo = 0.12, hi_o = 0.12; /* dim opacity */
+    const oL  = hl ? 0.45 : lo;
+    const oI  = hi ? 0.55 : hi_o;
+    const oR  = hr ? 0.45 : lo;
+    const sL  = hl ? 'stroke-width:2.5' : 'stroke-width:1.5';
+    const sR  = hr ? 'stroke-width:2.5' : 'stroke-width:1.5';
+
+    return `<svg viewBox="0 0 120 75" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="clipL"><circle cx="38" cy="38" r="28"/></clipPath>
+    <clipPath id="clipR"><circle cx="82" cy="38" r="28"/></clipPath>
+  </defs>
+  <!-- left only -->
+  <circle cx="38" cy="38" r="28" fill="#3b82f6" opacity="${oL}" stroke="#3b82f6" ${sL} fill-rule="evenodd"/>
+  <!-- right only -->
+  <circle cx="82" cy="38" r="28" fill="#22c55e" opacity="${oR}" stroke="#22c55e" ${sR} fill-rule="evenodd"/>
+  <!-- intersection: draw left circle clipped to right -->
+  <circle cx="38" cy="38" r="28" fill="#3b82f6" opacity="${oI}" clip-path="url(#clipR)"/>
+  <circle cx="82" cy="38" r="28" fill="#22c55e" opacity="${oI}" clip-path="url(#clipL)"/>
+  <!-- outlines on top -->
+  <circle cx="38" cy="38" r="28" fill="none" stroke="#3b82f6" ${sL}/>
+  <circle cx="82" cy="38" r="28" fill="none" stroke="#22c55e" ${sR}/>
+</svg>`;
+}
+
+function vennCross() {
+    return `<svg viewBox="0 0 120 75" xmlns="http://www.w3.org/2000/svg">
+  <rect x="8" y="8" width="44" height="58" rx="4" fill="#3b82f6" opacity="0.35" stroke="#3b82f6" stroke-width="2"/>
+  <rect x="68" y="8" width="44" height="58" rx="4" fill="#22c55e" opacity="0.35" stroke="#22c55e" stroke-width="2"/>
+  <line x1="52" y1="20" x2="68" y2="20" stroke="#888" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="52" y1="32" x2="68" y2="32" stroke="#888" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="52" y1="44" x2="68" y2="44" stroke="#888" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="52" y1="56" x2="68" y2="56" stroke="#888" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="60" y="12" text-anchor="middle" font-size="7" fill="#888" font-family="Outfit,sans-serif" font-weight="700">&times;</text>
+</svg>`;
+}
+
+function makeExpl(txt, vennSvg) {
+    return `<div class="expl-wrap">
+        <div class="expl-text">${txt}</div>
+        <div class="venn-box">
+            ${vennSvg}
+            <div class="venn-labels"><span class="vl">Bestellung</span><span class="vr">Kunden</span></div>
+        </div>
+    </div>`;
+}
+
 const PR = {
     inner: {
         sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nINNER JOIN Kunden k\n  ON b.K_ID = k.K_ID;`,
-        t: `<strong>INNER JOIN</strong> &mdash; nur Zeilen mit Partner in beiden Tabellen. #106 raus: K_ID=99 existiert nicht. Raph und Splinter raus: keine Bestellung.`
+        t: `<strong>INNER JOIN</strong> &mdash; nur Zeilen mit Partner in beiden Tabellen. #106 raus: K_ID=99 existiert nicht. Raph und Splinter raus: keine Bestellung. Kurzform: <code>JOIN</code> ohne INNER funktioniert genauso.`,
+        v: () => venn(false, true, false)
     },
     left: {
         sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nLEFT JOIN Kunden k\n  ON b.K_ID = k.K_ID;`,
-        t: `<strong>LEFT JOIN</strong> &mdash; alle Bestellungen bleiben. #106 hat keinen Kunden, daher Name und Stadtteil = <code>NULL</code>.`
+        t: `<strong>LEFT JOIN</strong> &mdash; alle Bestellungen bleiben. #106 hat keinen Kunden, daher Name und Stadtteil = <code>NULL</code>.`,
+        v: () => venn(true, true, false)
     },
     right: {
         sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nRIGHT JOIN Kunden k\n  ON b.K_ID = k.K_ID;`,
-        t: `<strong>RIGHT JOIN</strong> &mdash; alle Kunden bleiben. Raph und Splinter haben nichts bestellt: B_ID, Pizza, Preis = <code>NULL</code>.`
+        t: `<strong>RIGHT JOIN</strong> &mdash; alle Kunden bleiben. Raph und Splinter haben nichts bestellt: B_ID, Pizza, Preis = <code>NULL</code>.`,
+        v: () => venn(false, true, true)
     },
     full: {
         sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nLEFT JOIN Kunden k\n  ON b.K_ID = k.K_ID\n\nUNION ALL\n\nSELECT NULL, NULL, NULL,\n       k.Name, k.Stadtteil\nFROM Kunden k\nWHERE k.K_ID NOT IN (\n  SELECT K_ID FROM Bestellung\n);`,
-        t: `<strong>FULL OUTER JOIN</strong> &mdash; alle Zeilen aus beiden Tabellen. Ohne Partner = <code>NULL</code>. (SQLite braucht den UNION-Trick.)`
+        t: `<strong>FULL OUTER JOIN</strong> &mdash; alle Zeilen aus beiden Tabellen. Ohne Partner = <code>NULL</code>. (SQLite braucht den UNION-Trick.)`,
+        v: () => venn(true, true, true)
     },
     cross: {
         sql: `SELECT b.B_ID, b.Pizza, k.Name\nFROM Bestellung b, Kunden k\nLIMIT 15;`,
-        t: `<strong>Kreuzprodukt</strong> &mdash; ohne ON: jede Bestellung &times; jeden Kunden = 30 Zeilen. Nicht sinnvoll, aber lehrreich.`
+        t: `<strong>Kreuzprodukt</strong> &mdash; ohne ON: jede Bestellung &times; jeden Kunden = 30 Zeilen. Nicht sinnvoll, aber lehrreich.`,
+        v: () => vennCross()
     }
 };
 
@@ -495,7 +558,7 @@ function clr() {
 function pre(n) {
     const p = PR[n];
     document.getElementById('ed').value = p.sql;
-    document.getElementById('ex').innerHTML = `<div class="expl">${p.t}</div>`;
+    document.getElementById('ex').innerHTML = makeExpl(p.t, p.v());
     document.querySelectorAll('.b-pre').forEach(b => b.classList.remove('on'));
     event.target.classList.add('on');
     go();
