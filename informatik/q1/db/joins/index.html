@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Schildkroeten-Pizza | SQL JOINs</title>
+    <link href="https://fonts.bunny.net/css?family=bangers:400|outfit:400,500,600,700|jetbrains-mono:400,500" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <style>
+        :root {
+            --font-display: 'Bangers', cursive;
+            --font-body: 'Outfit', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+
+            --green-dark: #14532d;
+            --green-bg: #f0fdf4;
+            --green: #16a34a;
+            --orange: #ea580c;
+            --orange-bg: #fff7ed;
+
+            --tbl-left: #dbeafe;
+            --tbl-left-head: #bfdbfe;
+            --tbl-right: #dcfce7;
+            --tbl-right-head: #bbf7d0;
+
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --border: #e5e5e5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: #fafaf9;
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---- Header ---- */
+        header {
+            background: var(--green-dark);
+            color: #fff;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            color: #4ade80;
+            line-height: 1;
+        }
+
+        header .tagline {
+            font-size: 0.78rem;
+            color: #86efac;
+            font-weight: 500;
+        }
+
+        /* ---- Hint ---- */
+        .hint-bar {
+            background: var(--orange-bg);
+            border-bottom: 2px solid var(--orange);
+            padding: 0.35rem 1rem;
+            font-size: 0.76rem;
+            color: #9a3412;
+            text-align: center;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .hint-bar code {
+            font-family: var(--mono);
+            background: #fff;
+            padding: 0.05rem 0.25rem;
+            border: 1px solid #fed7aa;
+            font-size: 0.72rem;
+        }
+
+        /* ---- Grid: fills remaining height ---- */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .col {
+            border: 2px solid var(--green-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .col-left  { border-right: none; }
+        .col-right { border-left: none; }
+
+        .col-head {
+            padding: 0.4rem 0.6rem;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 2px solid var(--green-dark);
+            flex-shrink: 0;
+        }
+
+        .col-left  .col-head { background: var(--tbl-left-head); }
+        .col-mid   .col-head { background: #fef3c7; }
+        .col-right .col-head { background: var(--tbl-right-head); }
+
+        .col-body {
+            padding: 0.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ---- Tables ---- */
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background: #f5f5f4;
+            padding: 0.35rem 0.4rem;
+            text-align: left;
+            font-family: var(--mono);
+            font-weight: 500;
+            font-size: 0.64rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-bottom: 2px solid #d4d4d4;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        td {
+            padding: 0.32rem 0.4rem;
+            border-bottom: 1px solid #eee;
+            font-size: 0.78rem;
+        }
+
+        .src td:first-child {
+            font-family: var(--mono);
+            font-size: 0.74rem;
+        }
+
+        .src td { transition: all 0.3s; }
+        .src tr.match td { font-weight: 700; }
+        .src tr.out td { opacity: 0.15; text-decoration: line-through; }
+
+        .res td.L { background: var(--tbl-left); }
+        .res td.R { background: var(--tbl-right); }
+        .res td.N { color: #aaa; font-style: italic; background: #f5f5f4; }
+
+        .res-info {
+            font-size: 0.66rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+            font-family: var(--mono);
+        }
+
+        /* ---- Editor ---- */
+        .ed-label {
+            font-size: 0.64rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.15rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.4rem;
+            font-family: var(--mono);
+            font-size: 0.74rem;
+            border: 2px solid var(--green-dark);
+            background: #fff;
+            resize: none;
+            color: var(--text);
+            line-height: 1.45;
+            -webkit-appearance: none;
+            border-radius: 0;
+        }
+
+        textarea:focus {
+            outline: none;
+            box-shadow: 2px 2px 0 var(--green-dark);
+        }
+
+        .btns {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .b {
+            padding: 0.35rem 0.65rem;
+            font-family: var(--font-body);
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 2px solid var(--green-dark);
+            cursor: pointer;
+            background: #fff;
+            color: var(--green-dark);
+            transition: all 0.1s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .b:hover {
+            box-shadow: 2px 2px 0 var(--green-dark);
+            transform: translate(-1px,-1px);
+        }
+
+        .b:active { box-shadow: none; transform: none; }
+        .b-go { background: var(--green-dark); color: #4ade80; }
+        .b-go:hover { background: #166534; }
+
+        .b-pre {
+            font-size: 0.62rem;
+            padding: 0.22rem 0.45rem;
+            font-family: var(--mono);
+            font-weight: 500;
+            text-transform: none;
+        }
+
+        .b-pre.on { background: var(--green-dark); color: #4ade80; }
+
+        .pre-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.15rem;
+        }
+
+        .expl {
+            background: var(--green-bg);
+            border-left: 3px solid var(--green);
+            padding: 0.4rem 0.6rem;
+            margin-top: 0.35rem;
+            font-size: 0.76rem;
+            color: #333;
+            line-height: 1.45;
+        }
+
+        .expl strong { font-weight: 700; color: var(--green-dark); }
+
+        .expl code {
+            font-family: var(--mono);
+            background: #fff;
+            padding: 0.05rem 0.2rem;
+            border: 1px solid #d4d4d4;
+            font-size: 0.72rem;
+        }
+
+        .err {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 0.4rem;
+            font-size: 0.76rem;
+            margin-top: 0.3rem;
+            border: 2px solid #dc2626;
+        }
+
+        .result-area {
+            margin-top: 0.3rem;
+            flex: 1;
+            overflow: auto;
+            min-height: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ---- iPad landscape (1180x820) — more room ---- */
+        @media (min-width: 1000px) and (max-height: 900px) {
+            header { padding: 0.45rem 1rem; }
+            header h1 { font-size: 1.4rem; }
+            .hint-bar { padding: 0.3rem 1rem; font-size: 0.72rem; }
+            textarea { min-height: 70px; }
+        }
+
+        /* ---- Stacked fallback for phones ---- */
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+            .col-left, .col-right { border: 2px solid var(--green-dark); }
+            html, body { overflow: auto; height: auto; }
+            body { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Schildkr&ouml;ten-Pizza</h1>
+    <span class="tagline">SQL JOINs lernen &mdash; Cowabunga!</span>
+</header>
+
+<div class="hint-bar">
+    Verbinde <code>Bestellung</code> und <code>Kunden</code> &uuml;ber <code>K_ID</code>
+</div>
+
+<div class="grid">
+
+    <div class="col col-left">
+        <div class="col-head">Bestellung</div>
+        <div class="col-body">
+            <table class="src"><thead><tr><th>B_ID</th><th>K_ID</th><th>Pizza</th><th>Preis</th></tr></thead><tbody id="bl"></tbody></table>
+        </div>
+    </div>
+
+    <div class="col col-mid">
+        <div class="col-head">Abfrage</div>
+        <div class="col-body">
+            <div class="pre-label">Vorlagen:</div>
+            <div class="btns" style="margin-bottom:0.35rem">
+                <button class="b b-pre" onclick="pre('inner')">INNER JOIN</button>
+                <button class="b b-pre" onclick="pre('left')">LEFT JOIN</button>
+                <button class="b b-pre" onclick="pre('right')">RIGHT JOIN</button>
+                <button class="b b-pre" onclick="pre('full')">FULL OUTER</button>
+                <button class="b b-pre" onclick="pre('cross')">Kreuzprodukt</button>
+            </div>
+            <div class="ed-label">SQL</div>
+            <textarea id="ed" placeholder="SELECT *&#10;FROM Bestellung b&#10;INNER JOIN Kunden k&#10;  ON b.K_ID = k.K_ID;"></textarea>
+            <div class="btns">
+                <button class="b b-go" onclick="go()">Ausf&uuml;hren</button>
+                <button class="b" onclick="clr()">Zur&uuml;cksetzen</button>
+            </div>
+            <div id="ex"></div>
+            <div class="result-area" id="res"></div>
+        </div>
+    </div>
+
+    <div class="col col-right">
+        <div class="col-head">Kunden</div>
+        <div class="col-body">
+            <table class="src"><thead><tr><th>K_ID</th><th>Name</th><th>Stadtteil</th></tr></thead><tbody id="br"></tbody></table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+let db;
+
+const B = [
+    [101,1,'Margherita',8.50],
+    [102,2,'Salami',9.50],
+    [103,3,'Quattro Formaggi',11.00],
+    [104,1,'Hawaii',10.00],
+    [105,2,'Diavola',9.00],
+    [106,99,'Tonno',10.50],
+];
+
+const KU = [
+    [1,'Leo','Widdersdorf'],
+    [2,'Michi','Loevenich'],
+    [3,'Donnie','Muengersdorf'],
+    [4,'Raph','Junkersdorf'],
+    [5,'Splinter','Brauweiler'],
+];
+
+const LC = new Set(['B_ID','PIZZA','PREIS']);
+const RC = new Set(['NAME','STADTTEIL']);
+
+const PR = {
+    inner: {
+        sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nINNER JOIN Kunden k\n  ON b.K_ID = k.K_ID;`,
+        t: `<strong>INNER JOIN</strong> &mdash; nur Zeilen mit Partner in beiden Tabellen. #106 raus: K_ID=99 existiert nicht. Raph und Splinter raus: keine Bestellung.`
+    },
+    left: {
+        sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nLEFT JOIN Kunden k\n  ON b.K_ID = k.K_ID;`,
+        t: `<strong>LEFT JOIN</strong> &mdash; alle Bestellungen bleiben. #106 hat keinen Kunden, daher Name und Stadtteil = <code>NULL</code>.`
+    },
+    right: {
+        sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nRIGHT JOIN Kunden k\n  ON b.K_ID = k.K_ID;`,
+        t: `<strong>RIGHT JOIN</strong> &mdash; alle Kunden bleiben. Raph und Splinter haben nichts bestellt: B_ID, Pizza, Preis = <code>NULL</code>.`
+    },
+    full: {
+        sql: `SELECT b.B_ID, b.Pizza, b.Preis,\n       k.Name, k.Stadtteil\nFROM Bestellung b\nLEFT JOIN Kunden k\n  ON b.K_ID = k.K_ID\n\nUNION ALL\n\nSELECT NULL, NULL, NULL,\n       k.Name, k.Stadtteil\nFROM Kunden k\nWHERE k.K_ID NOT IN (\n  SELECT K_ID FROM Bestellung\n);`,
+        t: `<strong>FULL OUTER JOIN</strong> &mdash; alle Zeilen aus beiden Tabellen. Ohne Partner = <code>NULL</code>. (SQLite braucht den UNION-Trick.)`
+    },
+    cross: {
+        sql: `SELECT b.B_ID, b.Pizza, k.Name\nFROM Bestellung b, Kunden k\nLIMIT 15;`,
+        t: `<strong>Kreuzprodukt</strong> &mdash; ohne ON: jede Bestellung &times; jeden Kunden = 30 Zeilen. Nicht sinnvoll, aber lehrreich.`
+    }
+};
+
+async function init() {
+    const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` });
+    db = new SQL.Database();
+    db.run(`
+        CREATE TABLE Kunden(K_ID INTEGER PRIMARY KEY,Name TEXT,Stadtteil TEXT);
+        INSERT INTO Kunden VALUES(1,'Leo','Widdersdorf');
+        INSERT INTO Kunden VALUES(2,'Michi','Loevenich');
+        INSERT INTO Kunden VALUES(3,'Donnie','Muengersdorf');
+        INSERT INTO Kunden VALUES(4,'Raph','Junkersdorf');
+        INSERT INTO Kunden VALUES(5,'Splinter','Brauweiler');
+        CREATE TABLE Bestellung(B_ID INTEGER PRIMARY KEY,K_ID INTEGER,Pizza TEXT,Preis REAL);
+        INSERT INTO Bestellung VALUES(101,1,'Margherita',8.50);
+        INSERT INTO Bestellung VALUES(102,2,'Salami',9.50);
+        INSERT INTO Bestellung VALUES(103,3,'Quattro Formaggi',11.00);
+        INSERT INTO Bestellung VALUES(104,1,'Hawaii',10.00);
+        INSERT INTO Bestellung VALUES(105,2,'Diavola',9.00);
+        INSERT INTO Bestellung VALUES(106,99,'Tonno',10.50);
+    `);
+    src();
+}
+
+function src(mB, mK) {
+    const bl = document.getElementById('bl');
+    bl.innerHTML = '';
+    B.forEach(([bid,kid,pz,pr]) => {
+        const tr = document.createElement('tr');
+        if (mB) {
+            tr.className = mB.has(bid) ? 'match' : 'out';
+            if (mB.has(bid)) tr.style.background = 'var(--tbl-left)';
+        }
+        tr.innerHTML = `<td>${bid}</td><td>${kid}</td><td>${pz}</td><td>${pr.toFixed(2)}&nbsp;&euro;</td>`;
+        bl.appendChild(tr);
+    });
+    const br = document.getElementById('br');
+    br.innerHTML = '';
+    KU.forEach(([kid,nm,st]) => {
+        const tr = document.createElement('tr');
+        if (mK) {
+            tr.className = mK.has(kid) ? 'match' : 'out';
+            if (mK.has(kid)) tr.style.background = 'var(--tbl-right)';
+        }
+        tr.innerHTML = `<td>${kid}</td><td>${nm}</td><td>${st}</td>`;
+        br.appendChild(tr);
+    });
+}
+
+function go() {
+    const q = document.getElementById('ed').value;
+    const el = document.getElementById('res');
+    el.innerHTML = '';
+    if (!db || !q.trim()) return;
+    try {
+        const r = db.exec(q);
+        if (!r.length) { el.innerHTML = '<div style="padding:0.3rem;color:#888;font-style:italic;font-size:0.76rem">Keine Ergebnisse.</div>'; src(); return; }
+        const d = r[0];
+        const cn = d.columns.map(c => c.toUpperCase().replace(/.*\./,''));
+        const mB = new Set(), mK = new Set();
+        const iB = cn.indexOf('B_ID'), iK = cn.indexOf('K_ID'), iN = cn.indexOf('NAME');
+        d.values.forEach(row => {
+            if (iB >= 0 && row[iB] !== null) mB.add(row[iB]);
+            if (iK >= 0 && row[iK] !== null && row[iK] !== 99) mK.add(row[iK]);
+            if (iN >= 0 && row[iN] !== null) { const f = KU.find(k => k[1] === row[iN]); if (f) mK.add(f[0]); }
+        });
+        const side = cn.map(c => LC.has(c) ? 'L' : RC.has(c) ? 'R' : '');
+        let h = `<div class="res-info">${d.values.length} Zeile${d.values.length!==1?'n':''}</div><table class="res"><thead><tr>`;
+        d.columns.forEach((c,i) => { const bg = side[i]==='L'?'background:var(--tbl-left)':side[i]==='R'?'background:var(--tbl-right)':''; h += `<th style="${bg}">${c}</th>`; });
+        h += '</tr></thead><tbody>';
+        d.values.forEach(row => { h += '<tr>'; row.forEach((v,i) => { h += v===null?'<td class="N">NULL</td>':`<td class="${side[i]}">${v}</td>`; }); h += '</tr>'; });
+        h += '</tbody></table>';
+        el.innerHTML = h;
+        src(mB, mK);
+    } catch(e) { el.innerHTML = `<div class="err">${e.message}</div>`; src(); }
+}
+
+function clr() {
+    document.getElementById('ed').value = '';
+    document.getElementById('res').innerHTML = '';
+    document.getElementById('ex').innerHTML = '';
+    document.querySelectorAll('.b-pre').forEach(b => b.classList.remove('on'));
+    src();
+}
+
+function pre(n) {
+    const p = PR[n];
+    document.getElementById('ed').value = p.sql;
+    document.getElementById('ex').innerHTML = `<div class="expl">${p.t}</div>`;
+    document.querySelectorAll('.b-pre').forEach(b => b.classList.remove('on'));
+    event.target.classList.add('on');
+    go();
+}
+
+init();
+</script>
+</body>
+</html>
