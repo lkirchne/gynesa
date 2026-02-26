@@ -197,15 +197,21 @@
             padding: 1rem;
             font-family: var(--code-font);
             font-size: 0.9rem;
-            border: 2px solid var(--border-color);
+            border: 2px solid #1e293b;
             border-radius: 8px;
-            background: #f8fafc;
+            background: #1e293b;
+            color: #e2e8f0;
             resize: vertical;
-            color: #334155;
-            transition: border-color 0.2s, background 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         
-        textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
+        textarea:focus { outline: none; border-color: var(--primary-dark); box-shadow: 0 0 0 3px rgba(14,165,233,0.15); }
+        textarea::placeholder { color: #64748b; }
+
+        /* Playground editor: lighter theme */
+        #main-editor { background: #f8fafc; color: #334155; border-color: var(--border-color); }
+        #main-editor:focus { border-color: var(--primary); background: #fff; box-shadow: none; }
+        #main-editor::placeholder { color: #94a3b8; }
         
         .button-group {
             display: flex;
@@ -291,6 +297,48 @@
         .error { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); }
         .warning { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
         
+        /* Niveau color coding */
+        .niveau-0 { --nv-color: #3b82f6; --nv-bg: #eff6ff; --nv-border: #bfdbfe; }
+        .niveau-1 { --nv-color: #8b5cf6; --nv-bg: #f5f3ff; --nv-border: #c4b5fd; }
+        .niveau-2 { --nv-color: #d97706; --nv-bg: #fffbeb; --nv-border: #fcd34d; }
+        .niveau-3a { --nv-color: #059669; --nv-bg: #ecfdf5; --nv-border: #6ee7b7; }
+        .niveau-3b { --nv-color: #0891b2; --nv-bg: #ecfeff; --nv-border: #67e8f9; }
+        .niveau-4 { --nv-color: #dc2626; --nv-bg: #fef2f2; --nv-border: #fca5a5; }
+
+        .section.niveau-section { border-left: 4px solid var(--nv-color); }
+        .section.niveau-section h2 { color: var(--nv-color); }
+
+        .section .niveau-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .section .niveau-progress .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .section .niveau-progress .progress-fill {
+            height: 100%;
+            background: var(--nv-color);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        .section .niveau-progress .progress-text {
+            font-weight: 600;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            color: var(--nv-color);
+        }
+
         .task {
             border: 1px solid var(--border-color);
             padding: 1.5rem;
@@ -302,27 +350,44 @@
 
         .task:hover { box-shadow: var(--shadow-sm); }
         
-        .task.solved { background: #f0fdf4; border-color: #bbf7d0; }
-        
+        .task.solved { background: #f8fdf9; border-color: #d1fae5; }
+
+        .task.solved .task-body { display: none; }
+        .task.solved.expanded .task-body { display: block; }
+
+        .task.solved .task-header { cursor: pointer; margin-bottom: 0; }
+        .task.solved.expanded .task-header { margin-bottom: 0.75rem; }
+
         .task-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.75rem;
         }
+
+        .task-header .expand-hint {
+            display: none;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-left: 0.5rem;
+        }
+
+        .task.solved:not(.expanded) .expand-hint { display: inline; }
         
         .task-title { font-weight: 600; font-size: 1.05rem; color: #1e293b; }
         
         .badge {
             font-size: 0.75rem;
             padding: 0.25rem 0.75rem;
-            background: #f1f5f9;
+            background: var(--nv-bg, #f1f5f9);
+            border: 1px solid var(--nv-border, #e2e8f0);
             border-radius: 999px;
             font-weight: 600;
-            color: #64748b;
+            color: var(--nv-color, #64748b);
         }
         
-        .badge.solved { background: #dcfce7; color: #15803d; }
+        .badge.solved { background: #dcfce7; color: #15803d; border-color: #86efac; }
         
         .task-desc {
             color: #475569;
@@ -843,12 +908,12 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             { id: 'n3a-2', n: '3a', title: 'Deutsche St\u00e4dte mit Land',
               desc: 'Zeige alle St\u00e4dte in Deutschland mit ihrem L\u00e4ndernamen! (L_ID = \'D\')',
-              hint: 'JOIN wie vorher, dann WHERE s.L_ID = \'D\'',
+              hint: 'Tabellen: STADT, LAND — JOIN wie vorher, dann WHERE s.L_ID = \'D\'',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE s.L_ID = \'D\' ORDER BY s.EINWOHNER DESC' },
 
             { id: 'n3a-3', n: '3a', title: 'Top 10 gr\u00f6\u00dfte St\u00e4dte + Land',
               desc: 'Zeige die 10 einwohnerreichsten St\u00e4dte mit ihrem L\u00e4ndernamen!',
-              hint: 'JOIN + ORDER BY s.EINWOHNER DESC LIMIT 10',
+              hint: 'Tabellen: STADT, LAND — JOIN + ORDER BY s.EINWOHNER DESC LIMIT 10',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID ORDER BY s.EINWOHNER DESC LIMIT 10' },
 
             // -- Phase 2: LEFT JOIN einführen --
@@ -859,7 +924,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             { id: 'n3a-4', n: '3a', title: 'Millionenst\u00e4dte mit Land',
               desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner? Zeige Stadt, Einwohner und L\u00e4ndername!',
-              hint: 'JOIN + WHERE s.EINWOHNER > 5000000',
+              hint: 'Tabellen: STADT, LAND — JOIN + WHERE s.EINWOHNER > 5000000',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE s.EINWOHNER > 5000000 ORDER BY s.EINWOHNER DESC' },
 
             // -- Phase 3: Neue Tabellenpaare --
@@ -881,7 +946,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             // -- Phase 4: WHERE auf die andere Tabelle --
             { id: 'n3a-5', n: '3a', title: 'St\u00e4dte in gro\u00dfen L\u00e4ndern',
               desc: 'Zeige alle St\u00e4dte in L\u00e4ndern mit mehr als 100 Millionen Einwohnern! Beachte: Die Bedingung gilt f\u00fcr die <em>Land</em>-Tabelle, nicht f\u00fcr die Stadt.',
-              hint: 'JOIN + WHERE l.EINWOHNER > 100000000',
+              hint: 'Tabellen: STADT, LAND — JOIN + WHERE l.EINWOHNER > 100000000',
               sol: 'SELECT s.ST_NAME, l.L_NAME, l.EINWOHNER FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.EINWOHNER > 100000000 ORDER BY l.EINWOHNER DESC' },
 
             { id: 'n3a-13', n: '3a', title: 'Fl\u00fcsse in tiefe Meere',
@@ -891,28 +956,28 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             { id: 'n3a-6', n: '3a', title: 'St\u00e4dte in Riesenl\u00e4ndern',
               desc: 'Welche St\u00e4dte liegen in L\u00e4ndern mit mehr als 5 Millionen km\u00b2 Fl\u00e4che?',
-              hint: 'JOIN + WHERE l.FLAECHE > 5000000',
+              hint: 'Tabellen: STADT, LAND — JOIN + WHERE l.FLAECHE > 5000000',
               sol: 'SELECT s.ST_NAME, l.L_NAME, l.FLAECHE FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.FLAECHE > 5000000' },
 
             // -- Phase 5: JOIN + Aggregation --
             { id: 'n3a-7', n: '3a', title: 'Anzahl St\u00e4dte pro Land',
               desc: 'Wie viele St\u00e4dte hat jedes Land in der Datenbank? Zeige L\u00e4ndername und Anzahl, sortiert! Hier kombinierst du JOIN mit GROUP BY.',
-              hint: 'JOIN + GROUP BY l.L_NAME + COUNT(*)',
+              hint: 'Tabellen: STADT, LAND — JOIN + GROUP BY l.L_NAME + COUNT(*)',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC' },
 
             { id: 'n3a-8', n: '3a', title: 'L\u00e4nder mit >5 St\u00e4dten',
               desc: 'Welche L\u00e4nder haben mehr als 5 St\u00e4dte in der Datenbank?',
-              hint: 'Wie vorher, aber mit HAVING COUNT(*) > 5',
+              hint: 'Tabellen: STADT, LAND — Wie vorher, aber mit HAVING COUNT(*) > 5',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME HAVING COUNT(*) > 5 ORDER BY Anzahl DESC' },
 
             { id: 'n3a-9', n: '3a', title: 'Durchschnittliche Stadtgr\u00f6\u00dfe pro Land',
               desc: 'Wie gro\u00df sind die St\u00e4dte im Durchschnitt pro Land? Zeige gerundet!',
-              hint: 'JOIN + GROUP BY + ROUND(AVG(s.EINWOHNER), 0)',
+              hint: 'Tabellen: STADT, LAND — JOIN + GROUP BY + ROUND(AVG(s.EINWOHNER), 0)',
               sol: 'SELECT l.L_NAME, ROUND(AVG(s.EINWOHNER), 0) AS Durchschnitt FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Durchschnitt DESC' },
 
             { id: 'n3a-10', n: '3a', title: 'Land mit den meisten St\u00e4dten',
               desc: 'Welches Land hat die meisten St\u00e4dte in der Datenbank?',
-              hint: 'GROUP BY + ORDER BY + LIMIT 1',
+              hint: 'Tabellen: STADT, LAND — GROUP BY + ORDER BY + LIMIT 1',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 1' },
 
             // =====================================================
@@ -925,7 +990,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             { id: 'n3-2', n: '3b', title: 'L\u00e4nder mit >6000m Bergen',
               desc: 'Welche L\u00e4nder haben Berge \u00fcber 6000m? (Jedes Land nur einmal!)',
-              hint: 'DISTINCT + JOIN mit WHERE',
+              hint: 'Tabellen: BERG, GEO_BERG, LAND — DISTINCT + JOIN mit WHERE',
               sol: 'SELECT DISTINCT l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE b.HOEHE > 6000' },
 
             { id: 'n3-3', n: '3b', title: 'Berge in Deutschland',
@@ -945,7 +1010,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             { id: 'n3-6', n: '3b', title: 'Land mit den meisten Bergen',
               desc: 'Welches Land hat die meisten Berge? (Name und Anzahl)',
-              hint: 'JOIN + GROUP BY + ORDER BY + LIMIT 1',
+              hint: 'Tabellen: LAND, GEO_BERG — JOIN + GROUP BY + ORDER BY + LIMIT 1',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 1' },
 
             { id: 'n3-7', n: '3b', title: 'St\u00e4dte am Rhein',
@@ -963,22 +1028,22 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             // =====================================================
             { id: 'n4-1', n: '4', title: 'Anzahl L\u00e4nder >5000m',
               desc: 'Wie viele L\u00e4nder haben mindestens einen Berg \u00fcber 5000m?',
-              hint: 'COUNT(DISTINCT) mit JOIN und WHERE',
+              hint: 'Tabellen: LAND, GEO_BERG, BERG — COUNT(DISTINCT) mit JOIN und WHERE',
               sol: 'SELECT COUNT(DISTINCT l.L_ID) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000' },
 
             { id: 'n4-2', n: '4', title: 'H\u00f6chster Durchschnitt',
               desc: 'Welches Land hat die h\u00f6chste durchschnittliche Bergh\u00f6he?',
-              hint: 'AVG mit GROUP BY, ORDER BY und LIMIT 1',
+              hint: 'Tabellen: LAND, GEO_BERG, BERG — AVG mit GROUP BY, ORDER BY und LIMIT 1',
               sol: 'SELECT l.L_NAME, ROUND(AVG(b.HOEHE), 0) AS Durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY Durchschnitt DESC LIMIT 1' },
 
             { id: 'n4-3', n: '4', title: 'L\u00e4nderstatistik',
               desc: 'F\u00fcr jedes Land: Anzahl und Durchschnittsh\u00f6he der Berge?',
-              hint: 'COUNT und AVG kombinieren mit JOIN und GROUP BY',
+              hint: 'Tabellen: LAND, GEO_BERG, BERG — COUNT und AVG kombinieren mit JOIN und GROUP BY',
               sol: 'SELECT l.L_NAME, COUNT(b.B_NAME) AS Anzahl, ROUND(AVG(b.HOEHE), 0) AS Durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY Durchschnitt DESC' },
 
             { id: 'n4-4', n: '4', title: 'Bergstarke L\u00e4nder',
               desc: 'Welche L\u00e4nder haben mehr als 5 Berge UND eine Durchschnittsh\u00f6he \u00fcber 3000m?',
-              hint: 'HAVING mit zwei Bedingungen (COUNT und AVG)',
+              hint: 'Tabellen: LAND, GEO_BERG, BERG — HAVING mit zwei Bedingungen (COUNT und AVG)',
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl, ROUND(AVG(b.HOEHE), 0) AS Durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(*) > 5 AND AVG(b.HOEHE) > 3000' },
 
             { id: 'n4-5', n: '4', title: 'Fl\u00fcsse pro Land',
@@ -1106,7 +1171,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
         // =====================================================
         // Result comparison (flexible)
         // =====================================================
-        function resultsMatch(r1, r2) {
+        function resultsMatch(r1, r2, solSql) {
             if (!r1 || !r2) return false;
             // Both empty
             if (r1.length === 0 && r2.length === 0) return true;
@@ -1115,12 +1180,44 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             // Same number of columns and rows
             if (a.columns.length !== b.columns.length) return false;
             if (a.values.length !== b.values.length) return false;
-            // Exact match (incl. order)
-            if (JSON.stringify(a.values) === JSON.stringify(b.values)) return true;
-            // Same rows, different order
-            const sortRows = v => v.map(r => JSON.stringify(r)).sort();
-            if (JSON.stringify(sortRows(a.values)) === JSON.stringify(sortRows(b.values))) return true;
-            return false;
+
+            // Normalize column names (strip alias prefixes, uppercase)
+            const normCol = c => c.toUpperCase().replace(/.*\./, '');
+            const colsA = a.columns.map(normCol);
+            const colsB = b.columns.map(normCol);
+
+            // Find column mapping: for each col in A, find matching col in B
+            // This allows flexible column order (SELECT Name, Stadt vs SELECT Stadt, Name)
+            const mapping = [];
+            const usedB = new Set();
+            for (let i = 0; i < colsA.length; i++) {
+                let found = -1;
+                for (let j = 0; j < colsB.length; j++) {
+                    if (!usedB.has(j) && colsA[i] === colsB[j]) {
+                        found = j;
+                        usedB.add(j);
+                        break;
+                    }
+                }
+                if (found === -1) return false; // column not found
+                mapping.push(found);
+            }
+
+            // Reorder B's values to match A's column order
+            const reorderRow = row => mapping.map(j => row[j]);
+            const bVals = b.values.map(reorderRow);
+
+            // Check if solution uses ORDER BY → require same row order
+            const hasOrderBy = solSql && /ORDER\s+BY/i.test(solSql);
+
+            if (hasOrderBy) {
+                // Strict row order: compare directly
+                return JSON.stringify(a.values) === JSON.stringify(bVals);
+            } else {
+                // Any row order OK: sort then compare
+                const sortRows = v => v.map(r => JSON.stringify(r)).sort();
+                return JSON.stringify(sortRows(a.values)) === JSON.stringify(sortRows(bVals));
+            }
         }
         
         // =====================================================
@@ -1159,24 +1256,37 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             niveauOrder.forEach(n => {
                 if (!grouped[n]) return;
                 const label = niveauLabels[n] || '';
-                html += '<div class="section"><h2>Niveau ' + n + (label ? ' \u2014 ' + label : '') + '</h2>';
-                grouped[n].forEach(t => {
+                const nTasks = grouped[n];
+                const nSolved = nTasks.filter(t => saved[t.id] && isSolved(t, saved[t.id])).length;
+                const pct = Math.round(nSolved / nTasks.length * 100);
+                const cssClass = 'niveau-' + n.replace(/\s/g,'');
+
+                html += `<div class="section niveau-section ${cssClass}" id="section-${n}">`;
+                html += `<h2>Niveau ${n}${label ? ' \u2014 ' + label : ''}</h2>`;
+                html += `<div class="niveau-progress">
+                    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+                    <div class="progress-text">${nSolved}/${nTasks.length}</div>
+                </div>`;
+
+                nTasks.forEach(t => {
                     const q = saved[t.id] || '';
                     const solved = q && isSolved(t, q);
-                    html += `<div class="task ${solved ? 'solved' : ''}" data-id="${t.id}">
+                    html += `<div class="task ${cssClass} ${solved ? 'solved' : ''}" data-id="${t.id}" ${solved ? 'onclick="toggleSolved(this)"' : ''}>
                         <div class="task-header">
-                            <div class="task-title">${t.title}</div>
-                            <span class="badge ${solved ? 'solved' : ''}">N${t.n} ${solved ? '✓' : ''}</span>
+                            <div class="task-title">${t.title}<span class="expand-hint">(klicken zum Aufklappen)</span></div>
+                            <span class="badge ${solved ? 'solved' : ''}">N${t.n}</span>
                         </div>
-                        <div class="task-desc">${t.desc}</div>
-                        <textarea id="t-${t.id}" placeholder="SELECT ...">${q}</textarea>
-                        <div class="button-group">
-                            <button class="btn-primary" onclick="checkTask('${t.id}')">Überprüfen</button>
-                            <button onclick="runTask('${t.id}')">Nur Ausführen</button>
-                            <button onclick="toggleHint('${t.id}')">Hinweis</button>
+                        <div class="task-body">
+                            <div class="task-desc">${t.desc}</div>
+                            <textarea id="t-${t.id}" placeholder="SELECT ...">${q}</textarea>
+                            <div class="button-group">
+                                <button class="btn-primary" onclick="event.stopPropagation(); checkTask('${t.id}')">Überprüfen</button>
+                                <button onclick="event.stopPropagation(); runTask('${t.id}')">Nur Ausführen</button>
+                                <button onclick="event.stopPropagation(); toggleHint('${t.id}')">Hinweis</button>
+                            </div>
+                            <div id="hint-${t.id}" class="hint"><strong>Tipp:</strong> ${t.hint}</div>
+                            <div id="res-${t.id}"></div>
                         </div>
-                        <div id="hint-${t.id}" class="hint"><strong>Tipp:</strong> ${t.hint}</div>
-                        <div id="res-${t.id}"></div>
                     </div>`;
                 });
                 html += '</div>';
@@ -1185,12 +1295,16 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             document.getElementById('total').textContent = tasks.length;
         }
 
+        function toggleSolved(el) {
+            el.classList.toggle('expanded');
+        }
+
         function isSolved(task, q) {
             if (!db || !q || !q.trim()) return false;
             try {
                 const ur = db.exec(q);
                 const sr = db.exec(task.sol);
-                return resultsMatch(ur, sr);
+                return resultsMatch(ur, sr, task.sol);
             } catch(e) { return false; }
         }
         
@@ -1222,20 +1336,23 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             }
 
             // Compare
-            const match = resultsMatch(studentResult, solResult);
+            const match = resultsMatch(studentResult, solResult, task.sol);
 
             let html = '';
 
             if (match) {
-                html += '<div class="message success" style="margin-bottom:0.5rem">\u2705 Korrekt!</div>';
+                html += '<div class="message success" style="margin-bottom:0.5rem">Korrekt!</div>';
                 const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
                 saved[id] = q;
                 localStorage.setItem('terra-sql', JSON.stringify(saved));
-                document.querySelector(`.task[data-id="${id}"]`).classList.add('solved');
-                const badge = document.querySelector(`.task[data-id="${id}"] .badge`);
+                const taskEl = document.querySelector(`.task[data-id="${id}"]`);
+                taskEl.classList.add('solved', 'expanded');
+                taskEl.setAttribute('onclick', 'toggleSolved(this)');
+                const badge = taskEl.querySelector('.badge');
                 badge.classList.add('solved');
-                badge.innerHTML = `N${task.n} ✓`;
+                badge.innerHTML = `N${task.n}`;
                 updateStats();
+                updateNiveauProgress(task.n);
             } else {
                 html += '<div class="message warning" style="margin-bottom:0.5rem">Vergleiche dein Ergebnis mit dem erwarteten Ergebnis.</div>';
             }
@@ -1275,6 +1392,19 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             document.getElementById('solved').textContent = solved;
             document.getElementById('progress').textContent = Math.round(solved / tasks.length * 100) + '%';
         }
+
+        function updateNiveauProgress(n) {
+            const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
+            const nTasks = tasks.filter(t => t.n === n);
+            const nSolved = nTasks.filter(t => saved[t.id] && isSolved(t, saved[t.id])).length;
+            const pct = Math.round(nSolved / nTasks.length * 100);
+            const section = document.getElementById('section-' + n);
+            if (!section) return;
+            const fill = section.querySelector('.progress-fill');
+            const text = section.querySelector('.progress-text');
+            if (fill) fill.style.width = pct + '%';
+            if (text) text.textContent = nSolved + '/' + nTasks.length;
+        }
         
         function exportSolutions() {
             const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
@@ -1288,7 +1418,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                 grouped[n].forEach(t => {
                     const q = saved[t.id] || '';
                     const ok = q && isSolved(t, q);
-                    md += `### ${t.title} ${ok ? '✓' : ''}\n\n${t.desc}\n\n`;
+                    md += `### ${t.title} ${ok ? '[gelöst]' : ''}\n\n${t.desc}\n\n`;
                     if (q) {
                         md += '```sql\n' + q + '\n```\n\n';
                         try {
