@@ -4,38 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQL Übungen - Terra Datenbank</title>
-    <!-- Fonts für das Design -->
     <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <style>
         :root {
-            /* Das gewünschte Pastell-Schema */
             --bg-body: #fdfcfc;
             --bg-surface: #ffffff;
             --text-main: #334155;
             --text-muted: #64748b;
-            
-            --primary: #7dd3fc; /* Pastel Blue */
+            --primary: #7dd3fc;
             --primary-dark: #0ea5e9;
             --primary-bg: #f0f9ff;
             --accent: #818cf8;
-            
             --border-color: #f1f5f9;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            
             --success-bg: #dcfce7;
             --success-text: #166534;
             --success-border: #86efac;
-            
             --error-bg: #fee2e2;
             --error-text: #991b1b;
             --error-border: #fca5a5;
-            
             --warning-bg: #fff7ed;
             --warning-text: #9a3412;
             --warning-border: #fdba74;
-            
             --code-font: 'Source Code Pro', monospace;
             --body-font: 'Inter', sans-serif;
         }
@@ -50,7 +42,6 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        /* Sticky Header Wrapper */
         .sticky-header {
             position: sticky;
             top: 0;
@@ -60,7 +51,6 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* Top Bar inside Sticky Header */
         .header-top {
             padding: 1rem 2rem;
             display: flex;
@@ -83,7 +73,6 @@
             margin-top: 0;
         }
 
-        /* Navigation Bar inside Sticky Header */
         .header-nav {
             background: var(--bg-surface);
             padding: 0.5rem 0;
@@ -99,7 +88,6 @@
             display: flex;
             gap: 0.5rem;
             overflow-x: auto;
-            /* Reset old margins */
             margin: 0;
             padding: 0;
         }
@@ -118,10 +106,7 @@
             white-space: nowrap;
         }
         
-        nav button:hover {
-            background: #f1f5f9;
-            color: var(--text-main);
-        }
+        nav button:hover { background: #f1f5f9; color: var(--text-main); }
         
         nav button.active {
             background: var(--primary-bg);
@@ -129,7 +114,6 @@
             font-weight: 600;
         }
 
-        /* File Upload Button Styled */
         .file-upload-btn {
             background: var(--bg-surface);
             color: var(--text-muted);
@@ -157,13 +141,11 @@
             padding: 2rem 1rem;
         }
         
-        /* Status Bar */
         #db-status {
             margin-bottom: 1.5rem;
             display: none;
         }
         
-        /* Stats */
         .stats {
             display: flex;
             gap: 2rem;
@@ -177,17 +159,13 @@
             border: 1px solid var(--border-color);
         }
         
-        .stats span {
-            font-weight: 600;
-            color: var(--text-main);
-        }
+        .stats span { font-weight: 600; color: var(--text-main); }
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Sections & Cards */
         .section {
             background: var(--bg-surface);
             padding: 2rem;
@@ -213,7 +191,6 @@
             letter-spacing: 0.05em;
         }
         
-        /* Editors & Inputs */
         textarea {
             width: 100%;
             min-height: 120px;
@@ -228,13 +205,8 @@
             transition: border-color 0.2s, background 0.2s;
         }
         
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-        }
+        textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
         
-        /* Buttons */
         .button-group {
             display: flex;
             gap: 0.75rem;
@@ -259,7 +231,7 @@
         button:active { transform: translateY(1px); }
         
         .btn-primary {
-            background: #3b82f6; /* Modern Blue */
+            background: #3b82f6;
             color: #fff;
             border: none;
             box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
@@ -267,13 +239,12 @@
         
         .btn-primary:hover { background: #2563eb; border-color: transparent; }
         
-        /* Tables - BEAUTIFIED */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            margin-top: 1rem;
+            margin-top: 0.5rem;
             background: #fff;
         }
 
@@ -281,7 +252,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            min-width: 600px; /* Ensure table doesn't squish too much */
+            min-width: 400px;
         }
         
         th {
@@ -307,7 +278,6 @@
         tr:nth-child(even) { background-color: #fafbfc; }
         tr:hover td { background-color: #f0f9ff; }
         
-        /* Messages & Feedback */
         .message {
             padding: 1rem;
             margin-top: 1rem;
@@ -317,25 +287,10 @@
             align-items: center;
         }
         
-        .success { 
-            background: var(--success-bg); 
-            color: var(--success-text); 
-            border: 1px solid var(--success-border);
-        }
+        .success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+        .error { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); }
+        .warning { background: var(--warning-bg); color: var(--warning-text); border: 1px solid var(--warning-border); }
         
-        .error { 
-            background: var(--error-bg); 
-            color: var(--error-text); 
-            border: 1px solid var(--error-border);
-        }
-        
-        .warning {
-            background: var(--warning-bg);
-            color: var(--warning-text);
-            border: 1px solid var(--warning-border);
-        }
-        
-        /* Tasks */
         .task {
             border: 1px solid var(--border-color);
             padding: 1.5rem;
@@ -345,14 +300,9 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .task:hover {
-            box-shadow: var(--shadow-sm);
-        }
+        .task:hover { box-shadow: var(--shadow-sm); }
         
-        .task.solved {
-            background: #f0fdf4;
-            border-color: #bbf7d0;
-        }
+        .task.solved { background: #f0fdf4; border-color: #bbf7d0; }
         
         .task-header {
             display: flex;
@@ -361,11 +311,7 @@
             margin-bottom: 0.75rem;
         }
         
-        .task-title {
-            font-weight: 600;
-            font-size: 1.05rem;
-            color: #1e293b;
-        }
+        .task-title { font-weight: 600; font-size: 1.05rem; color: #1e293b; }
         
         .badge {
             font-size: 0.75rem;
@@ -376,10 +322,7 @@
             color: #64748b;
         }
         
-        .badge.solved { 
-            background: #dcfce7; 
-            color: #15803d;
-        }
+        .badge.solved { background: #dcfce7; color: #15803d; }
         
         .task-desc {
             color: #475569;
@@ -388,7 +331,6 @@
             line-height: 1.5;
         }
         
-        /* Hints & Help */
         .hint {
             background: #fffbeb;
             border: 1px solid #fef3c7;
@@ -442,12 +384,35 @@
         .result-info {
             font-size: 0.8rem;
             color: var(--text-muted);
-            margin: 0.5rem 0;
-            text-align: right;
+            margin: 0.5rem 0 0.25rem 0;
             font-family: var(--code-font);
         }
+
+        .result-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.25rem;
+            color: #475569;
+        }
+
+        .expected-block {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .expected-block .result-label {
+            color: var(--primary-dark);
+            margin-top: 0;
+        }
+
+        .expected-block .table-wrapper {
+            border-color: #bae6fd;
+        }
         
-        /* Scrollbar Styling */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -455,7 +420,6 @@
     </style>
 </head>
 <body>
-    <!-- Sticky Header Wrapper -->
     <div class="sticky-header">
         <div class="header-top">
             <div class="header-content">
@@ -463,14 +427,12 @@
                 <p class="subtitle">SELECT, WHERE, Aggregation, GROUP BY & JOINs</p>
             </div>
             <div>
-                <!-- Hidden File Input -->
                 <input type="file" id="local-file-input" accept=".db,.sqlite,.sqlite3" style="display: none;" onchange="loadLocalFile(this)">
                 <button class="file-upload-btn" onclick="document.getElementById('local-file-input').click()">
                     Lokale Datei öffnen
                 </button>
             </div>
         </div>
-        
         <div class="header-nav">
             <div class="nav-container">
                 <nav>
@@ -484,7 +446,6 @@
     </div>
     
     <div class="container">
-        <!-- Notification Area for DB Status -->
         <div id="db-status"></div>
         
         <div id="tab-editor" class="tab-content active">
@@ -505,7 +466,6 @@
             <div class="stats">
                 <div>Gelöst: <span id="solved">0</span>/<span id="total">0</span></div>
                 <div>Fortschritt: <span id="progress">0%</span></div>
-                <div>Niveau: <span id="niveau">0</span></div>
             </div>
             <div id="tasks"></div>
             <div class="section">
@@ -779,8 +739,16 @@ HAVING COUNT(*) > 5;</code>
                 
                 <h3>Verknüpfung (JOINs)</h3>
                 <div class="help-block">
-                    <h4>INNER JOIN</h4>
-                    <code>SELECT b.B_NAME, l.L_NAME
+                    <h4>Einfacher JOIN (2 Tabellen)</h4>
+                    <code>-- STADT und LAND teilen sich L_ID
+SELECT s.ST_NAME, l.L_NAME
+FROM STADT s
+JOIN LAND l ON s.L_ID = l.L_ID;</code>
+                </div>
+                <div class="help-block">
+                    <h4>JOIN über Verbindungstabelle (3 Tabellen)</h4>
+                    <code>-- BERG hat keine L_ID → Umweg über GEO_BERG
+SELECT b.B_NAME, l.L_NAME
 FROM BERG b
 JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME
 JOIN LAND l ON gb.L_ID = l.L_ID;</code>
@@ -797,77 +765,200 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
     
     <script>
         let db;
+
+        // Niveau order and labels
+        const niveauOrder = ['0','1','2','3a','3b','4'];
+        const niveauLabels = {
+            '0': 'Einstieg (SELECT & WHERE)',
+            '1': 'Aggregation',
+            '2': 'GROUP BY & HAVING',
+            '3a': 'Einfache JOINs (2 Tabellen)',
+            '3b': 'JOINs mit Verbindungstabellen',
+            '4': 'Kombination'
+        };
+
         const tasks = [
             // =====================================================
             // Niveau 0: Einstieg (SELECT, WHERE, ORDER BY, LIMIT)
             // =====================================================
-            { id: 'n0-1', n: 0, title: 'Alle Berge anzeigen', desc: 'Zeige alle Berge mit allen Spalten an!', hint: 'SELECT * FROM ...', sols: ['SELECT * FROM BERG'] },
-            { id: 'n0-2', n: 0, title: 'Alle L\u00e4nder', desc: 'Zeige alle L\u00e4nder mit Name und Hauptstadt an!', hint: 'SELECT spalte1, spalte2 FROM ...', sols: ['SELECT L_NAME, HAUPTSTADT FROM LAND', 'SELECT L_NAME, HAUPTSTADT FROM LAND ORDER BY L_NAME'] },
-            { id: 'n0-3', n: 0, title: 'Wo liegt Berlin?', desc: 'Zeige Breitengrad und L\u00e4ngengrad von Berlin! (Tabelle: STADT)', hint: 'WHERE ST_NAME = \'Berlin\'', sols: ['SELECT ST_NAME, BREITE, LAENGE FROM STADT WHERE ST_NAME = \'Berlin\'', 'SELECT * FROM STADT WHERE ST_NAME = \'Berlin\'', 'SELECT BREITE, LAENGE FROM STADT WHERE ST_NAME = \'Berlin\''] },
-            { id: 'n0-4', n: 0, title: 'Top 5 h\u00f6chste Berge', desc: 'Zeige die 5 h\u00f6chsten Berge (Name und H\u00f6he), absteigend sortiert!', hint: 'ORDER BY ... DESC und LIMIT', sols: ['SELECT B_NAME, HOEHE FROM BERG ORDER BY HOEHE DESC LIMIT 5'] },
-            { id: 'n0-5', n: 0, title: 'Achttausender', desc: 'Welche Berge sind h\u00f6her als 8000 Meter? Zeige Name und H\u00f6he!', hint: 'WHERE HOEHE > 8000', sols: ['SELECT * FROM BERG WHERE HOEHE > 8000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC', 'SELECT * FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC'] },
-            { id: 'n0-6', n: 0, title: 'Berge im Himalaya', desc: 'Zeige alle Berge, die im Himalaya liegen!', hint: 'WHERE GEBIRGE = \'Himalaya\'', sols: ['SELECT * FROM BERG WHERE GEBIRGE = \'Himalaya\'', 'SELECT B_NAME, HOEHE FROM BERG WHERE GEBIRGE = \'Himalaya\'', 'SELECT B_NAME, HOEHE, GEBIRGE FROM BERG WHERE GEBIRGE = \'Himalaya\''] },
-            { id: 'n0-7', n: 0, title: 'Mount-Berge', desc: 'Finde alle Berge, deren Name mit "Mount" beginnt!', hint: 'LIKE \'Mount%\'', sols: ['SELECT * FROM BERG WHERE B_NAME LIKE \'Mount%\'', 'SELECT B_NAME, HOEHE FROM BERG WHERE B_NAME LIKE \'Mount%\'', 'SELECT B_NAME FROM BERG WHERE B_NAME LIKE \'Mount%\''] },
-            { id: 'n0-8', n: 0, title: 'Gro\u00dfe L\u00e4nder', desc: 'Welche L\u00e4nder haben mehr als 100 Millionen Einwohner? Sortiere absteigend!', hint: 'WHERE EINWOHNER > 100000000 und ORDER BY', sols: ['SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC', 'SELECT * FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC', 'SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000'] },
-            { id: 'n0-9', n: 0, title: 'Lange Fl\u00fcsse', desc: 'Welche Fl\u00fcsse sind l\u00e4nger als 5000 km? Zeige Name und L\u00e4nge!', hint: 'WHERE LAENGE > 5000', sols: ['SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000', 'SELECT * FROM FLUSS WHERE LAENGE > 5000', 'SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000 ORDER BY LAENGE DESC'] },
-            { id: 'n0-10', n: 0, title: 'St\u00e4dte in Deutschland', desc: 'Zeige alle St\u00e4dte in Deutschland mit Einwohnerzahl! (L_ID = \'D\')', hint: 'WHERE L_ID = \'D\' auf Tabelle STADT', sols: ['SELECT ST_NAME, EINWOHNER FROM STADT WHERE L_ID = \'D\'', 'SELECT * FROM STADT WHERE L_ID = \'D\'', 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE L_ID = \'D\' ORDER BY EINWOHNER DESC'] },
-            { id: 'n0-11', n: 0, title: 'Millionenst\u00e4dte', desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner?', hint: 'WHERE EINWOHNER > 5000000 auf STADT', sols: ['SELECT ST_NAME, EINWOHNER FROM STADT WHERE EINWOHNER > 5000000 ORDER BY EINWOHNER DESC', 'SELECT * FROM STADT WHERE EINWOHNER > 5000000 ORDER BY EINWOHNER DESC', 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE EINWOHNER > 5000000'] },
-            { id: 'n0-12', n: 0, title: 'Sandw\u00fcsten', desc: 'Zeige alle W\u00fcsten vom Typ "Sand"! (Tabelle: WUESTE, Spalte: WUESTENART)', hint: 'WHERE WUESTENART = \'Sand\'', sols: ['SELECT * FROM WUESTE WHERE WUESTENART = \'Sand\'', 'SELECT W_NAME, FLAECHE FROM WUESTE WHERE WUESTENART = \'Sand\'', 'SELECT W_NAME, FLAECHE, WUESTENART FROM WUESTE WHERE WUESTENART = \'Sand\''] },
-            { id: 'n0-13', n: 0, title: 'Gro\u00dfe Inseln', desc: 'Welche Inseln sind gr\u00f6\u00dfer als 100.000 km\u00b2? (Tabelle: INSEL)', hint: 'WHERE FLAECHE > 100000', sols: ['SELECT I_NAME, FLAECHE FROM INSEL WHERE FLAECHE > 100000', 'SELECT * FROM INSEL WHERE FLAECHE > 100000', 'SELECT I_NAME, FLAECHE FROM INSEL WHERE FLAECHE > 100000 ORDER BY FLAECHE DESC'] },
-            { id: 'n0-14', n: 0, title: 'Tiefe Meere', desc: 'Zeige alle Meere sortiert nach Tiefe (tiefstes zuerst)! (Tabelle: MEER)', hint: 'ORDER BY TIEFE DESC', sols: ['SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC', 'SELECT * FROM MEER ORDER BY TIEFE DESC'] },
-            { id: 'n0-15', n: 0, title: 'Hauptstadt mit A', desc: 'Welche L\u00e4nder haben eine Hauptstadt, die mit "A" anf\u00e4ngt?', hint: 'WHERE HAUPTSTADT LIKE \'A%\'', sols: ['SELECT L_NAME, HAUPTSTADT FROM LAND WHERE HAUPTSTADT LIKE \'A%\'', 'SELECT * FROM LAND WHERE HAUPTSTADT LIKE \'A%\''] },
-            { id: 'n0-16', n: 0, title: 'Berge zwischen 4000 und 5000m', desc: 'Finde alle Berge zwischen 4000 und 5000 Meter H\u00f6he!', hint: 'BETWEEN ... AND ... oder zwei Bedingungen mit AND', sols: ['SELECT * FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000', 'SELECT * FROM BERG WHERE HOEHE >= 4000 AND HOEHE <= 5000', 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE >= 4000 AND HOEHE <= 5000'] },
-            { id: 'n0-17', n: 0, title: 'Alpen oder Anden', desc: 'Zeige alle Berge in den Alpen ODER den Anden!', hint: 'WHERE ... IN (...) oder WHERE ... OR ...', sols: ['SELECT * FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')', 'SELECT B_NAME, GEBIRGE, HOEHE FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')', 'SELECT * FROM BERG WHERE GEBIRGE = \'Alpen\' OR GEBIRGE = \'Anden\''] },
-            { id: 'n0-18', n: 0, title: 'Seen mit gro\u00dfer Fl\u00e4che', desc: 'Welche Seen haben eine Fl\u00e4che von mehr als 10.000 km\u00b2? (Tabelle: SEE)', hint: 'WHERE FLAECHE > 10000', sols: ['SELECT S_NAME, FLAECHE FROM SEE WHERE FLAECHE > 10000', 'SELECT * FROM SEE WHERE FLAECHE > 10000', 'SELECT S_NAME, FLAECHE FROM SEE WHERE FLAECHE > 10000 ORDER BY FLAECHE DESC'] },
+            { id: 'n0-1', n: '0', title: 'Alle Berge anzeigen', desc: 'Zeige alle Berge mit allen Spalten an!', hint: 'SELECT * FROM ...', sol: 'SELECT * FROM BERG' },
+            { id: 'n0-2', n: '0', title: 'Alle L\u00e4nder', desc: 'Zeige alle L\u00e4nder mit Name und Hauptstadt an!', hint: 'SELECT spalte1, spalte2 FROM ...', sol: 'SELECT L_NAME, HAUPTSTADT FROM LAND' },
+            { id: 'n0-3', n: '0', title: 'Wo liegt Berlin?', desc: 'Zeige Breitengrad und L\u00e4ngengrad von Berlin! (Tabelle: STADT)', hint: 'WHERE ST_NAME = \'Berlin\'', sol: 'SELECT ST_NAME, BREITE, LAENGE FROM STADT WHERE ST_NAME = \'Berlin\'' },
+            { id: 'n0-4', n: '0', title: 'Top 5 h\u00f6chste Berge', desc: 'Zeige die 5 h\u00f6chsten Berge (Name und H\u00f6he), absteigend sortiert!', hint: 'ORDER BY ... DESC und LIMIT', sol: 'SELECT B_NAME, HOEHE FROM BERG ORDER BY HOEHE DESC LIMIT 5' },
+            { id: 'n0-5', n: '0', title: 'Achttausender', desc: 'Welche Berge sind h\u00f6her als 8000 Meter? Zeige Name und H\u00f6he!', hint: 'WHERE HOEHE > 8000', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC' },
+            { id: 'n0-6', n: '0', title: 'Berge im Himalaya', desc: 'Zeige alle Berge, die im Himalaya liegen!', hint: 'WHERE GEBIRGE = \'Himalaya\'', sol: 'SELECT * FROM BERG WHERE GEBIRGE = \'Himalaya\'' },
+            { id: 'n0-7', n: '0', title: 'Mount-Berge', desc: 'Finde alle Berge, deren Name mit "Mount" beginnt!', hint: 'LIKE \'Mount%\'', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE B_NAME LIKE \'Mount%\'' },
+            { id: 'n0-8', n: '0', title: 'Gro\u00dfe L\u00e4nder', desc: 'Welche L\u00e4nder haben mehr als 100 Millionen Einwohner? Sortiere absteigend!', hint: 'WHERE EINWOHNER > 100000000 und ORDER BY', sol: 'SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC' },
+            { id: 'n0-9', n: '0', title: 'Lange Fl\u00fcsse', desc: 'Welche Fl\u00fcsse sind l\u00e4nger als 5000 km? Zeige Name und L\u00e4nge!', hint: 'WHERE LAENGE > 5000', sol: 'SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000 ORDER BY LAENGE DESC' },
+            { id: 'n0-10', n: '0', title: 'St\u00e4dte in Deutschland', desc: 'Zeige alle St\u00e4dte in Deutschland mit Einwohnerzahl! (L_ID = \'D\')', hint: 'WHERE L_ID = \'D\' auf Tabelle STADT', sol: 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE L_ID = \'D\' ORDER BY EINWOHNER DESC' },
+            { id: 'n0-11', n: '0', title: 'Millionenst\u00e4dte', desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner?', hint: 'WHERE EINWOHNER > 5000000 auf STADT', sol: 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE EINWOHNER > 5000000 ORDER BY EINWOHNER DESC' },
+            { id: 'n0-12', n: '0', title: 'Sandw\u00fcsten', desc: 'Zeige alle W\u00fcsten vom Typ "Sand"! (Tabelle: WUESTE, Spalte: WUESTENART)', hint: 'WHERE WUESTENART = \'Sand\'', sol: 'SELECT W_NAME, FLAECHE, WUESTENART FROM WUESTE WHERE WUESTENART = \'Sand\'' },
+            { id: 'n0-13', n: '0', title: 'Gro\u00dfe Inseln', desc: 'Welche Inseln sind gr\u00f6\u00dfer als 100.000 km\u00b2? (Tabelle: INSEL)', hint: 'WHERE FLAECHE > 100000', sol: 'SELECT I_NAME, FLAECHE FROM INSEL WHERE FLAECHE > 100000 ORDER BY FLAECHE DESC' },
+            { id: 'n0-14', n: '0', title: 'Tiefe Meere', desc: 'Zeige alle Meere sortiert nach Tiefe (tiefstes zuerst)! (Tabelle: MEER)', hint: 'ORDER BY TIEFE DESC', sol: 'SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC' },
+            { id: 'n0-15', n: '0', title: 'Hauptstadt mit A', desc: 'Welche L\u00e4nder haben eine Hauptstadt, die mit "A" anf\u00e4ngt?', hint: 'WHERE HAUPTSTADT LIKE \'A%\'', sol: 'SELECT L_NAME, HAUPTSTADT FROM LAND WHERE HAUPTSTADT LIKE \'A%\'' },
+            { id: 'n0-16', n: '0', title: 'Berge zwischen 4000 und 5000m', desc: 'Finde alle Berge zwischen 4000 und 5000 Meter H\u00f6he!', hint: 'BETWEEN ... AND ... oder zwei Bedingungen mit AND', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000' },
+            { id: 'n0-17', n: '0', title: 'Alpen oder Anden', desc: 'Zeige alle Berge in den Alpen ODER den Anden!', hint: 'WHERE ... IN (...) oder WHERE ... OR ...', sol: 'SELECT B_NAME, GEBIRGE, HOEHE FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')' },
+            { id: 'n0-18', n: '0', title: 'Seen mit gro\u00dfer Fl\u00e4che', desc: 'Welche Seen haben eine Fl\u00e4che von mehr als 10.000 km\u00b2? (Tabelle: SEE)', hint: 'WHERE FLAECHE > 10000', sol: 'SELECT S_NAME, FLAECHE FROM SEE WHERE FLAECHE > 10000 ORDER BY FLAECHE DESC' },
 
             // =====================================================
             // Niveau 1: Aggregation (COUNT, MAX, MIN, AVG, SUM)
             // =====================================================
-            { id: 'n1-1', n: 1, title: 'Anzahl L\u00e4nder', desc: 'Wie viele L\u00e4nder gibt es in der Datenbank?', hint: 'COUNT(*) auf LAND', sols: ['SELECT COUNT(*) FROM LAND', 'SELECT COUNT(*) AS anzahl FROM LAND', 'SELECT COUNT(L_ID) FROM LAND'] },
-            { id: 'n1-2', n: 1, title: 'Gr\u00f6\u00dftes Land', desc: 'Welches Land hat die gr\u00f6\u00dfte Fl\u00e4che? Zeige Name und Fl\u00e4che!', hint: 'ORDER BY FLAECHE DESC LIMIT 1 oder MAX()', sols: ['SELECT L_NAME, FLAECHE FROM LAND ORDER BY FLAECHE DESC LIMIT 1', 'SELECT L_NAME, MAX(FLAECHE) FROM LAND', 'SELECT L_NAME, FLAECHE FROM LAND WHERE FLAECHE = (SELECT MAX(FLAECHE) FROM LAND)'] },
-            { id: 'n1-3', n: 1, title: 'Bev\u00f6lkerungsreichstes Land', desc: 'Wie viele Einwohner hat das bev\u00f6lkerungsreichste Land?', hint: 'MAX(EINWOHNER)', sols: ['SELECT MAX(EINWOHNER) FROM LAND', 'SELECT L_NAME, EINWOHNER FROM LAND ORDER BY EINWOHNER DESC LIMIT 1', 'SELECT EINWOHNER FROM LAND WHERE EINWOHNER = (SELECT MAX(EINWOHNER) FROM LAND)'] },
-            { id: 'n1-4', n: 1, title: 'L\u00e4ngster Fluss', desc: 'Wie lang ist der l\u00e4ngste Fluss?', hint: 'MAX(LAENGE) auf FLUSS', sols: ['SELECT MAX(LAENGE) FROM FLUSS', 'SELECT F_NAME, LAENGE FROM FLUSS ORDER BY LAENGE DESC LIMIT 1', 'SELECT LAENGE FROM FLUSS WHERE LAENGE = (SELECT MAX(LAENGE) FROM FLUSS)'] },
-            { id: 'n1-5', n: 1, title: 'Anzahl Gebirge', desc: 'Wie viele verschiedene Gebirge gibt es?', hint: 'COUNT(DISTINCT GEBIRGE)', sols: ['SELECT COUNT(DISTINCT GEBIRGE) FROM BERG', 'SELECT COUNT(DISTINCT GEBIRGE) AS anzahl FROM BERG'] },
-            { id: 'n1-6', n: 1, title: 'Durchschnittliche Bergh\u00f6he', desc: 'Durchschnittliche H\u00f6he aller Berge?', hint: 'AVG(HOEHE)', sols: ['SELECT AVG(HOEHE) FROM BERG', 'SELECT AVG(HOEHE) AS durchschnitt FROM BERG', 'SELECT ROUND(AVG(HOEHE), 0) FROM BERG'] },
-            { id: 'n1-7', n: 1, title: 'Anzahl St\u00e4dte', desc: 'Wie viele St\u00e4dte enth\u00e4lt die Datenbank?', hint: 'COUNT(*) auf STADT', sols: ['SELECT COUNT(*) FROM STADT', 'SELECT COUNT(*) AS anzahl FROM STADT'] },
-            { id: 'n1-8', n: 1, title: 'Tiefster See', desc: 'Wie hei\u00dft der tiefste See und wie tief ist er?', hint: 'ORDER BY TIEFE DESC LIMIT 1', sols: ['SELECT S_NAME, TIEFE FROM SEE ORDER BY TIEFE DESC LIMIT 1', 'SELECT S_NAME, MAX(TIEFE) FROM SEE', 'SELECT MAX(TIEFE) FROM SEE'] },
-            { id: 'n1-9', n: 1, title: 'Gr\u00f6\u00dfte Insel', desc: 'Welche Insel hat die gr\u00f6\u00dfte Fl\u00e4che?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 auf INSEL', sols: ['SELECT I_NAME, FLAECHE FROM INSEL ORDER BY FLAECHE DESC LIMIT 1', 'SELECT I_NAME, MAX(FLAECHE) FROM INSEL'] },
-            { id: 'n1-10', n: 1, title: 'Tiefstes Meer', desc: 'Welches Meer ist am tiefsten?', hint: 'ORDER BY TIEFE DESC LIMIT 1 auf MEER', sols: ['SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC LIMIT 1', 'SELECT M_NAME, MAX(TIEFE) FROM MEER'] },
-            { id: 'n1-11', n: 1, title: 'Anzahl W\u00fcsten', desc: 'Wie viele W\u00fcsten gibt es in der Datenbank?', hint: 'COUNT(*) auf WUESTE', sols: ['SELECT COUNT(*) FROM WUESTE', 'SELECT COUNT(*) AS anzahl FROM WUESTE'] },
+            { id: 'n1-1', n: '1', title: 'Anzahl L\u00e4nder', desc: 'Wie viele L\u00e4nder gibt es in der Datenbank?', hint: 'COUNT(*) auf LAND', sol: 'SELECT COUNT(*) FROM LAND' },
+            { id: 'n1-2', n: '1', title: 'Gr\u00f6\u00dftes Land', desc: 'Welches Land hat die gr\u00f6\u00dfte Fl\u00e4che? Zeige Name und Fl\u00e4che!', hint: 'ORDER BY FLAECHE DESC LIMIT 1 oder MAX()', sol: 'SELECT L_NAME, FLAECHE FROM LAND ORDER BY FLAECHE DESC LIMIT 1' },
+            { id: 'n1-3', n: '1', title: 'Bev\u00f6lkerungsreichstes Land', desc: 'Wie viele Einwohner hat das bev\u00f6lkerungsreichste Land?', hint: 'MAX(EINWOHNER)', sol: 'SELECT L_NAME, EINWOHNER FROM LAND ORDER BY EINWOHNER DESC LIMIT 1' },
+            { id: 'n1-4', n: '1', title: 'L\u00e4ngster Fluss', desc: 'Wie lang ist der l\u00e4ngste Fluss?', hint: 'MAX(LAENGE) auf FLUSS', sol: 'SELECT F_NAME, LAENGE FROM FLUSS ORDER BY LAENGE DESC LIMIT 1' },
+            { id: 'n1-5', n: '1', title: 'Anzahl Gebirge', desc: 'Wie viele verschiedene Gebirge gibt es?', hint: 'COUNT(DISTINCT GEBIRGE)', sol: 'SELECT COUNT(DISTINCT GEBIRGE) FROM BERG' },
+            { id: 'n1-6', n: '1', title: 'Durchschnittliche Bergh\u00f6he', desc: 'Durchschnittliche H\u00f6he aller Berge?', hint: 'AVG(HOEHE)', sol: 'SELECT AVG(HOEHE) FROM BERG' },
+            { id: 'n1-7', n: '1', title: 'Anzahl St\u00e4dte', desc: 'Wie viele St\u00e4dte enth\u00e4lt die Datenbank?', hint: 'COUNT(*) auf STADT', sol: 'SELECT COUNT(*) FROM STADT' },
+            { id: 'n1-8', n: '1', title: 'Tiefster See', desc: 'Wie hei\u00dft der tiefste See und wie tief ist er?', hint: 'ORDER BY TIEFE DESC LIMIT 1', sol: 'SELECT S_NAME, TIEFE FROM SEE ORDER BY TIEFE DESC LIMIT 1' },
+            { id: 'n1-9', n: '1', title: 'Gr\u00f6\u00dfte Insel', desc: 'Welche Insel hat die gr\u00f6\u00dfte Fl\u00e4che?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 auf INSEL', sol: 'SELECT I_NAME, FLAECHE FROM INSEL ORDER BY FLAECHE DESC LIMIT 1' },
+            { id: 'n1-10', n: '1', title: 'Tiefstes Meer', desc: 'Welches Meer ist am tiefsten?', hint: 'ORDER BY TIEFE DESC LIMIT 1 auf MEER', sol: 'SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC LIMIT 1' },
+            { id: 'n1-11', n: '1', title: 'Anzahl W\u00fcsten', desc: 'Wie viele W\u00fcsten gibt es in der Datenbank?', hint: 'COUNT(*) auf WUESTE', sol: 'SELECT COUNT(*) FROM WUESTE' },
 
             // =====================================================
             // Niveau 2: GROUP BY & HAVING
             // =====================================================
-            { id: 'n2-1', n: 2, title: 'Berge pro Gebirge', desc: 'Wie viele Berge pro Gebirge? (sortiert)', hint: 'GROUP BY GEBIRGE', sols: ['SELECT GEBIRGE, COUNT(*) FROM BERG GROUP BY GEBIRGE ORDER BY COUNT(*) DESC', 'SELECT GEBIRGE, COUNT(*) AS anzahl FROM BERG GROUP BY GEBIRGE ORDER BY anzahl DESC'] },
-            { id: 'n2-2', n: 2, title: 'Gebirge mit >10 Bergen', desc: 'Welche Gebirge haben mehr als 10 Berge?', hint: 'HAVING COUNT(*) > 10', sols: ['SELECT GEBIRGE, COUNT(*) FROM BERG GROUP BY GEBIRGE HAVING COUNT(*) > 10', 'SELECT GEBIRGE, COUNT(*) AS anzahl FROM BERG GROUP BY GEBIRGE HAVING COUNT(*) > 10'] },
-            { id: 'n2-3', n: 2, title: 'Durchschnitt pro Gebirge', desc: 'Durchschnittliche H\u00f6he pro Gebirge?', hint: 'AVG(HOEHE) mit GROUP BY', sols: ['SELECT GEBIRGE, AVG(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, ROUND(AVG(HOEHE), 0) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, AVG(HOEHE) AS durchschnitt FROM BERG GROUP BY GEBIRGE ORDER BY durchschnitt DESC'] },
-            { id: 'n2-4', n: 2, title: 'Max/Min pro Gebirge', desc: 'H\u00f6chster und niedrigster Berg pro Gebirge?', hint: 'MAX() und MIN() mit GROUP BY', sols: ['SELECT GEBIRGE, MAX(HOEHE), MIN(HOEHE) FROM BERG GROUP BY GEBIRGE', 'SELECT GEBIRGE, MAX(HOEHE) AS hoechster, MIN(HOEHE) AS niedrigster FROM BERG GROUP BY GEBIRGE'] },
-            { id: 'n2-5', n: 2, title: 'W\u00fcstenarten', desc: 'Wie viele W\u00fcsten gibt es pro W\u00fcstenart?', hint: 'GROUP BY WUESTENART auf WUESTE', sols: ['SELECT WUESTENART, COUNT(*) FROM WUESTE GROUP BY WUESTENART', 'SELECT WUESTENART, COUNT(*) AS anzahl FROM WUESTE GROUP BY WUESTENART', 'SELECT WUESTENART, COUNT(*) AS anzahl FROM WUESTE GROUP BY WUESTENART ORDER BY anzahl DESC'] },
-            { id: 'n2-6', n: 2, title: 'L\u00e4nder pro Kontinent', desc: 'Wie viele L\u00e4nder gibt es pro Kontinent? (Tabelle: UMFASST)', hint: 'GROUP BY K_NAME auf UMFASST', sols: ['SELECT K_NAME, COUNT(*) FROM UMFASST GROUP BY K_NAME', 'SELECT K_NAME, COUNT(*) AS anzahl FROM UMFASST GROUP BY K_NAME', 'SELECT K_NAME, COUNT(*) AS anzahl FROM UMFASST GROUP BY K_NAME ORDER BY anzahl DESC'] },
-            { id: 'n2-7', n: 2, title: 'Inseln pro Inselgruppe', desc: 'Wie viele Inseln geh\u00f6ren zu jeder Inselgruppe? (Nur Gruppen mit >1 Insel)', hint: 'GROUP BY INSELGRUPPE mit HAVING', sols: ['SELECT INSELGRUPPE, COUNT(*) FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1', 'SELECT INSELGRUPPE, COUNT(*) AS anzahl FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1', 'SELECT INSELGRUPPE, COUNT(*) AS anzahl FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1 ORDER BY anzahl DESC'] },
+            { id: 'n2-1', n: '2', title: 'Berge pro Gebirge', desc: 'Wie viele Berge pro Gebirge? (sortiert)', hint: 'GROUP BY GEBIRGE', sol: 'SELECT GEBIRGE, COUNT(*) AS Anzahl FROM BERG GROUP BY GEBIRGE ORDER BY Anzahl DESC' },
+            { id: 'n2-2', n: '2', title: 'Gebirge mit >10 Bergen', desc: 'Welche Gebirge haben mehr als 10 Berge?', hint: 'HAVING COUNT(*) > 10', sol: 'SELECT GEBIRGE, COUNT(*) AS Anzahl FROM BERG GROUP BY GEBIRGE HAVING COUNT(*) > 10' },
+            { id: 'n2-3', n: '2', title: 'Durchschnitt pro Gebirge', desc: 'Durchschnittliche H\u00f6he pro Gebirge?', hint: 'AVG(HOEHE) mit GROUP BY', sol: 'SELECT GEBIRGE, ROUND(AVG(HOEHE), 0) AS Durchschnitt FROM BERG GROUP BY GEBIRGE ORDER BY Durchschnitt DESC' },
+            { id: 'n2-4', n: '2', title: 'Max/Min pro Gebirge', desc: 'H\u00f6chster und niedrigster Berg pro Gebirge?', hint: 'MAX() und MIN() mit GROUP BY', sol: 'SELECT GEBIRGE, MAX(HOEHE) AS Hoechster, MIN(HOEHE) AS Niedrigster FROM BERG GROUP BY GEBIRGE' },
+            { id: 'n2-5', n: '2', title: 'W\u00fcstenarten', desc: 'Wie viele W\u00fcsten gibt es pro W\u00fcstenart?', hint: 'GROUP BY WUESTENART auf WUESTE', sol: 'SELECT WUESTENART, COUNT(*) AS Anzahl FROM WUESTE GROUP BY WUESTENART ORDER BY Anzahl DESC' },
+            { id: 'n2-6', n: '2', title: 'L\u00e4nder pro Kontinent', desc: 'Wie viele L\u00e4nder gibt es pro Kontinent? (Tabelle: UMFASST)', hint: 'GROUP BY K_NAME auf UMFASST', sol: 'SELECT K_NAME, COUNT(*) AS Anzahl FROM UMFASST GROUP BY K_NAME ORDER BY Anzahl DESC' },
+            { id: 'n2-7', n: '2', title: 'Inseln pro Inselgruppe', desc: 'Wie viele Inseln geh\u00f6ren zu jeder Inselgruppe? (Nur Gruppen mit >1 Insel)', hint: 'GROUP BY INSELGRUPPE mit HAVING', sol: 'SELECT INSELGRUPPE, COUNT(*) AS Anzahl FROM INSEL GROUP BY INSELGRUPPE HAVING COUNT(*) > 1 ORDER BY Anzahl DESC' },
 
             // =====================================================
-            // Niveau 3: JOINs
+            // Niveau 3a: Einfache JOINs (2 Tabellen: STADT ↔ LAND)
             // =====================================================
-            { id: 'n3-1', n: 3, title: 'Top 10 Berge + L\u00e4nder', desc: 'Die 10 h\u00f6chsten Berge mit ihren L\u00e4ndern?', hint: 'JOIN \u00fcber 3 Tabellen: BERG \u2192 GEO_BERG \u2192 LAND', sols: ['SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10', 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b INNER JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME INNER JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10'] },
-            { id: 'n3-2', n: 3, title: 'L\u00e4nder mit >6000m Bergen', desc: 'Welche L\u00e4nder haben Berge \u00fcber 6000m? (Jedes Land nur einmal!)', hint: 'JOIN mit WHERE und DISTINCT', sols: ['SELECT DISTINCT l.L_NAME FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 6000', 'SELECT DISTINCT l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE b.HOEHE > 6000'] },
-            { id: 'n3-3', n: 3, title: 'L\u00e4nder + Berganzahl', desc: 'Alle L\u00e4nder mit Anzahl ihrer Berge (nur L\u00e4nder mit Bergen)?', hint: 'JOIN mit GROUP BY und HAVING', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME) FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl FROM LAND l LEFT JOIN GEO_BERG gb ON l.L_ID = gb.L_ID LEFT JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 0 ORDER BY anzahl DESC'] },
-            { id: 'n3-4', n: 3, title: 'Berge in Deutschland', desc: 'Zeige alle Berge in Deutschland mit H\u00f6he und Gebirge! (L_ID = \'D\')', hint: 'BERG \u2192 GEO_BERG mit WHERE L_ID = \'D\'', sols: ['SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME WHERE gb.L_ID = \'D\'', 'SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE l.L_ID = \'D\''] },
-            { id: 'n3-5', n: 3, title: 'Fl\u00fcsse in Frankreich', desc: 'Welche Fl\u00fcsse flie\u00dfen durch Frankreich? (L_ID = \'F\') Zeige Name und L\u00e4nge!', hint: 'FLUSS \u2192 GEO_FLUSS mit WHERE L_ID = \'F\'', sols: ['SELECT f.F_NAME, f.LAENGE FROM FLUSS f JOIN GEO_FLUSS gf ON f.F_NAME = gf.F_NAME WHERE gf.L_ID = \'F\'', 'SELECT f.F_NAME, f.LAENGE FROM FLUSS f JOIN GEO_FLUSS gf ON f.F_NAME = gf.F_NAME WHERE gf.L_ID = \'F\' ORDER BY f.LAENGE DESC'] },
-            { id: 'n3-6', n: 3, title: 'Seen in Russland', desc: 'Welche Seen liegen in Russland? (L_ID = \'RUS\') Zeige Name und Tiefe! (GEO_SEE)', hint: 'SEE \u2192 GEO_SEE mit WHERE L_ID = \'RUS\'', sols: ['SELECT s.S_NAME, s.TIEFE FROM SEE s JOIN GEO_SEE gs ON s.S_NAME = gs.S_NAME WHERE gs.L_ID = \'RUS\'', 'SELECT s.S_NAME, s.TIEFE FROM SEE s JOIN GEO_SEE gs ON s.S_NAME = gs.S_NAME WHERE gs.L_ID = \'RUS\' ORDER BY s.TIEFE DESC'] },
-            { id: 'n3-7', n: 3, title: 'Land mit den meisten Bergen', desc: 'Welches Land hat die meisten Berge? (Name und Anzahl)', hint: 'JOIN + GROUP BY + ORDER BY + LIMIT 1', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 1', 'SELECT l.L_NAME, COUNT(gb.B_NAME) AS anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 1', 'SELECT l.L_NAME, COUNT(*) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY COUNT(*) DESC LIMIT 1'] },
-            { id: 'n3-8', n: 3, title: 'St\u00e4dte am Rhein', desc: 'Welche St\u00e4dte liegen am Rhein? (Tabelle: LIEGT_AN, Spalte: F_NAME)', hint: 'STADT \u2192 LIEGT_AN mit WHERE F_NAME = \'Rhein\'', sols: ['SELECT s.ST_NAME, s.EINWOHNER FROM STADT s JOIN LIEGT_AN la ON s.ST_NAME = la.ST_NAME AND s.L_ID = la.L_ID WHERE la.F_NAME = \'Rhein\'', 'SELECT la.ST_NAME FROM LIEGT_AN la WHERE la.F_NAME = \'Rhein\'', 'SELECT DISTINCT la.ST_NAME FROM LIEGT_AN la WHERE la.F_NAME = \'Rhein\''] },
+            { id: 'n3a-1', n: '3a', title: 'St\u00e4dte mit L\u00e4ndername',
+              desc: 'Zeige alle St\u00e4dte mit dem Namen ihres Landes! STADT und LAND teilen sich die Spalte <code class="inline">L_ID</code> \u2014 das ist dein erster JOIN.',
+              hint: 'SELECT s.ST_NAME, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID',
+              sol: 'SELECT s.ST_NAME, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID' },
+
+            { id: 'n3a-2', n: '3a', title: 'Deutsche St\u00e4dte mit Land',
+              desc: 'Zeige alle St\u00e4dte in Deutschland mit ihrem L\u00e4ndernamen! (L_ID = \'D\')',
+              hint: 'JOIN wie oben, dann WHERE s.L_ID = \'D\'',
+              sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE s.L_ID = \'D\' ORDER BY s.EINWOHNER DESC' },
+
+            { id: 'n3a-3', n: '3a', title: 'Top 10 gr\u00f6\u00dfte St\u00e4dte + Land',
+              desc: 'Zeige die 10 einwohnerreichsten St\u00e4dte mit ihrem L\u00e4ndernamen!',
+              hint: 'JOIN + ORDER BY s.EINWOHNER DESC LIMIT 10',
+              sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID ORDER BY s.EINWOHNER DESC LIMIT 10' },
+
+            { id: 'n3a-4', n: '3a', title: 'Millionenst\u00e4dte mit Land',
+              desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner? Zeige Stadt, Einwohner und L\u00e4ndername!',
+              hint: 'JOIN + WHERE s.EINWOHNER > 5000000',
+              sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE s.EINWOHNER > 5000000 ORDER BY s.EINWOHNER DESC' },
+
+            { id: 'n3a-5', n: '3a', title: 'St\u00e4dte in gro\u00dfen L\u00e4ndern',
+              desc: 'Zeige alle St\u00e4dte in L\u00e4ndern mit mehr als 100 Millionen Einwohnern! (Stadtname, Landesname, Einwohner des Landes)',
+              hint: 'JOIN + WHERE l.EINWOHNER > 100000000',
+              sol: 'SELECT s.ST_NAME, l.L_NAME, l.EINWOHNER FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.EINWOHNER > 100000000 ORDER BY l.EINWOHNER DESC' },
+
+            { id: 'n3a-6', n: '3a', title: 'St\u00e4dte in Riesenl\u00e4ndern',
+              desc: 'Welche St\u00e4dte liegen in L\u00e4ndern mit mehr als 5 Millionen km\u00b2 Fl\u00e4che?',
+              hint: 'JOIN + WHERE l.FLAECHE > 5000000',
+              sol: 'SELECT s.ST_NAME, l.L_NAME, l.FLAECHE FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.FLAECHE > 5000000' },
+
+            { id: 'n3a-7', n: '3a', title: 'Anzahl St\u00e4dte pro Land',
+              desc: 'Wie viele St\u00e4dte hat jedes Land in der Datenbank? Zeige L\u00e4ndername und Anzahl, sortiert!',
+              hint: 'JOIN + GROUP BY l.L_NAME + COUNT(*)',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC' },
+
+            { id: 'n3a-8', n: '3a', title: 'L\u00e4nder mit >5 St\u00e4dten',
+              desc: 'Welche L\u00e4nder haben mehr als 5 St\u00e4dte in der Datenbank?',
+              hint: 'Wie oben, aber mit HAVING COUNT(*) > 5',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME HAVING COUNT(*) > 5 ORDER BY Anzahl DESC' },
+
+            { id: 'n3a-9', n: '3a', title: 'Durchschnittliche Stadtgr\u00f6\u00dfe pro Land',
+              desc: 'Wie gro\u00df sind die St\u00e4dte im Durchschnitt pro Land? Zeige gerundet!',
+              hint: 'JOIN + GROUP BY + ROUND(AVG(s.EINWOHNER), 0)',
+              sol: 'SELECT l.L_NAME, ROUND(AVG(s.EINWOHNER), 0) AS Durchschnitt FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Durchschnitt DESC' },
+
+            { id: 'n3a-10', n: '3a', title: 'Land mit den meisten St\u00e4dten',
+              desc: 'Welches Land hat die meisten St\u00e4dte in der Datenbank?',
+              hint: 'Wie Aufgabe 7, aber mit LIMIT 1',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 1' },
+
+            // =====================================================
+            // Niveau 3b: JOINs mit Verbindungstabellen (3 Tabellen)
+            // =====================================================
+            { id: 'n3-1', n: '3b', title: 'Top 10 Berge + L\u00e4nder',
+              desc: 'Die 10 h\u00f6chsten Berge mit ihren L\u00e4ndern? BERG hat keine L_ID \u2014 du brauchst den Umweg \u00fcber GEO_BERG!',
+              hint: 'BERG \u2192 GEO_BERG (B_NAME) \u2192 LAND (L_ID)',
+              sol: 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID ORDER BY b.HOEHE DESC LIMIT 10' },
+
+            { id: 'n3-2', n: '3b', title: 'L\u00e4nder mit >6000m Bergen',
+              desc: 'Welche L\u00e4nder haben Berge \u00fcber 6000m? (Jedes Land nur einmal!)',
+              hint: 'DISTINCT + JOIN mit WHERE',
+              sol: 'SELECT DISTINCT l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID WHERE b.HOEHE > 6000' },
+
+            { id: 'n3-3', n: '3b', title: 'Berge in Deutschland',
+              desc: 'Zeige alle Berge in Deutschland mit H\u00f6he und Gebirge! (L_ID = \'D\')',
+              hint: 'BERG \u2192 GEO_BERG mit WHERE gb.L_ID = \'D\'',
+              sol: 'SELECT b.B_NAME, b.HOEHE, b.GEBIRGE FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME WHERE gb.L_ID = \'D\'' },
+
+            { id: 'n3-4', n: '3b', title: 'Fl\u00fcsse in Frankreich',
+              desc: 'Welche Fl\u00fcsse flie\u00dfen durch Frankreich? (L_ID = \'F\') Zeige Name und L\u00e4nge!',
+              hint: 'FLUSS \u2192 GEO_FLUSS mit WHERE L_ID = \'F\'',
+              sol: 'SELECT f.F_NAME, f.LAENGE FROM FLUSS f JOIN GEO_FLUSS gf ON f.F_NAME = gf.F_NAME WHERE gf.L_ID = \'F\' ORDER BY f.LAENGE DESC' },
+
+            { id: 'n3-5', n: '3b', title: 'Seen in Russland',
+              desc: 'Welche Seen liegen in Russland? (L_ID = \'RUS\') Zeige Name und Tiefe!',
+              hint: 'SEE \u2192 GEO_SEE mit WHERE L_ID = \'RUS\'',
+              sol: 'SELECT s.S_NAME, s.TIEFE FROM SEE s JOIN GEO_SEE gs ON s.S_NAME = gs.S_NAME WHERE gs.L_ID = \'RUS\' ORDER BY s.TIEFE DESC' },
+
+            { id: 'n3-6', n: '3b', title: 'Land mit den meisten Bergen',
+              desc: 'Welches Land hat die meisten Berge? (Name und Anzahl)',
+              hint: 'JOIN + GROUP BY + ORDER BY + LIMIT 1',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 1' },
+
+            { id: 'n3-7', n: '3b', title: 'St\u00e4dte am Rhein',
+              desc: 'Welche St\u00e4dte liegen am Rhein? (Tabelle: LIEGT_AN, Spalte: F_NAME)',
+              hint: 'STADT \u2192 LIEGT_AN mit WHERE F_NAME = \'Rhein\'',
+              sol: 'SELECT DISTINCT la.ST_NAME FROM LIEGT_AN la WHERE la.F_NAME = \'Rhein\'' },
+
+            { id: 'n3-8', n: '3b', title: 'L\u00e4nder + Berganzahl',
+              desc: 'Zeige alle L\u00e4nder mit der Anzahl ihrer Berge (nur L\u00e4nder mit mindestens einem Berg)!',
+              hint: 'LAND \u2192 GEO_BERG + GROUP BY + HAVING',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID GROUP BY l.L_NAME HAVING COUNT(*) > 0 ORDER BY Anzahl DESC' },
 
             // =====================================================
             // Niveau 4: Kombination (JOIN + GROUP BY + HAVING)
             // =====================================================
-            { id: 'n4-1', n: 4, title: 'Anzahl L\u00e4nder >5000m', desc: 'Wie viele L\u00e4nder haben mindestens einen Berg \u00fcber 5000m?', hint: 'COUNT(DISTINCT) mit JOIN und WHERE', sols: ['SELECT COUNT(DISTINCT l.L_ID) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000', 'SELECT COUNT(DISTINCT l.L_NAME) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000'] },
-            { id: 'n4-2', n: 4, title: 'H\u00f6chster Durchschnitt', desc: 'Welches Land hat die h\u00f6chste durchschnittliche Bergh\u00f6he?', hint: 'AVG mit GROUP BY, ORDER BY und LIMIT 1', sols: ['SELECT l.L_NAME, AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY AVG(b.HOEHE) DESC LIMIT 1', 'SELECT l.L_NAME, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC LIMIT 1'] },
-            { id: 'n4-3', n: 4, title: 'L\u00e4nderstatistik', desc: 'F\u00fcr jedes Land: Anzahl und Durchschnittsh\u00f6he der Berge?', hint: 'COUNT und AVG kombinieren mit JOIN und GROUP BY', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME), AVG(b.HOEHE) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME', 'SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY durchschnitt DESC'] },
-            { id: 'n4-4', n: 4, title: 'Bergstarke L\u00e4nder', desc: 'Welche L\u00e4nder haben mehr als 5 Berge UND eine Durchschnittsh\u00f6he \u00fcber 3000m?', hint: 'HAVING mit zwei Bedingungen (COUNT und AVG)', sols: ['SELECT l.L_NAME, COUNT(b.B_NAME) AS anzahl, ROUND(AVG(b.HOEHE), 0) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(b.B_NAME) > 5 AND AVG(b.HOEHE) > 3000', 'SELECT l.L_NAME, COUNT(*) AS anzahl, AVG(b.HOEHE) AS durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(*) > 5 AND AVG(b.HOEHE) > 3000'] },
-            { id: 'n4-5', n: 4, title: 'Fl\u00fcsse pro Land', desc: 'Wie viele Fl\u00fcsse flie\u00dfen durch jedes Land? Top 10!', hint: 'LAND \u2192 GEO_FLUSS mit GROUP BY und LIMIT 10', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_FLUSS gf ON l.L_ID = gf.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 10', 'SELECT l.L_NAME, COUNT(gf.F_NAME) AS anzahl FROM LAND l JOIN GEO_FLUSS gf ON l.L_ID = gf.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 10'] },
-            { id: 'n4-6', n: 4, title: 'Europ\u00e4ische Berge', desc: 'Zeige alle Berge in europ\u00e4ischen L\u00e4ndern mit L\u00e4ndername! (K_NAME = \'Europa\' in UMFASST)', hint: '4 Tabellen: BERG \u2192 GEO_BERG \u2192 LAND + UMFASST', sols: ['SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\'', 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\' ORDER BY b.HOEHE DESC'] },
-            { id: 'n4-7', n: 4, title: 'Seen pro Land', desc: 'Welche L\u00e4nder haben die meisten Seen? Top 5! (GEO_SEE)', hint: 'LAND \u2192 GEO_SEE mit GROUP BY und LIMIT', sols: ['SELECT l.L_NAME, COUNT(*) AS anzahl FROM LAND l JOIN GEO_SEE gs ON l.L_ID = gs.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 5', 'SELECT l.L_NAME, COUNT(gs.S_NAME) AS anzahl FROM LAND l JOIN GEO_SEE gs ON l.L_ID = gs.L_ID GROUP BY l.L_NAME ORDER BY anzahl DESC LIMIT 5'] }
+            { id: 'n4-1', n: '4', title: 'Anzahl L\u00e4nder >5000m',
+              desc: 'Wie viele L\u00e4nder haben mindestens einen Berg \u00fcber 5000m?',
+              hint: 'COUNT(DISTINCT) mit JOIN und WHERE',
+              sol: 'SELECT COUNT(DISTINCT l.L_ID) FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME WHERE b.HOEHE > 5000' },
+
+            { id: 'n4-2', n: '4', title: 'H\u00f6chster Durchschnitt',
+              desc: 'Welches Land hat die h\u00f6chste durchschnittliche Bergh\u00f6he?',
+              hint: 'AVG mit GROUP BY, ORDER BY und LIMIT 1',
+              sol: 'SELECT l.L_NAME, ROUND(AVG(b.HOEHE), 0) AS Durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY Durchschnitt DESC LIMIT 1' },
+
+            { id: 'n4-3', n: '4', title: 'L\u00e4nderstatistik',
+              desc: 'F\u00fcr jedes Land: Anzahl und Durchschnittsh\u00f6he der Berge?',
+              hint: 'COUNT und AVG kombinieren mit JOIN und GROUP BY',
+              sol: 'SELECT l.L_NAME, COUNT(b.B_NAME) AS Anzahl, ROUND(AVG(b.HOEHE), 0) AS Durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME ORDER BY Durchschnitt DESC' },
+
+            { id: 'n4-4', n: '4', title: 'Bergstarke L\u00e4nder',
+              desc: 'Welche L\u00e4nder haben mehr als 5 Berge UND eine Durchschnittsh\u00f6he \u00fcber 3000m?',
+              hint: 'HAVING mit zwei Bedingungen (COUNT und AVG)',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl, ROUND(AVG(b.HOEHE), 0) AS Durchschnitt FROM LAND l JOIN GEO_BERG gb ON l.L_ID = gb.L_ID JOIN BERG b ON gb.B_NAME = b.B_NAME GROUP BY l.L_NAME HAVING COUNT(*) > 5 AND AVG(b.HOEHE) > 3000' },
+
+            { id: 'n4-5', n: '4', title: 'Fl\u00fcsse pro Land',
+              desc: 'Wie viele Fl\u00fcsse flie\u00dfen durch jedes Land? Top 10!',
+              hint: 'LAND \u2192 GEO_FLUSS mit GROUP BY und LIMIT 10',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM LAND l JOIN GEO_FLUSS gf ON l.L_ID = gf.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 10' },
+
+            { id: 'n4-6', n: '4', title: 'Europ\u00e4ische Berge',
+              desc: 'Zeige alle Berge in europ\u00e4ischen L\u00e4ndern mit L\u00e4ndername! (K_NAME = \'Europa\' in UMFASST)',
+              hint: '4 Tabellen: BERG \u2192 GEO_BERG \u2192 LAND + UMFASST',
+              sol: 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\' ORDER BY b.HOEHE DESC' },
+
+            { id: 'n4-7', n: '4', title: 'Seen pro Land',
+              desc: 'Welche L\u00e4nder haben die meisten Seen? Top 5! (GEO_SEE)',
+              hint: 'LAND \u2192 GEO_SEE mit GROUP BY und LIMIT',
+              sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM LAND l JOIN GEO_SEE gs ON l.L_ID = gs.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 5' }
         ];
         
         const tabScrollPositions = {};
@@ -880,64 +971,47 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             event.target.classList.add('active');
             document.getElementById('tab-' + name).classList.add('active');
             currentTab = name;
-            requestAnimationFrame(() => {
-                window.scrollTo(0, tabScrollPositions[name] || 0);
-            });
+            requestAnimationFrame(() => { window.scrollTo(0, tabScrollPositions[name] || 0); });
         }
 
         function loadLocalFile(input) {
             const file = input.files[0];
             if(!file) return;
-
             const reader = new FileReader();
             const statusEl = document.getElementById('db-status');
             statusEl.style.display = 'block';
             statusEl.innerHTML = `<div class="message warning">Lade lokale Datei: ${file.name}...</div>`;
-
             reader.onload = async function() {
-                try {
-                    const buffer = reader.result;
-                    await initSqlJsWithBuffer(buffer, `Lokal: ${file.name}`);
-                } catch(e) {
-                    statusEl.innerHTML = `<div class="message error">Fehler beim Lesen der lokalen Datei: ${e.message}</div>`;
-                }
+                try { await initSqlJsWithBuffer(reader.result, `Lokal: ${file.name}`); }
+                catch(e) { statusEl.innerHTML = `<div class="message error">Fehler: ${e.message}</div>`; }
             };
             reader.readAsArrayBuffer(file);
         }
 
         async function initSqlJsWithBuffer(buffer, sourceName) {
             const statusEl = document.getElementById('db-status');
-            
             if (buffer.byteLength < 1000) {
-                 statusEl.innerHTML = `<div class="message error"><strong>Datei zu klein:</strong> '${sourceName}' ist nur ${buffer.byteLength} Bytes groß.</div>`;
-                 return;
+                statusEl.innerHTML = `<div class="message error"><strong>Datei zu klein:</strong> '${sourceName}' ist nur ${buffer.byteLength} Bytes.</div>`;
+                return;
             }
-
             try {
-                const SQL = await initSqlJs({ 
-                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` 
-                });
-                
+                const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` });
                 db = new SQL.Database(new Uint8Array(buffer));
-                
                 const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='LAND'");
-                
                 if (tables.length === 0) {
                     statusEl.innerHTML = `<div class="message error">Datenbank '${sourceName}' geladen, aber Tabelle 'LAND' fehlt.</div>`;
                 } else {
                     const rowCount = db.exec("SELECT count(*) FROM LAND")[0].values[0][0];
                     if (rowCount === 0) {
-                        statusEl.innerHTML = `<div class="message error">Datenbank '${sourceName}' geladen, aber Tabelle 'LAND' ist <strong>LEER</strong> (0 Zeilen).<br>Bitte prüfe deinen Export.</div>`;
+                        statusEl.innerHTML = `<div class="message error">Tabelle 'LAND' ist leer (0 Zeilen).</div>`;
                     } else {
-                        statusEl.innerHTML = `<div class="message success">Erfolg! '${sourceName}' geladen. (${rowCount} Länder)</div>`;
+                        statusEl.innerHTML = `<div class="message success">'${sourceName}' geladen. (${rowCount} Länder)</div>`;
                         setTimeout(() => statusEl.style.display = 'none', 3000);
                         runMain();
                     }
                 }
-                
                 renderTasks();
                 updateStats();
-
             } catch (err) {
                 statusEl.innerHTML = `<div class="message error">SQL Fehler: ${err.message}</div>`;
             }
@@ -947,100 +1021,93 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             const statusEl = document.getElementById('db-status');
             statusEl.style.display = 'block';
             statusEl.innerHTML = '<div class="message warning">Suche Datenbank...</div>';
-            
             const filesToCheck = ['https://lkirchne.github.io/gynesa/informatik/q1/db/terra/terra2023.db','/informatik/q1/db/terra/terra2023.db'];
-            let buffer = null;
-            let loadedName = '';
-            
+            let buffer = null, loadedName = '';
             for (let file of filesToCheck) {
                 try {
-                    // Cache-Busting nur für lokale Dateien ohne 'http'
                     const url = file.startsWith('http') ? file : file + '?t=' + Date.now();
-                    
                     const res = await fetch(url);
-                    if (res.ok) {
-                        buffer = await res.arrayBuffer();
-                        loadedName = file;
-                        break; 
-                    }
+                    if (res.ok) { buffer = await res.arrayBuffer(); loadedName = file; break; }
                 } catch(e) {}
             }
-            
             if (!buffer) {
-                statusEl.innerHTML = `<div class="message warning"><strong>Keine Datenbank gefunden.</strong><br>Konnte weder lokale Dateien noch den Fallback-Server laden. Bitte lade deine Datei oben manuell.</div>`;
+                statusEl.innerHTML = `<div class="message warning"><strong>Keine Datenbank gefunden.</strong> Bitte lade deine Datei oben manuell.</div>`;
                 return;
             }
-
             const decoder = new TextDecoder("utf-8");
             const firstBytes = decoder.decode(new Uint8Array(buffer.slice(0, 50)));
             if (firstBytes.includes("git-lfs")) {
-                statusEl.innerHTML = `<div class="message error"><strong>Git LFS Fehler!</strong><br>Die Datei '${loadedName}' ist nur ein Text-Link. Bitte lade sie lokal.</div>`;
-                return; 
+                statusEl.innerHTML = `<div class="message error"><strong>Git LFS Fehler!</strong> Die Datei '${loadedName}' ist nur ein Text-Link.</div>`;
+                return;
             }
-
             await initSqlJsWithBuffer(buffer, loadedName);
         }
-        
-        function norm(q) { return q.toUpperCase().replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').replace(/\s*=\s*/g, '=').replace(/\s*\(\s*/g, '(').replace(/\s*\)\s*/g, ')').trim().replace(/;$/, ''); }
-        
-        function check(q, sols) {
-            const nq = norm(q);
-            for (let s of sols) if (nq === norm(s)) return true;
-            try {
-                const ur = db.exec(q);
-                for (let s of sols) {
-                    const sr = db.exec(s);
-                    if (JSON.stringify(ur) === JSON.stringify(sr)) return true;
-                }
-            } catch (e) {}
+
+        // =====================================================
+        // Result rendering helper
+        // =====================================================
+        function renderResultHtml(res, maxVisible) {
+            if (!res || res.length === 0) return '<div style="padding:0.4rem;color:#888;font-style:italic;font-size:0.85rem">Keine Ergebnisse.</div>';
+            const r = res[0];
+            const total = r.values.length;
+            maxVisible = maxVisible || 10;
+            let html = `<div class="result-info">${total} Zeile${total !== 1 ? 'n' : ''}</div>`;
+            html += '<div class="table-wrapper"><table><thead><tr>';
+            html += r.columns.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+            r.values.forEach((row, i) => {
+                const hidden = i >= maxVisible ? ' style="display:none" class="extra-row extra-' + Date.now() + '"' : '';
+                html += '<tr' + hidden + '>' + row.map(c => '<td>' + (c === null ? '<span style="color:#aaa">NULL</span>' : c) + '</td>').join('') + '</tr>';
+            });
+            html += '</tbody></table></div>';
+            if (total > maxVisible) {
+                const uid = 'g' + Math.random().toString(36).slice(2, 8);
+                html = html.replace(new RegExp('extra-' + '\\d+', 'g'), uid);
+                html += `<button style="margin-top:0.4rem;font-size:0.8rem;" onclick="this.parentElement.querySelectorAll('.${uid}').forEach(r=>r.style.display='');this.style.display='none';">Alle ${total} Zeilen anzeigen</button>`;
+            }
+            return html;
+        }
+
+        // =====================================================
+        // Result comparison (flexible)
+        // =====================================================
+        function resultsMatch(r1, r2) {
+            if (!r1 || !r2) return false;
+            // Both empty
+            if (r1.length === 0 && r2.length === 0) return true;
+            if (r1.length === 0 || r2.length === 0) return false;
+            const a = r1[0], b = r2[0];
+            // Same number of columns and rows
+            if (a.columns.length !== b.columns.length) return false;
+            if (a.values.length !== b.values.length) return false;
+            // Exact match (incl. order)
+            if (JSON.stringify(a.values) === JSON.stringify(b.values)) return true;
+            // Same rows, different order
+            const sortRows = v => v.map(r => JSON.stringify(r)).sort();
+            if (JSON.stringify(sortRows(a.values)) === JSON.stringify(sortRows(b.values))) return true;
             return false;
         }
         
-        function run(q, target, extraMsg = '') {
-            const el = document.getElementById(target);
-            el.innerHTML = extraMsg;
-            if (!db || !q.trim()) return;
-            try {
-                const res = db.exec(q);
-                if(target === 'main-result') document.getElementById('main-result-header').style.display = 'block';
+        // =====================================================
+        // Run query (for playground)
+        // =====================================================
+        function runQuery(q) {
+            if (!db || !q.trim()) return null;
+            return db.exec(q);
+        }
 
-                if (res.length === 0) {
-                    el.innerHTML += '<div class="message success">Query erfolgreich ausgeführt (keine Ergebnisse).</div>';
-                    return;
-                }
-                const r = res[0];
-                const maxVisible = 10;
-                const total = r.values.length;
-                let html = `<div class="result-info">${total} Ergebnisse</div>`;
-                html += '<div class="table-wrapper"><table><thead><tr>';
-                html += r.columns.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
-                r.values.forEach((row, i) => {
-                    const hidden = i >= maxVisible ? ' style="display:none" class="extra-row"' : '';
-                    html += '<tr' + hidden + '>' + row.map(c => '<td>' + (c === null ? '<span style="color:#aaa">NULL</span>' : c) + '</td>').join('') + '</tr>';
-                });
-                html += '</tbody></table></div>';
-                if (total > maxVisible) {
-                    html += `<button class="show-more-btn" style="margin-top:0.5rem;font-size:0.85rem;" onclick="
-                        this.parentElement.querySelectorAll('.extra-row').forEach(r => r.style.display = '');
-                        var less = document.createElement('button');
-                        less.style = 'margin-top:0.5rem;font-size:0.85rem;';
-                        less.textContent = 'Weniger anzeigen';
-                        less.onclick = function() {
-                            this.parentElement.querySelectorAll('.extra-row').forEach(r => r.style.display = 'none');
-                            this.parentElement.querySelector('.show-more-btn').style.display = '';
-                            this.remove();
-                        };
-                        this.parentElement.insertBefore(less, this.nextSibling);
-                        this.style.display = 'none';
-                    ">Alle ${total} Zeilen anzeigen</button>`;
-                }
-                el.innerHTML += html;
-            } catch (e) {
-                el.innerHTML += '<div class="message error">SQL Fehler: ' + e.message + '</div>';
+        function runMain() {
+            const el = document.getElementById('main-result');
+            el.innerHTML = '';
+            if (!db) return;
+            const q = document.getElementById('main-editor').value;
+            try {
+                document.getElementById('main-result-header').style.display = 'block';
+                el.innerHTML = renderResultHtml(db.exec(q));
+            } catch(e) {
+                el.innerHTML = '<div class="message error">SQL Fehler: ' + e.message + '</div>';
             }
         }
-        
-        function runMain() { run(document.getElementById('main-editor').value, 'main-result'); }
+
         function clearMain() { 
             document.getElementById('main-editor').value = ''; 
             document.getElementById('main-result').innerHTML = ''; 
@@ -1052,14 +1119,14 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             const grouped = {};
             tasks.forEach(t => { if (!grouped[t.n]) grouped[t.n] = []; grouped[t.n].push(t); });
             
-            const niveauLabels = {0: 'Einstieg (SELECT & WHERE)', 1: 'Aggregation', 2: 'GROUP BY & HAVING', 3: 'JOINs', 4: 'Kombination'};
             let html = '';
-            Object.keys(grouped).sort().forEach(n => {
+            niveauOrder.forEach(n => {
+                if (!grouped[n]) return;
                 const label = niveauLabels[n] || '';
                 html += '<div class="section"><h2>Niveau ' + n + (label ? ' \u2014 ' + label : '') + '</h2>';
                 grouped[n].forEach(t => {
                     const q = saved[t.id] || '';
-                    const solved = q && check(q, t.sols);
+                    const solved = q && isSolved(t, q);
                     html += `<div class="task ${solved ? 'solved' : ''}" data-id="${t.id}">
                         <div class="task-header">
                             <div class="task-title">${t.title}</div>
@@ -1081,6 +1148,15 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             document.getElementById('tasks').innerHTML = html;
             document.getElementById('total').textContent = tasks.length;
         }
+
+        function isSolved(task, q) {
+            if (!db || !q || !q.trim()) return false;
+            try {
+                const ur = db.exec(q);
+                const sr = db.exec(task.sol);
+                return resultsMatch(ur, sr);
+            } catch(e) { return false; }
+        }
         
         function checkTask(id) {
             const task = tasks.find(t => t.id === id);
@@ -1091,60 +1167,91 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                 el.innerHTML = '<div class="message error">Bitte gib eine Query ein.</div>'; 
                 return; 
             }
+
+            let studentResult, solResult;
             
-            let message = '';
-            let isCorrect = check(q, task.sols);
-            
-            if (isCorrect) {
-                message = '<div class="message success" style="margin-bottom:1rem">Richtig gelöst! ✓</div>';
+            // Run student query
+            try {
+                studentResult = db.exec(q);
+            } catch(e) {
+                el.innerHTML = `<div class="message error">SQL Fehler: ${e.message}</div>`;
+                return;
+            }
+
+            // Run solution query
+            try {
+                solResult = db.exec(task.sol);
+            } catch(e) {
+                solResult = [];
+            }
+
+            // Compare
+            const match = resultsMatch(studentResult, solResult);
+
+            let html = '';
+
+            if (match) {
+                html += '<div class="message success" style="margin-bottom:0.5rem">\u2705 Korrekt!</div>';
                 const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
                 saved[id] = q;
                 localStorage.setItem('terra-sql', JSON.stringify(saved));
-                
                 document.querySelector(`.task[data-id="${id}"]`).classList.add('solved');
-                document.querySelector(`.task[data-id="${id}"] .badge`).classList.add('solved');
-                document.querySelector(`.task[data-id="${id}"] .badge`).innerHTML = `N${task.n} ✓`;
+                const badge = document.querySelector(`.task[data-id="${id}"] .badge`);
+                badge.classList.add('solved');
+                badge.innerHTML = `N${task.n} ✓`;
                 updateStats();
             } else {
-                 message = '<div class="message error" style="margin-bottom:1rem">Leider nicht korrekt. Versuche es nochmal oder prüfe die Ergebnisse unten.</div>';
+                html += '<div class="message warning" style="margin-bottom:0.5rem">Vergleiche dein Ergebnis mit dem erwarteten Ergebnis.</div>';
             }
 
-            run(q, 'res-' + id, message);
+            // Student result
+            html += '<div class="result-label">Dein Ergebnis:</div>';
+            html += renderResultHtml(studentResult);
+
+            // Expected result
+            html += '<div class="expected-block">';
+            html += '<div class="result-label">Erwartetes Ergebnis:</div>';
+            html += renderResultHtml(solResult);
+            html += '</div>';
+
+            el.innerHTML = html;
         }
         
         function runTask(id) { 
-            run(document.getElementById('t-' + id).value, 'res-' + id); 
+            const q = document.getElementById('t-' + id).value;
+            const el = document.getElementById('res-' + id);
+            if (!q.trim()) { el.innerHTML = ''; return; }
+            try {
+                el.innerHTML = renderResultHtml(db.exec(q));
+            } catch(e) {
+                el.innerHTML = '<div class="message error">SQL Fehler: ' + e.message + '</div>';
+            }
         }
         
         function toggleHint(id) { document.getElementById('hint-' + id).classList.toggle('visible'); }
         
         function updateStats() {
             const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
-            let solved = 0, maxN = 0;
+            let solved = 0;
             tasks.forEach(t => {
-                if (saved[t.id] && check(saved[t.id], t.sols)) {
-                    solved++;
-                    maxN = Math.max(maxN, t.n);
-                }
+                if (saved[t.id] && isSolved(t, saved[t.id])) solved++;
             });
             document.getElementById('solved').textContent = solved;
             document.getElementById('progress').textContent = Math.round(solved / tasks.length * 100) + '%';
-            document.getElementById('niveau').textContent = maxN;
         }
         
         function exportSolutions() {
             const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
             let md = '# SQL Übungen\n\n**Datum:** ' + new Date().toLocaleDateString('de-DE') + '\n';
             md += '**Gelöst:** ' + document.getElementById('solved').textContent + '/' + tasks.length + '\n\n---\n\n';
-            
             const grouped = {};
             tasks.forEach(t => { if (!grouped[t.n]) grouped[t.n] = []; grouped[t.n].push(t); });
-            
-            Object.keys(grouped).sort().forEach(n => {
-                md += `## Niveau ${n}\n\n`;
+            niveauOrder.forEach(n => {
+                if (!grouped[n]) return;
+                md += `## Niveau ${n} — ${niveauLabels[n]}\n\n`;
                 grouped[n].forEach(t => {
                     const q = saved[t.id] || '';
-                    const ok = q && check(q, t.sols);
+                    const ok = q && isSolved(t, q);
                     md += `### ${t.title} ${ok ? '✓' : ''}\n\n${t.desc}\n\n`;
                     if (q) {
                         md += '```sql\n' + q + '\n```\n\n';
@@ -1153,15 +1260,14 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                             if (r.length && r[0].values.length <= 10) {
                                 md += '| ' + r[0].columns.join(' | ') + ' |\n';
                                 md += '|' + r[0].columns.map(() => '---').join('|') + '|\n';
-                                r[0].values.forEach(row => md += '| ' + row.map(v => v || 'NULL').join(' | ') + ' |\n');
+                                r[0].values.forEach(row => md += '| ' + row.map(v => v !== null ? v : 'NULL').join(' | ') + ' |\n');
                                 md += '\n';
                             }
-                        } catch (e) {}
+                        } catch(e) {}
                     }
                     md += '---\n\n';
                 });
             });
-            
             const blob = new Blob([md], { type: 'text/markdown' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -1170,13 +1276,9 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
         }
         
         function resetApp() {
-            if(confirm("Bist du sicher? Dies löscht:\n1. Deinen gespeicherten Fortschritt\n2. Den Browser-Cache für diese Seite\n\nDie Seite wird danach neu geladen.")) {
+            if(confirm("Bist du sicher? Dies löscht deinen gespeicherten Fortschritt.\nDie Seite wird danach neu geladen.")) {
                 localStorage.clear();
-                if('caches' in window) {
-                    caches.keys().then(function(names) {
-                        for (let name of names) caches.delete(name);
-                    });
-                }
+                if('caches' in window) caches.keys().then(names => { for (let n of names) caches.delete(n); });
                 const url = new URL(window.location.href);
                 url.searchParams.set('reloadTime', Date.now());
                 window.location.href = url.toString();
