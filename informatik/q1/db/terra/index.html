@@ -477,6 +477,32 @@
         .expected-block .table-wrapper {
             border-color: #bae6fd;
         }
+
+        .btn-mark-correct, .btn-mark-incorrect {
+            display: inline-block;
+            margin-top: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            font-family: inherit;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-mark-correct {
+            background: #fff;
+            color: var(--success-text);
+            border: 1px solid var(--success-border);
+        }
+        .btn-mark-correct:hover { background: var(--success-bg); }
+
+        .btn-mark-incorrect {
+            background: #fff;
+            color: var(--text-muted);
+            border: 1px solid #e2e8f0;
+        }
+        .btn-mark-incorrect:hover { background: #fef2f2; color: var(--error-text); border-color: var(--error-border); }
         
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -1300,6 +1326,10 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
         }
 
         function isSolved(task, q) {
+            // Check manual override first
+            const manual = JSON.parse(localStorage.getItem('terra-sql-manual') || '[]');
+            if (manual.includes(task.id)) return true;
+            // Auto check
             if (!db || !q || !q.trim()) return false;
             try {
                 const ur = db.exec(q);
@@ -1342,19 +1372,17 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             if (match) {
                 html += '<div class="message success" style="margin-bottom:0.5rem">Korrekt!</div>';
-                const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
-                saved[id] = q;
-                localStorage.setItem('terra-sql', JSON.stringify(saved));
-                const taskEl = document.querySelector(`.task[data-id="${id}"]`);
-                taskEl.classList.add('solved', 'expanded');
-                taskEl.querySelector('.task-header').setAttribute('onclick', 'toggleSolved(this.parentElement)');
-                const badge = taskEl.querySelector('.badge');
-                badge.classList.add('solved');
-                badge.innerHTML = `N${task.n}`;
-                updateStats();
-                updateNiveauProgress(task.n);
+                markTaskSolved(id, task, q);
             } else {
-                html += '<div class="message warning" style="margin-bottom:0.5rem">Vergleiche dein Ergebnis mit dem erwarteten Ergebnis.</div>';
+                const manual = JSON.parse(localStorage.getItem('terra-sql-manual') || '[]');
+                const isManual = manual.includes(id);
+                if (isManual) {
+                    html += '<div class="message success" style="margin-bottom:0.5rem">Manuell als richtig markiert.</div>';
+                    html += `<button class="btn-mark-incorrect" onclick="event.stopPropagation(); markIncorrect('${id}')">Doch falsch — Markierung entfernen</button>`;
+                } else {
+                    html += '<div class="message warning" style="margin-bottom:0.5rem">Vergleiche dein Ergebnis mit dem erwarteten Ergebnis.</div>';
+                    html += `<button class="btn-mark-correct" onclick="event.stopPropagation(); markCorrect('${id}')">Stimmt trotzdem — als richtig markieren</button>`;
+                }
             }
 
             // Student result
@@ -1368,6 +1396,71 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             html += '</div>';
 
             el.innerHTML = html;
+        }
+
+        function markTaskSolved(id, task, q) {
+            const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
+            saved[id] = q;
+            localStorage.setItem('terra-sql', JSON.stringify(saved));
+            const taskEl = document.querySelector(`.task[data-id="${id}"]`);
+            taskEl.classList.add('solved', 'expanded');
+            taskEl.querySelector('.task-header').setAttribute('onclick', 'toggleSolved(this.parentElement)');
+            const badge = taskEl.querySelector('.badge');
+            badge.classList.add('solved');
+            badge.innerHTML = `N${task.n}`;
+            updateStats();
+            updateNiveauProgress(task.n);
+        }
+
+        function markTaskUnsolved(id, task) {
+            // Remove from manual
+            let manual = JSON.parse(localStorage.getItem('terra-sql-manual') || '[]');
+            manual = manual.filter(x => x !== id);
+            localStorage.setItem('terra-sql-manual', JSON.stringify(manual));
+            // Remove from saved
+            const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
+            delete saved[id];
+            localStorage.setItem('terra-sql', JSON.stringify(saved));
+            // Update UI
+            const taskEl = document.querySelector(`.task[data-id="${id}"]`);
+            taskEl.classList.remove('solved', 'expanded');
+            taskEl.querySelector('.task-header').removeAttribute('onclick');
+            const badge = taskEl.querySelector('.badge');
+            badge.classList.remove('solved');
+            badge.innerHTML = `N${task.n}`;
+            document.getElementById('res-' + id).innerHTML = '';
+            updateStats();
+            updateNiveauProgress(task.n);
+        }
+
+        function markCorrect(id) {
+            const task = tasks.find(t => t.id === id);
+            const q = document.getElementById('t-' + id).value;
+            // Save to manual overrides
+            const manual = JSON.parse(localStorage.getItem('terra-sql-manual') || '[]');
+            if (!manual.includes(id)) manual.push(id);
+            localStorage.setItem('terra-sql-manual', JSON.stringify(manual));
+            markTaskSolved(id, task, q);
+            // Update result area
+            const el = document.getElementById('res-' + id);
+            const msg = el.querySelector('.message');
+            if (msg) {
+                msg.className = 'message success';
+                msg.style.marginBottom = '0.5rem';
+                msg.innerHTML = 'Manuell als richtig markiert.';
+            }
+            // Replace mark button with unmark button
+            const btn = el.querySelector('.btn-mark-correct');
+            if (btn) {
+                btn.className = 'btn-mark-incorrect';
+                btn.innerHTML = 'Doch falsch — Markierung entfernen';
+                btn.setAttribute('onclick', `event.stopPropagation(); markIncorrect('${id}')`);
+            }
+        }
+
+        function markIncorrect(id) {
+            const task = tasks.find(t => t.id === id);
+            markTaskUnsolved(id, task);
         }
         
         function runTask(id) { 
