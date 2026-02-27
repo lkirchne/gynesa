@@ -896,18 +896,18 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             { id: 'n0-4', n: '0', title: 'Top 5 h\u00f6chste Berge', desc: 'Zeige die 5 h\u00f6chsten Berge (Name und H\u00f6he), absteigend sortiert!', hint: 'ORDER BY ... DESC und LIMIT', sol: 'SELECT B_NAME, HOEHE FROM BERG ORDER BY HOEHE DESC LIMIT 5' },
             { id: 'n0-5', n: '0', title: 'Achttausender', desc: 'Welche Berge sind h\u00f6her als 8000 Meter? Zeige Name und H\u00f6he!', hint: 'WHERE HOEHE > 8000', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE > 8000 ORDER BY HOEHE DESC' },
             { id: 'n0-6', n: '0', title: 'Berge im Himalaya', desc: 'Zeige alle Berge, die im Himalaya liegen!', hint: 'WHERE GEBIRGE = \'Himalaya\'', sol: 'SELECT * FROM BERG WHERE GEBIRGE = \'Himalaya\'' },
-            { id: 'n0-7', n: '0', title: 'Mount-Berge', desc: 'Finde alle Berge, deren Name mit "Mount" beginnt!', hint: 'LIKE \'Mount%\'', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE B_NAME LIKE \'Mount%\'' },
+            { id: 'n0-7', n: '0', title: 'Mount-Berge', desc: 'Finde alle Berge, deren Name mit "Mount" beginnt! Zeige Name und H\u00f6he!', hint: 'LIKE \'Mount%\'', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE B_NAME LIKE \'Mount%\'' },
             { id: 'n0-8', n: '0', title: 'Gro\u00dfe L\u00e4nder', desc: 'Welche L\u00e4nder haben mehr als 100 Millionen Einwohner? Sortiere absteigend!', hint: 'WHERE EINWOHNER > 100000000 und ORDER BY', sol: 'SELECT L_NAME, EINWOHNER FROM LAND WHERE EINWOHNER > 100000000 ORDER BY EINWOHNER DESC' },
             { id: 'n0-9', n: '0', title: 'Lange Fl\u00fcsse', desc: 'Welche Fl\u00fcsse sind l\u00e4nger als 5000 km? Zeige Name und L\u00e4nge!', hint: 'WHERE LAENGE > 5000', sol: 'SELECT F_NAME, LAENGE FROM FLUSS WHERE LAENGE > 5000 ORDER BY LAENGE DESC' },
             { id: 'n0-10', n: '0', title: 'St\u00e4dte in Deutschland', desc: 'Zeige alle St\u00e4dte in Deutschland mit Einwohnerzahl! (L_ID = \'D\')', hint: 'WHERE L_ID = \'D\' auf Tabelle STADT', sol: 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE L_ID = \'D\' ORDER BY EINWOHNER DESC' },
-            { id: 'n0-11', n: '0', title: 'Millionenst\u00e4dte', desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner?', hint: 'WHERE EINWOHNER > 5000000 auf STADT', sol: 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE EINWOHNER > 5000000 ORDER BY EINWOHNER DESC' },
-            { id: 'n0-12', n: '0', title: 'Sandw\u00fcsten', desc: 'Zeige alle W\u00fcsten vom Typ "Sand"! (Tabelle: WUESTE, Spalte: WUESTENART)', hint: 'WHERE WUESTENART = \'Sand\'', sol: 'SELECT W_NAME, FLAECHE, WUESTENART FROM WUESTE WHERE WUESTENART = \'Sand\'' },
-            { id: 'n0-13', n: '0', title: 'Gro\u00dfe Inseln', desc: 'Welche Inseln sind gr\u00f6\u00dfer als 100.000 km\u00b2? (Tabelle: INSEL)', hint: 'WHERE FLAECHE > 100000', sol: 'SELECT I_NAME, FLAECHE FROM INSEL WHERE FLAECHE > 100000 ORDER BY FLAECHE DESC' },
+            { id: 'n0-11', n: '0', title: 'Millionenst\u00e4dte', desc: 'Welche St\u00e4dte haben mehr als 5 Millionen Einwohner? Zeige Name und Einwohnerzahl!', hint: 'WHERE EINWOHNER > 5000000 auf STADT', sol: 'SELECT ST_NAME, EINWOHNER FROM STADT WHERE EINWOHNER > 5000000 ORDER BY EINWOHNER DESC' },
+            { id: 'n0-12', n: '0', title: 'Sandw\u00fcsten', desc: 'Zeige alle W\u00fcsten vom Typ "Sand" mit Name, Fl\u00e4che und W\u00fcstenart! (Tabelle: WUESTE, Spalte: WUESTENART)', hint: 'WHERE WUESTENART = \'Sand\'', sol: 'SELECT W_NAME, FLAECHE, WUESTENART FROM WUESTE WHERE WUESTENART = \'Sand\'' },
+            { id: 'n0-13', n: '0', title: 'Gro\u00dfe Inseln', desc: 'Welche Inseln sind gr\u00f6\u00dfer als 100.000 km\u00b2? Zeige Name und Fl\u00e4che! (Tabelle: INSEL)', hint: 'WHERE FLAECHE > 100000', sol: 'SELECT I_NAME, FLAECHE FROM INSEL WHERE FLAECHE > 100000 ORDER BY FLAECHE DESC' },
             { id: 'n0-14', n: '0', title: 'Tiefe Meere', desc: 'Zeige alle Meere sortiert nach Tiefe (tiefstes zuerst)! (Tabelle: MEER)', hint: 'ORDER BY TIEFE DESC', sol: 'SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC' },
             { id: 'n0-15', n: '0', title: 'Hauptstadt mit A', desc: 'Welche L\u00e4nder haben eine Hauptstadt, die mit "A" anf\u00e4ngt?', hint: 'WHERE HAUPTSTADT LIKE \'A%\'', sol: 'SELECT L_NAME, HAUPTSTADT FROM LAND WHERE HAUPTSTADT LIKE \'A%\'' },
-            { id: 'n0-16', n: '0', title: 'Berge zwischen 4000 und 5000m', desc: 'Finde alle Berge zwischen 4000 und 5000 Meter H\u00f6he!', hint: 'BETWEEN ... AND ... oder zwei Bedingungen mit AND', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000' },
-            { id: 'n0-17', n: '0', title: 'Alpen oder Anden', desc: 'Zeige alle Berge in den Alpen ODER den Anden!', hint: 'WHERE ... IN (...) oder WHERE ... OR ...', sol: 'SELECT B_NAME, GEBIRGE, HOEHE FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')' },
-            { id: 'n0-18', n: '0', title: 'Seen mit gro\u00dfer Fl\u00e4che', desc: 'Welche Seen haben eine Fl\u00e4che von mehr als 10.000 km\u00b2? (Tabelle: SEE)', hint: 'WHERE FLAECHE > 10000', sol: 'SELECT S_NAME, FLAECHE FROM SEE WHERE FLAECHE > 10000 ORDER BY FLAECHE DESC' },
+            { id: 'n0-16', n: '0', title: 'Berge zwischen 4000 und 5000m', desc: 'Finde alle Berge zwischen 4000 und 5000 Meter H\u00f6he! Zeige Name und H\u00f6he!', hint: 'BETWEEN ... AND ... oder zwei Bedingungen mit AND', sol: 'SELECT B_NAME, HOEHE FROM BERG WHERE HOEHE BETWEEN 4000 AND 5000' },
+            { id: 'n0-17', n: '0', title: 'Alpen oder Anden', desc: 'Zeige alle Berge in den Alpen ODER den Anden! (Name, Gebirge und H\u00f6he)', hint: 'WHERE ... IN (...) oder WHERE ... OR ...', sol: 'SELECT B_NAME, GEBIRGE, HOEHE FROM BERG WHERE GEBIRGE IN (\'Alpen\', \'Anden\')' },
+            { id: 'n0-18', n: '0', title: 'Seen mit gro\u00dfer Fl\u00e4che', desc: 'Welche Seen haben eine Fl\u00e4che von mehr als 10.000 km\u00b2? Zeige Name und Fl\u00e4che! (Tabelle: SEE)', hint: 'WHERE FLAECHE > 10000', sol: 'SELECT S_NAME, FLAECHE FROM SEE WHERE FLAECHE > 10000 ORDER BY FLAECHE DESC' },
 
             // =====================================================
             // Niveau 1: Aggregation (COUNT, MAX, MIN, AVG, SUM)
@@ -920,8 +920,8 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
             { id: 'n1-6', n: '1', title: 'Durchschnittliche Bergh\u00f6he', desc: 'Durchschnittliche H\u00f6he aller Berge?', hint: 'AVG(HOEHE)', sol: 'SELECT AVG(HOEHE) FROM BERG' },
             { id: 'n1-7', n: '1', title: 'Anzahl St\u00e4dte', desc: 'Wie viele St\u00e4dte enth\u00e4lt die Datenbank?', hint: 'COUNT(*) auf STADT', sol: 'SELECT COUNT(*) FROM STADT' },
             { id: 'n1-8', n: '1', title: 'Tiefster See', desc: 'Wie hei\u00dft der tiefste See und wie tief ist er?', hint: 'ORDER BY TIEFE DESC LIMIT 1', sol: 'SELECT S_NAME, TIEFE FROM SEE ORDER BY TIEFE DESC LIMIT 1' },
-            { id: 'n1-9', n: '1', title: 'Gr\u00f6\u00dfte Insel', desc: 'Welche Insel hat die gr\u00f6\u00dfte Fl\u00e4che?', hint: 'ORDER BY FLAECHE DESC LIMIT 1 auf INSEL', sol: 'SELECT I_NAME, FLAECHE FROM INSEL ORDER BY FLAECHE DESC LIMIT 1' },
-            { id: 'n1-10', n: '1', title: 'Tiefstes Meer', desc: 'Welches Meer ist am tiefsten?', hint: 'ORDER BY TIEFE DESC LIMIT 1 auf MEER', sol: 'SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC LIMIT 1' },
+            { id: 'n1-9', n: '1', title: 'Gr\u00f6\u00dfte Insel', desc: 'Welche Insel hat die gr\u00f6\u00dfte Fl\u00e4che? Zeige Name und Fl\u00e4che!', hint: 'ORDER BY FLAECHE DESC LIMIT 1 auf INSEL', sol: 'SELECT I_NAME, FLAECHE FROM INSEL ORDER BY FLAECHE DESC LIMIT 1' },
+            { id: 'n1-10', n: '1', title: 'Tiefstes Meer', desc: 'Welches Meer ist am tiefsten? Zeige Name und Tiefe!', hint: 'ORDER BY TIEFE DESC LIMIT 1 auf MEER', sol: 'SELECT M_NAME, TIEFE FROM MEER ORDER BY TIEFE DESC LIMIT 1' },
             { id: 'n1-11', n: '1', title: 'Anzahl W\u00fcsten', desc: 'Wie viele W\u00fcsten gibt es in der Datenbank?', hint: 'COUNT(*) auf WUESTE', sol: 'SELECT COUNT(*) FROM WUESTE' },
 
             // =====================================================
@@ -951,12 +951,12 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
               sol: 'SELECT s.ST_NAME, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID' },
 
             { id: 'n3a-2', n: '3a', title: 'Deutsche St\u00e4dte mit Land',
-              desc: 'Zeige alle St\u00e4dte in Deutschland mit ihrem L\u00e4ndernamen! (L_ID = \'D\')',
+              desc: 'Zeige alle St\u00e4dte in Deutschland mit Einwohnerzahl und L\u00e4ndernamen! (L_ID = \'D\')',
               hint: 'Tabellen: STADT, LAND — JOIN wie vorher, dann WHERE s.L_ID = \'D\'',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE s.L_ID = \'D\' ORDER BY s.EINWOHNER DESC' },
 
             { id: 'n3a-3', n: '3a', title: 'Top 10 gr\u00f6\u00dfte St\u00e4dte + Land',
-              desc: 'Zeige die 10 einwohnerreichsten St\u00e4dte mit ihrem L\u00e4ndernamen!',
+              desc: 'Zeige die 10 einwohnerreichsten St\u00e4dte mit Einwohnerzahl und L\u00e4ndernamen!',
               hint: 'Tabellen: STADT, LAND — JOIN + ORDER BY s.EINWOHNER DESC LIMIT 10',
               sol: 'SELECT s.ST_NAME, s.EINWOHNER, l.L_NAME FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID ORDER BY s.EINWOHNER DESC LIMIT 10' },
 
@@ -989,7 +989,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
 
             // -- Phase 4: WHERE auf die andere Tabelle --
             { id: 'n3a-5', n: '3a', title: 'St\u00e4dte in gro\u00dfen L\u00e4ndern',
-              desc: 'Zeige alle St\u00e4dte in L\u00e4ndern mit mehr als 100 Millionen Einwohnern! Beachte: Die Bedingung gilt f\u00fcr die <em>Land</em>-Tabelle, nicht f\u00fcr die Stadt.',
+              desc: 'Zeige alle St\u00e4dte in L\u00e4ndern mit mehr als 100 Millionen Einwohnern! Zeige Stadtname, L\u00e4ndername und Einwohnerzahl des Landes. Beachte: Die Bedingung gilt f\u00fcr die <em>Land</em>-Tabelle, nicht f\u00fcr die Stadt.',
               hint: 'Tabellen: STADT, LAND — JOIN + WHERE l.EINWOHNER > 100000000',
               sol: 'SELECT s.ST_NAME, l.L_NAME, l.EINWOHNER FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.EINWOHNER > 100000000 ORDER BY l.EINWOHNER DESC' },
 
@@ -999,7 +999,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
               sol: 'SELECT f.F_NAME, m.M_NAME, m.TIEFE FROM FLUSS f JOIN MEER m ON f.MEER = m.M_NAME WHERE m.TIEFE > 3000 ORDER BY m.TIEFE DESC' },
 
             { id: 'n3a-6', n: '3a', title: 'St\u00e4dte in Riesenl\u00e4ndern',
-              desc: 'Welche St\u00e4dte liegen in L\u00e4ndern mit mehr als 5 Millionen km\u00b2 Fl\u00e4che?',
+              desc: 'Welche St\u00e4dte liegen in L\u00e4ndern mit mehr als 5 Millionen km\u00b2 Fl\u00e4che? Zeige Stadtname, L\u00e4ndername und Fl\u00e4che!',
               hint: 'Tabellen: STADT, LAND — JOIN + WHERE l.FLAECHE > 5000000',
               sol: 'SELECT s.ST_NAME, l.L_NAME, l.FLAECHE FROM STADT s JOIN LAND l ON s.L_ID = l.L_ID WHERE l.FLAECHE > 5000000' },
 
@@ -1096,7 +1096,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
               sol: 'SELECT l.L_NAME, COUNT(*) AS Anzahl FROM LAND l JOIN GEO_FLUSS gf ON l.L_ID = gf.L_ID GROUP BY l.L_NAME ORDER BY Anzahl DESC LIMIT 10' },
 
             { id: 'n4-6', n: '4', title: 'Europ\u00e4ische Berge',
-              desc: 'Zeige alle Berge in europ\u00e4ischen L\u00e4ndern mit L\u00e4ndername! (K_NAME = \'Europa\' in UMFASST)',
+              desc: 'Zeige alle Berge in europ\u00e4ischen L\u00e4ndern mit H\u00f6he und L\u00e4ndername! (K_NAME = \'Europa\' in UMFASST)',
               hint: '4 Tabellen: BERG \u2192 GEO_BERG \u2192 LAND + UMFASST',
               sol: 'SELECT b.B_NAME, b.HOEHE, l.L_NAME FROM BERG b JOIN GEO_BERG gb ON b.B_NAME = gb.B_NAME JOIN LAND l ON gb.L_ID = l.L_ID JOIN UMFASST u ON l.L_ID = u.L_ID WHERE u.K_NAME = \'Europa\' ORDER BY b.HOEHE DESC' },
 
