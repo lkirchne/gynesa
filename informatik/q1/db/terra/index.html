@@ -244,6 +244,23 @@
         }
         
         .btn-primary:hover { background: #2563eb; border-color: transparent; }
+
+        .btn-quote {
+            font-family: var(--code-font);
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.4rem 0.7rem;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .btn-quote:hover { background: #e2e8f0; }
         
         .table-wrapper {
             width: 100%;
@@ -547,6 +564,7 @@
                 <div class="button-group">
                     <button class="btn-primary" onclick="runMain()">Abfrage Ausführen</button>
                     <button onclick="clearMain()">Leeren</button>
+                    <button class="btn-quote" onclick="insertChar('main-editor')">&apos; Anf&uuml;hrungszeichen</button>
                 </div>
                 <h3 id="main-result-header" style="display:none; margin-top: 1.5rem; font-size: 1rem; color: var(--text-muted);">Ergebnis:</h3>
                 <div id="main-result"></div>
@@ -1309,6 +1327,7 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
                                 <button class="btn-primary" onclick="event.stopPropagation(); checkTask('${t.id}')">Überprüfen</button>
                                 <button onclick="event.stopPropagation(); runTask('${t.id}')">Nur Ausführen</button>
                                 <button onclick="event.stopPropagation(); toggleHint('${t.id}')">Hinweis</button>
+                                <button class="btn-quote" onclick="event.stopPropagation(); insertChar('t-${t.id}')">' </button>
                             </div>
                             <div id="hint-${t.id}" class="hint"><strong>Tipp:</strong> ${t.hint}</div>
                             <div id="res-${t.id}"></div>
@@ -1475,6 +1494,17 @@ JOIN LAND l ON gb.L_ID = l.L_ID;</code>
         }
         
         function toggleHint(id) { document.getElementById('hint-' + id).classList.toggle('visible'); }
+
+        function insertChar(textareaId) {
+            const ta = document.getElementById(textareaId);
+            if (!ta) return;
+            const start = ta.selectionStart;
+            const end = ta.selectionEnd;
+            const val = ta.value;
+            ta.value = val.substring(0, start) + "'" + val.substring(end);
+            ta.selectionStart = ta.selectionEnd = start + 1;
+            ta.focus();
+        }
         
         function updateStats() {
             const saved = JSON.parse(localStorage.getItem('terra-sql') || '{}');
