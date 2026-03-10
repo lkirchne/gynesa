@@ -65,6 +65,13 @@ h1 {
 }
 .tab-btn:hover { color: var(--ink); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn.locked { color: var(--border); cursor: not-allowed; }
+.tab-btn.locked:hover { color: var(--border); }
+.tab-btn.unlocked-flash { animation: unlockPulse 0.6s ease; }
+@keyframes unlockPulse {
+  0%   { background: var(--accent-l); }
+  100% { background: transparent; }
+}
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
@@ -300,15 +307,16 @@ footer {
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" onclick="switchTab('angriffe', this)">Angriffsmethoden</button>
-    <button class="tab-btn" onclick="switchTab('check', this)">Passwort-Check</button>
-    <button class="tab-btn" onclick="switchTab('phrase', this)">Passphrase</button>
+    <button class="tab-btn active" onclick="switchTab('problem', this)">Das Problem</button>
+    <button class="tab-btn" onclick="switchTab('loesung', this)">Die Lösung</button>
+    <button class="tab-btn" onclick="switchTab('methoden', this)">Methoden</button>
     <button class="tab-btn" onclick="switchTab('quiz', this)">Quiz</button>
+    <button class="tab-btn locked" id="tab-btn-check" onclick="tryCheck(this)">🔒 Passwort-Check</button>
   </nav>
 
 
-  <!-- ═══ ANGRIFFSMETHODEN ═══ -->
-  <div id="tab-angriffe" class="tab-content active">
+  <!-- ═══ DAS PROBLEM ═══ -->
+  <div id="tab-problem" class="tab-content active">
 
     <div class="card">
       <div class="card-heading">Wie kommen Angreifer an Passwörter?</div>
@@ -365,6 +373,12 @@ footer {
       </div>
 
     </div>
+
+  </div>
+
+
+  <!-- ═══ DIE LÖSUNG ═══ -->
+  <div id="tab-loesung" class="tab-content">
 
     <div class="card">
       <div class="card-heading">Was dagegen hilft</div>
@@ -472,8 +486,8 @@ footer {
   </div>
 
 
-  <!-- ═══ PASSPHRASE ═══ -->
-  <div id="tab-phrase" class="tab-content">
+  <!-- ═══ METHODEN ═══ -->
+  <div id="tab-methoden" class="tab-content">
 
     <div class="card">
       <div class="card-heading">Passphrase — lang, merkbar, sicher</div>
@@ -663,7 +677,7 @@ footer {
 </div>
 
 <footer>
-  Passwort-Labor · Informatik Klasse 5 · Gymnasium Neue Sandkaul<br>
+  Passwort-Labor · Informatik Klasse 5 · Gymnasium Neue Sandkaul, NRW<br>
   Keine Passwörter werden gespeichert oder übertragen — alle Berechnungen laufen lokal im Browser.
 </footer>
 
@@ -721,6 +735,7 @@ function renderPhrase() {
 
 function testPhrase() {
   if (!phraseWords.length) return;
+  if (!checkUnlocked) { switchTabByName('quiz'); initQuiz(); return; }
   switchTabByName('check');
   const inp = document.getElementById('pwInput');
   inp.value = phraseWords.join(phraseSep);
@@ -874,7 +889,7 @@ function toggleVis() {
 }
 
 // ── TABS ───────────────────────────────────────────────────
-const TAB_NAMES = ['angriffe', 'check', 'phrase', 'quiz'];
+const TAB_NAMES = ['problem', 'loesung', 'methoden', 'quiz', 'check'];
 
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -890,6 +905,24 @@ function switchTabByName(name) {
   document.getElementById('tab-' + name).classList.add('active');
   const i = TAB_NAMES.indexOf(name);
   if (i >= 0) document.querySelectorAll('.tab-btn')[i].classList.add('active');
+}
+
+let checkUnlocked = false;
+
+function unlockAndGo() {
+  checkUnlocked = true;
+  const btn = document.getElementById('tab-btn-check');
+  btn.classList.remove('locked');
+  btn.textContent = 'Passwort-Check';
+  btn.setAttribute('onclick', "switchTab('check', this)");
+  btn.classList.add('unlocked-flash');
+  switchTabByName('check');
+}
+
+function tryCheck(btn) {
+  if (checkUnlocked) { switchTab('check', btn); return; }
+  switchTabByName('quiz');
+  initQuiz();
 }
 
 // ── QUIZ ───────────────────────────────────────────────────
@@ -988,17 +1021,25 @@ function answer(i) {
 function nextQ() { qIdx++; renderQ(); }
 
 function renderScore() {
-  const msg = qPts === 5 ? 'Alles richtig.' :
+  const msg = qPts === 5 ? 'Alles richtig — du hast alles verstanden.' :
               qPts >= 4  ? 'Fast perfekt.' :
-              qPts >= 3  ? 'Gut. Schau nochmal in die Angriffsmethoden.' :
-                           'Lies die Angriffsmethoden nochmal durch.';
+              qPts >= 3  ? 'Gut. Schau nochmal in „Die Lösung".' :
+                           'Lies die Tabs nochmal durch.';
+  const unlockHtml = !checkUnlocked
+    ? `<div style="margin-top:24px;padding:18px 20px;background:var(--accent-l);border:1px solid #a8d5be;border-radius:8px;text-align:center;">
+        <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:6px;">Passwort-Check freigeschaltet!</div>
+        <div style="font-size:0.87rem;color:var(--ink2);margin-bottom:14px;">Jetzt kannst du eigene Passwörter testen.</div>
+        <button class="btn btn-primary" onclick="unlockAndGo()">Zum Passwort-Check →</button>
+      </div>`
+    : `<div style="margin-top:16px;"><button class="btn btn-outline" onclick="switchTabByName('check')">Zum Passwort-Check →</button></div>`;
   document.getElementById('quizInner').innerHTML = `
     <div class="card-heading">Ergebnis</div>
     <div class="score-wrap">
       <div class="score-num">${qPts}/${Qs.length}</div>
       <div class="score-msg">${msg}</div>
-      <div style="margin-top:22px;"><button class="btn btn-primary" onclick="initQuiz()">Nochmal</button></div>
+      <div style="margin-top:16px;"><button class="btn btn-primary" onclick="initQuiz()">Nochmal</button></div>
     </div>
+    ${unlockHtml}
   `;
 }
 
