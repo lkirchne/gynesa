@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passwort-Labor · Informatik Klasse 5</title>
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=fraunces:400,400i,700,900|libre-franklin:400,600,700|ibm-plex-mono:400,600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:       #f7f4ef;
+  --surface:  #ffffff;
+  --ink:      #1c1c1a;
+  --ink2:     #4a4a46;
+  --ink3:     #9a9a94;
+  --accent:   #2d6a4f;
+  --accent-l: #d8ede4;
+  --warn:     #c0392b;
+  --warn-l:   #fbe9e7;
+  --gold:     #b5651d;
+  --gold-l:   #fdf0e3;
+  --border:   #e0ddd6;
+  --shadow:   0 2px 12px rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: 'Libre Franklin', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.page { max-width: 820px; margin: 0 auto; padding: 32px 24px 64px; }
+
+header { margin-bottom: 36px; border-bottom: 3px solid var(--ink); padding-bottom: 20px; }
+
+.eyebrow {
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 8px;
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 6vw, 2.9rem);
+  font-weight: 900; line-height: 1.05; color: var(--ink); margin-bottom: 6px;
+}
+
+.tagline { color: var(--ink2); font-size: 1rem; }
+
+.tabs {
+  display: flex; gap: 0; margin-bottom: 28px;
+  border-bottom: 2px solid var(--border); overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 10px 20px; border: none; background: transparent;
+  font-family: 'Libre Franklin', sans-serif; font-weight: 600; font-size: 0.9rem;
+  color: var(--ink3); cursor: pointer; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap; flex-shrink: 0;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 28px 32px; margin-bottom: 18px; box-shadow: var(--shadow);
+}
+
+.card-heading {
+  font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700;
+  color: var(--ink); margin-bottom: 16px;
+}
+
+.pw-wrap { position: relative; margin-bottom: 18px; }
+
+.pw-input {
+  width: 100%; padding: 13px 48px 13px 16px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 1rem;
+  border: 2px solid var(--border); border-radius: 6px; background: var(--bg);
+  color: var(--ink); outline: none; letter-spacing: 0.04em; transition: border-color 0.15s;
+}
+.pw-input:focus { border-color: var(--accent); }
+
+.pw-toggle {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--ink3); line-height: 1;
+}
+
+.strength-track { height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 9px; }
+.strength-fill { height: 100%; border-radius: 4px; transition: width 0.35s ease, background-color 0.25s; width: 0; }
+.strength-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; }
+.strength-text { font-weight: 700; font-size: 0.9rem; transition: color 0.2s; color: var(--ink3); }
+.crack-short   { font-size: 0.82rem; color: var(--ink3); font-family: 'IBM Plex Mono', monospace; }
+
+.criteria { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 18px; }
+@media (max-width: 460px) { .criteria { grid-template-columns: 1fr; } }
+
+.crit {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 5px;
+  font-size: 0.83rem; font-weight: 600; color: var(--ink3); transition: all 0.2s;
+}
+.crit.met { background: var(--accent-l); border-color: #a8d5be; color: var(--accent); }
+.crit-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.2s; }
+.crit.met .crit-dot { background: var(--accent); }
+
+.crack-box {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.crack-key { font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink3); }
+.crack-note { font-size: 0.76rem; color: var(--ink3); font-style: italic; margin-top: 2px; }
+.crack-val { font-family: 'IBM Plex Mono', monospace; font-size: 1rem; font-weight: 600; text-align: right; transition: color 0.25s; }
+
+.comp-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.comp-table th {
+  text-align: left; padding: 7px 12px; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink3); border-bottom: 2px solid var(--border);
+}
+.comp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: var(--bg); }
+.pw-mono { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 0.88rem; }
+
+.chip { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; }
+.chip-bad  { background: var(--warn-l); color: var(--warn); }
+.chip-mid  { background: var(--gold-l); color: var(--gold); }
+.chip-good { background: var(--accent-l); color: var(--accent); }
+
+/* PASSPHRASE */
+.phrase-output {
+  background: var(--bg); border: 2px solid var(--border); border-radius: 8px;
+  padding: 24px 20px; margin: 18px 0; min-height: 90px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+}
+.phrase-words { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; }
+.phrase-word {
+  font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 700;
+  background: var(--surface); border: 2px solid var(--border); border-radius: 6px; padding: 5px 13px;
+}
+.phrase-word:nth-child(odd)  { border-color: #a8d5be; color: var(--accent); }
+.phrase-word:nth-child(even) { border-color: #f9c784; color: var(--gold); }
+.phrase-sep-inline { font-family: 'IBM Plex Mono', monospace; color: var(--ink3); font-size: 1.1rem; }
+.phrase-full { font-family: 'IBM Plex Mono', monospace; font-size: 0.88rem; color: var(--ink3); word-break: break-all; text-align: center; }
+
+.entropy-row { display: flex; gap: 10px; margin-top: 4px; }
+.entropy-box { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 11px 12px; text-align: center; }
+.entropy-val { font-family: 'IBM Plex Mono', monospace; font-size: 1rem; font-weight: 600; color: var(--accent); display: block; }
+.entropy-key { font-size: 0.7rem; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-top: 2px; }
+
+.sep-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.sep-label { font-size: 0.84rem; font-weight: 600; color: var(--ink2); white-space: nowrap; }
+.sep-options { display: flex; gap: 5px; flex-wrap: wrap; }
+.sep-btn {
+  padding: 4px 11px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; cursor: pointer; color: var(--ink); transition: all 0.12s;
+}
+.sep-btn:hover { border-color: var(--accent); color: var(--accent); }
+.sep-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+.callout { border-radius: 6px; padding: 13px 16px; font-size: 0.88rem; line-height: 1.6; margin-bottom: 12px; }
+.callout-green  { background: var(--accent-l); border-left: 3px solid var(--accent); }
+.callout-red    { background: var(--warn-l);   border-left: 3px solid var(--warn); }
+.callout-yellow { background: var(--gold-l);   border-left: 3px solid var(--gold); }
+.callout strong { font-weight: 700; }
+.callout:last-child { margin-bottom: 0; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px; border-radius: 6px; border: none;
+  font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.12s;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #235c40; }
+.btn-outline { background: transparent; border: 2px solid var(--border); color: var(--ink); }
+.btn-outline:hover { border-color: var(--ink); }
+.btn-row { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 14px; }
+
+.tip { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+.tip:last-child { border-bottom: none; }
+.tip-icon { font-size: 1.2rem; min-width: 26px; text-align: center; padding-top: 2px; }
+.tip-title { font-weight: 700; margin-bottom: 3px; font-size: 0.95rem; }
+.tip-body  { font-size: 0.87rem; color: var(--ink2); line-height: 1.55; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+/* BRUTE FORCE DEMO */
+.attack-demo {
+  background: #1c1c1a; border-radius: 8px; padding: 16px 20px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: #666;
+  margin-top: 12px; min-height: 80px; position: relative;
+}
+.attack-current { color: #52b788; font-size: 1.1rem; font-weight: 600; margin: 6px 0; }
+.attack-counter { font-size: 0.72rem; color: #555; }
+.attack-label   { font-size: 0.7rem; color: #444; margin-bottom: 4px; }
+
+/* MASTERPASSWORT */
+.uebung-badge {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-l); padding: 2px 10px; border-radius: 20px;
+  display: inline-block; margin-bottom: 12px;
+}
+
+.master-builder { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+@media (max-width: 500px) { .master-builder { grid-template-columns: 1fr; } }
+
+.master-field label {
+  display: block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 5px;
+}
+.master-input {
+  width: 100%; padding: 10px 13px; font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem;
+  border: 2px solid var(--border); border-radius: 6px; background: var(--bg);
+  color: var(--ink); outline: none; transition: border-color 0.15s;
+}
+.master-input:focus { border-color: var(--accent); }
+
+.master-result {
+  margin-top: 14px; background: var(--bg); border: 2px solid var(--border);
+  border-radius: 8px; padding: 18px 20px; display: none;
+}
+.master-result.show { display: block; }
+
+.master-pw-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.master-pw-row:last-child { margin-bottom: 0; }
+.master-pw-svc { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink3); min-width: 70px; }
+.master-pw-full { font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; font-weight: 600; }
+.pw-part1 { color: var(--accent); }
+.pw-part2 { color: var(--gold); }
+
+/* ZETTEL */
+.zettel {
+  background: #fffdf0; border: 1px solid #e0d870; border-radius: 3px;
+  padding: 20px 24px; margin: 16px 0; font-family: 'IBM Plex Mono', monospace;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.06); position: relative;
+}
+.zettel-title {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: #b0a030;
+  margin-bottom: 12px; font-family: 'Libre Franklin', sans-serif; font-weight: 700;
+}
+.zettel-item { padding: 5px 0; border-bottom: 1px dashed #e0d870; font-size: 0.9rem; color: var(--ink2); }
+.zettel-item:last-child { border-bottom: none; }
+
+.answer-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.answer-btn {
+  padding: 9px 18px; border-radius: 6px; border: 2px solid var(--border); background: var(--surface);
+  font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 0.85rem;
+  cursor: pointer; transition: all 0.12s; color: var(--ink);
+}
+.answer-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.reveal-panel { margin-top: 14px; padding: 16px 18px; border-radius: 6px; display: none; font-size: 0.88rem; line-height: 1.6; }
+.reveal-panel.show { display: block; }
+.reveal-yes { background: var(--warn-l); border-left: 3px solid var(--warn); color: #8b1a13; }
+.reveal-no  { background: var(--accent-l); border-left: 3px solid var(--accent); color: #1d4d38; }
+
+/* QUIZ */
+.quiz-q { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; line-height: 1.4; }
+.quiz-opts { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+.quiz-opt {
+  padding: 11px 15px; border: 2px solid var(--border); border-radius: 6px; background: var(--surface);
+  text-align: left; font-family: 'Libre Franklin', sans-serif; font-size: 0.9rem; font-weight: 600;
+  color: var(--ink); cursor: pointer; transition: border-color 0.12s, background 0.12s;
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-l); }
+.quiz-opt.correct { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+.quiz-opt.wrong   { border-color: var(--warn);   background: var(--warn-l);   color: var(--warn); }
+.quiz-fb {
+  padding: 11px 15px; border-radius: 6px; font-size: 0.87rem; font-weight: 600;
+  display: none; margin-bottom: 12px; line-height: 1.5;
+}
+.quiz-fb.show { display: block; }
+.quiz-fb.ok  { background: var(--accent-l); color: var(--accent); }
+.quiz-fb.err { background: var(--warn-l);   color: var(--warn); }
+.quiz-prog { font-size: 0.8rem; color: var(--ink3); font-family: 'IBM Plex Mono', monospace; }
+.score-wrap { text-align: center; padding: 20px 0; }
+.score-num { font-family: 'Fraunces', serif; font-size: 3.5rem; font-weight: 900; color: var(--accent); line-height: 1; }
+.score-msg { font-size: 1rem; margin-top: 8px; color: var(--ink2); }
+
+footer {
+  text-align: center; padding: 28px 0 0; font-size: 0.76rem; color: var(--ink3);
+  border-top: 1px solid var(--border); margin-top: 36px; line-height: 1.8;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Informatik · Klasse 5 · Gymnasium Neue Sandkaul</div>
+    <h1>Passwort-Labor</h1>
+    <p class="tagline">Was macht ein Passwort wirklich sicher?</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="switchTab('angriffe', this)">Angriffsmethoden</button>
+    <button class="tab-btn" onclick="switchTab('check', this)">Passwort-Check</button>
+    <button class="tab-btn" onclick="switchTab('phrase', this)">Passphrase</button>
+    <button class="tab-btn" onclick="switchTab('quiz', this)">Quiz</button>
+  </nav>
+
+
+  <!-- ═══ ANGRIFFSMETHODEN ═══ -->
+  <div id="tab-angriffe" class="tab-content active">
+
+    <div class="card">
+      <div class="card-heading">Wie kommen Angreifer an Passwörter?</div>
+      <p style="color:var(--ink2);font-size:0.92rem;margin-bottom:20px;">Bevor wir über sichere Passwörter reden: Wie gehen Angreifer eigentlich vor? Das erklärt, warum „Hund123" trotz Großbuchstabe und Zahl kein sicheres Passwort ist.</p>
+
+      <div class="tip">
+        <div class="tip-icon">📖</div>
+        <div>
+          <div class="tip-title">Wörterbuch-Angriff</div>
+          <div class="tip-body">
+            Ein Programm probiert automatisch alle Wörter aus dem Duden — und danach alle Varianten mit Zahlen und Sonderzeichen:
+            <span style="font-family:'IBM Plex Mono',monospace;display:block;margin-top:5px;color:var(--ink);">Hund → Hund1 → Hund! → Hund2013 → Hund2013! …</span>
+            Das dauert keine Sekunde. Jedes echte Einzelwort als Passwort ist damit unsicher.
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <div class="tip-icon">🔨</div>
+        <div>
+          <div class="tip-title">Brute-Force — rohe Gewalt</div>
+          <div class="tip-body">
+            Alle denkbaren Zeichenfolgen werden der Reihe nach durchprobiert: <span style="font-family:'IBM Plex Mono',monospace">a, b … aa, ab … aaa …</span>
+            Eine RTX 4090 (Grafikkarte, ~1.600 €) schafft <strong>164 Milliarden Versuche pro Sekunde</strong> —
+            das entspricht etwa <strong>6 PS5-Grafikkarten</strong> gleichzeitig.
+            Ein 8-Zeichen-Passwort mit Groß-/Kleinbuchstaben und Zahlen ist damit in unter einer Stunde geknackt.
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-outline" style="font-size:0.8rem;padding:7px 14px;" onclick="toggleBruteDemo(this)">Demo ansehen</button>
+            <div class="attack-demo" id="bruteDemo" style="display:none;">
+              <div class="attack-label">Aktueller Versuch:</div>
+              <div class="attack-current" id="bruteCurrent">…</div>
+              <div class="attack-counter" id="bruteCount">0 Versuche</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin:4px 0 8px;padding:12px 15px;background:var(--gold-l);border-left:3px solid var(--gold);border-radius:4px;font-size:0.83rem;color:var(--ink2);line-height:1.6;">
+        <strong>Wichtig für beide Methoden:</strong> So schnell sind die Programme nur, wenn Angreifer eine gestohlene Passwortliste auf ihrem eigenen Computer durchprobieren.
+        Beim direkten Einloggen auf einer Website geht das nicht — da muss das Programm jedes Mal auf eine Antwort warten, und die meisten Seiten sperren den Account nach wenigen Fehlversuchen.
+        Deshalb sperren Websites nach 3–5 falschen Versuchen: genau als Schutz dagegen.
+      </div>
+
+      <div class="tip">
+        <div class="tip-icon">🎭</div>
+        <div>
+          <div class="tip-title">Social Engineering — einfach fragen</div>
+          <div class="tip-body">
+            Jemand gibt sich als IT-Admin, Spieleentwickler oder Freund aus und bittet um das Passwort — per E-Mail, Nachricht oder direkt.
+            Kein echter Dienst fragt jemals nach dem Passwort. Wer fragt, will täuschen.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <div class="card-heading">Was dagegen hilft</div>
+
+      <div class="tip">
+        <div class="tip-icon">📏</div>
+        <div>
+          <div class="tip-title">Länge ist entscheidend</div>
+          <div class="tip-body">Je mehr Zeichen, desto mehr mögliche Kombinationen — und zwar sehr schnell sehr viele. Ein 20-Zeichen-Passwort aus einfachen Wörtern ist sicherer als 8 Zeichen mit Großbuchstaben, Zahlen und Sonderzeichen (!, ?, #…).</div>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🎲</div>
+        <div>
+          <div class="tip-title">Kein Muster, kein echtes Wort</div>
+          <div class="tip-body">„Hund1!" sieht komplex aus — aber das Programm kennt genau dieses Muster und probiert es gezielt: erst alle Wörter, dann Wort+1, Wort+2, Wort+!, und so weiter. Vier zufällige Wörter ohne Zusammenhang sind viel schwerer zu erraten.</div>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🔑</div>
+        <div>
+          <div class="tip-title">Für jeden Dienst ein eigenes Passwort</div>
+          <div class="tip-body">Irgendwo auf der Welt wird regelmäßig eine Website gehackt. Die gestohlenen Passwörter werden sofort bei anderen Seiten ausprobiert — Schule, E-Mail, YouTube. Wer überall dasselbe nutzt, verliert mit einem einzigen Hack alle Konten auf einmal.</div>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🤫</div>
+        <div>
+          <div class="tip-title">Niemals weitergeben</div>
+          <div class="tip-body">Nicht an Freunde, nicht an Eltern, nicht an jemanden, der behauptet für die Schule oder eine Website zu arbeiten. Ein Passwort, das jemand anderes kennt, ist kein sicheres Passwort mehr.</div>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🔄</div>
+        <div>
+          <div class="tip-title">Nicht einfach so wechseln</div>
+          <div class="tip-body">Früher hieß es: „Ändere dein Passwort alle 3 Monate." Das stimmt nicht. Sicherheitsexperten sind sich heute einig: Ein starkes Passwort muss nur dann geändert werden, wenn eine Website gehackt wurde — nicht vorher.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ═══ PASSWORT CHECK ═══ -->
+  <div id="tab-check" class="tab-content">
+
+    <div class="card">
+      <div class="card-heading">Wie sicher ist dein Passwort?</div>
+      <div class="pw-wrap">
+        <input type="password" id="pwInput" class="pw-input"
+          placeholder="Gib hier ein Passwort ein …"
+          autocomplete="new-password" oninput="analyze()">
+        <button class="pw-toggle" onclick="toggleVis()" id="toggleBtn">👁</button>
+      </div>
+      <div class="strength-track"><div class="strength-fill" id="sBar"></div></div>
+      <div class="strength-row">
+        <span class="strength-text" id="sLabel">—</span>
+        <span class="crack-short" id="crackShort"></span>
+      </div>
+      <div class="criteria">
+        <div class="crit" id="c-len"><div class="crit-dot"></div>Mind. 12 Zeichen</div>
+        <div class="crit" id="c-dict"><div class="crit-dot"></div>Kein einzelnes Wörterbuch-Wort</div>
+      </div>
+      <div class="crack-box">
+        <div>
+          <div class="crack-key">Eine RTX 4090 bräuchte dafür</div>
+          <div class="crack-note">~164 Mrd. Versuche/Sek. · ≈ 6 PS5-Grafikkarten · MD5-Hashing · Hive Systems 2024</div>
+        </div>
+        <div class="crack-val" id="crackVal">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-heading">Kurz vs. lang</div>
+      <p style="font-size:0.85rem;color:var(--ink3);margin-bottom:16px;">Knackzeiten für eine RTX 4090 (~164 Mrd. Versuche/Sek., ≈ 6 PS5-Grafikkarten, MD5-Hashing)</p>
+      <table class="comp-table">
+        <thead><tr><th>Passwort</th><th>Zeichen</th><th>Stärke</th><th>Knackzeit</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="pw-mono" style="color:var(--warn)">hallo</td><td>5</td>
+            <td><span class="chip chip-bad">Sehr schwach</span></td>
+            <td style="font-family:'IBM Plex Mono',monospace">&lt; 1 Sekunde</td>
+          </tr>
+          <tr>
+            <td class="pw-mono" style="color:var(--warn)">Hund2015!</td><td>9</td>
+            <td><span class="chip chip-mid">Mittel</span></td>
+            <td style="font-family:'IBM Plex Mono',monospace">~4 Tage¹</td>
+          </tr>
+          <tr>
+            <td class="pw-mono" style="color:var(--gold)">Katze-Regen-Brot-7</td><td>18</td>
+            <td><span class="chip chip-good">Stark</span></td>
+            <td style="font-family:'IBM Plex Mono',monospace">&gt; 1 Mrd. Jahre</td>
+          </tr>
+          <tr>
+            <td class="pw-mono" style="color:var(--accent)">Elefant-Wolke-Pizza-42</td><td>22</td>
+            <td><span class="chip chip-good">Sehr stark</span></td>
+            <td style="font-family:'IBM Plex Mono',monospace">&gt; 1 Billion Jahre</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:var(--ink3);margin-top:10px;">¹ Reiner Brute-Force. Per Wörterbuch-Angriff (Muster „Wort+Jahr+!") schneller.</p>
+    </div>
+
+  </div>
+
+
+  <!-- ═══ PASSPHRASE ═══ -->
+  <div id="tab-phrase" class="tab-content">
+
+    <div class="card">
+      <div class="card-heading">Passphrase — lang, merkbar, sicher</div>
+      <div class="callout callout-green">
+        4 zufällige Wörter aus ~3.000 deutschen Begriffen → über 81 Milliarden Milliarden Kombinationen. Eine RTX 4090 bräuchte dafür länger als das Universum alt ist.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-heading">Generator</div>
+      <div class="phrase-output" id="phraseOut">
+        <div class="phrase-words" id="phraseWords">
+          <span style="color:var(--ink3);font-size:0.9rem;">Klicke auf „Neu würfeln" …</span>
+        </div>
+        <div class="phrase-full" id="phraseFull" style="display:none"></div>
+      </div>
+      <div class="entropy-row" id="phraseStats" style="display:none">
+        <div class="entropy-box"><span class="entropy-val" id="phraseLen">—</span><span class="entropy-key">Zeichen</span></div>
+        <div class="entropy-box"><span class="entropy-val" id="phraseCrack">—</span><span class="entropy-key">Knackzeit</span></div>
+        <div class="entropy-box"><span class="entropy-val" id="phraseScore">—</span><span class="entropy-key">Stärke</span></div>
+      </div>
+      <div class="sep-row" style="margin-top:16px;">
+        <span class="sep-label">Trennzeichen:</span>
+        <div class="sep-options" id="phraseSeps">
+          <button class="sep-btn active" onclick="setSep('-', this)">-</button>
+          <button class="sep-btn" onclick="setSep('.', this)">.</button>
+          <button class="sep-btn" onclick="setSep('_', this)">_</button>
+          <button class="sep-btn" onclick="setSep('!', this)">!</button>
+          <button class="sep-btn" onclick="setSep('+', this)">+</button>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="rollPhrase()">Neu würfeln</button>
+        <button class="btn btn-outline" onclick="testPhrase()">Im Check testen →</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-heading">Eigene Wörter wählen</div>
+      <div class="callout callout-green">
+        <strong>Gut:</strong> Dinge ohne Zusammenhang — Tier, Wetter, Essen, Zahl.<br>
+        <span style="font-family:'IBM Plex Mono',monospace;font-weight:600;display:block;margin-top:4px;">Delfin-Hagel-Pfannkuchen-99</span>
+      </div>
+      <div class="callout callout-yellow">
+        <strong>Vorsicht:</strong> Keine echten Haustiernamen, Geschwister oder Geburtsdaten — die werden bei gezielten Angriffen zuerst probiert.
+      </div>
+      <div class="callout callout-red">
+        <strong>Nicht gut:</strong> Echte Sätze. „IchLiebeMeinenHund" klingt lang, aber Satzmuster werden systematisch getestet.
+      </div>
+      <hr class="divider">
+      <div class="callout callout-yellow" style="margin:0;">
+        <strong>Die Satz-Methode</strong> — aus „Ich esse jeden Montag 2 Scheiben Brot" wird <span style="font-family:'IBM Plex Mono',monospace">IejM2SB</span> — ergibt nur 7 Zeichen. Zu kurz. Eine Passphrase ist merkbarer <em>und</em> länger.
+      </div>
+    </div>
+
+    <!-- MASTERPASSWORT ERKLÄRUNG -->
+    <div class="card">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+        <div class="card-heading" style="margin:0;">Das zweiteilige Passwort-System</div>
+        <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-l);padding:2px 9px;border-radius:20px;">Experten-Tipp</span>
+      </div>
+      <p style="font-size:0.9rem;color:var(--ink2);margin-bottom:18px;">
+        Das Problem: Du brauchst für jeden Dienst ein anderes Passwort — Schule, E-Mail, Spiele, YouTube. Aber wie soll man sich das alles merken?
+        Sicherheitsexperten empfehlen ein System, das genau dieses Problem löst: <strong>ein Passwort aus zwei Teilen</strong>.
+      </p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        <div style="background:var(--accent-l);border:1px solid #a8d5be;border-radius:8px;padding:18px;">
+          <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">Teil 1 — Dein Masterpasswort</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.25rem;font-weight:700;color:var(--accent);margin-bottom:10px;">tisch_himmel</div>
+          <ul style="font-size:0.82rem;color:var(--ink2);list-style:none;line-height:1.9;padding:0;">
+            <li>→ 2 zufällige, unzusammenhängende Wörter</li>
+            <li>→ Merkst du dir im Kopf</li>
+            <li>→ Schreibst du <strong>nirgends</strong> auf</li>
+            <li>→ Bleibt für alle Accounts gleich</li>
+          </ul>
+        </div>
+        <div style="background:var(--gold-l);border:1px solid #f9c784;border-radius:8px;padding:18px;">
+          <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Teil 2 — Das Dienst-Kürzel</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.25rem;font-weight:700;color:var(--gold);margin-bottom:10px;">Schule · YT · Mail</div>
+          <ul style="font-size:0.82rem;color:var(--ink2);list-style:none;line-height:1.9;padding:0;">
+            <li>→ Kurzes Kürzel pro Dienst</li>
+            <li>→ Darf auf einem Zettel stehen</li>
+            <li>→ Ohne Teil 1 völlig nutzlos</li>
+            <li>→ Jeder Account bekommt ein anderes</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="font-size:0.9rem;color:var(--ink2);margin-bottom:12px;">Du hängst Teil 2 einfach an Teil 1 — fertig ist ein einzigartiges Passwort für jeden Dienst:</p>
+
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;font-family:'IBM Plex Mono',monospace;font-size:0.9rem;line-height:2.4;">
+        <div><span style="color:var(--accent);font-weight:600;">tisch_himmel</span><span style="color:var(--gold);font-weight:600;">Schule</span><span style="color:var(--ink3);font-size:0.75rem;font-family:'Libre Franklin',sans-serif;margin-left:12px;">→ Schullogin</span></div>
+        <div><span style="color:var(--accent);font-weight:600;">tisch_himmel</span><span style="color:var(--gold);font-weight:600;">YT</span><span style="color:var(--ink3);font-size:0.75rem;font-family:'Libre Franklin',sans-serif;margin-left:12px;">→ YouTube</span></div>
+        <div><span style="color:var(--accent);font-weight:600;">tisch_himmel</span><span style="color:var(--gold);font-weight:600;">Mail</span><span style="color:var(--ink3);font-size:0.75rem;font-family:'Libre Franklin',sans-serif;margin-left:12px;">→ E-Mail</span></div>
+      </div>
+
+      <div class="callout callout-green" style="margin-top:14px;margin-bottom:0;">
+        Findet jemand deinen Zettel mit den Kürzeln, kann er sich nirgends einloggen — Teil 1 kennt nur du.
+      </div>
+    </div>
+
+    <!-- ÜBUNG 1 -->
+    <div class="card">
+      <div class="uebung-badge">Übung 1</div>
+      <div class="card-heading" style="margin-bottom:8px;">Bau dein eigenes System</div>
+      <p style="font-size:0.9rem;color:var(--ink2);margin-bottom:16px;">
+        Wähle zwei zufällige, unzusammenhängende Wörter als Masterpasswort.
+        Kein echter Name, kein Haustier, keine Lieblingsband.
+        Dann siehst du live, wie deine Passwörter für verschiedene Dienste aussehen würden.
+      </p>
+
+      <div class="master-builder">
+        <div class="master-field">
+          <label>Wort 1</label>
+          <input type="text" class="master-input" id="mw1" placeholder="z.B. Tisch" oninput="updateMaster()">
+        </div>
+        <div class="master-field">
+          <label>Wort 2</label>
+          <input type="text" class="master-input" id="mw2" placeholder="z.B. Himmel" oninput="updateMaster()">
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:0.75rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;">Trennzeichen zwischen den Wörtern</label>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="sep-btn active" onclick="setMasterSep('_',this)">_</button>
+          <button class="sep-btn" onclick="setMasterSep('-',this)">-</button>
+          <button class="sep-btn" onclick="setMasterSep('.',this)">.</button>
+        </div>
+      </div>
+
+      <div class="master-result" id="masterResult">
+        <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;">Deine Passwörter wären:</div>
+        <div class="master-pw-row"><span class="master-pw-svc">Schule</span><span class="master-pw-full" id="mpw-schule"></span></div>
+        <div class="master-pw-row"><span class="master-pw-svc">YouTube</span><span class="master-pw-full" id="mpw-yt"></span></div>
+        <div class="master-pw-row"><span class="master-pw-svc">E-Mail</span><span class="master-pw-full" id="mpw-mail"></span></div>
+        <div class="master-pw-row"><span class="master-pw-svc">Spiel</span><span class="master-pw-full" id="mpw-game"></span></div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:0.82rem;color:var(--ink3);">
+          Dein Masterpasswort (<span style="color:var(--accent);font-weight:600;" id="masterDisplay">—</span>) kennst nur du — es steht nirgends.
+        </div>
+      </div>
+    </div>
+
+    <!-- ÜBUNG 2 -->
+    <div class="card">
+      <div class="uebung-badge">Übung 2</div>
+      <div class="card-heading" style="margin-bottom:8px;">Der gefundene Zettel</div>
+      <p style="font-size:0.9rem;color:var(--ink2);margin-bottom:4px;">
+        Jemand findet in der Schule einen Zettel, der aus deiner Tasche gefallen ist. Darauf steht:
+      </p>
+
+      <div class="zettel">
+        <div class="zettel-title">Meine Dienste</div>
+        <div class="zettel-item">Schule</div>
+        <div class="zettel-item">YT</div>
+        <div class="zettel-item">Mail</div>
+        <div class="zettel-item">Insta</div>
+      </div>
+
+      <p style="font-size:0.9rem;color:var(--ink2);margin-top:14px;margin-bottom:4px;"><strong>Kann die Person damit irgendwo einloggen?</strong></p>
+
+      <div class="answer-btns">
+        <button class="answer-btn" onclick="zettelAnswer('nein')">Nein, das reicht nicht</button>
+        <button class="answer-btn" onclick="zettelAnswer('ja')">Ja, wenn sie es ausprobiert</button>
+      </div>
+
+      <div class="reveal-panel reveal-no" id="zettel-nein">
+        Richtig. Die Kürzel sind nur Teil 2 — sie sind ohne das Masterpasswort wertlos.
+        Wer den Zettel findet, weiß nicht einmal, dass „Schule" ein Kürzel ist. Und selbst wenn — ohne Teil 1 ergibt sich kein vollständiges Passwort.
+        Das ist der Witz am System: Notieren ist erlaubt, weil der Zettel allein niemandem nützt.
+      </div>
+      <div class="reveal-panel reveal-yes" id="zettel-ja">
+        Fast richtig — aber: Die Kürzel sind nur Teil 2. Allein ergeben sie kein Passwort.
+        „Schule" als Passwort einzutippen würde nicht funktionieren. Das vollständige Passwort wäre z.B. <span style="font-family:'IBM Plex Mono',monospace">tisch_himmelSchule</span> — und den ersten Teil kennt nur du.
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ═══ QUIZ ═══ -->
+  <div id="tab-quiz" class="tab-content">
+    <div class="card"><div id="quizInner"></div></div>
+  </div>
+
+</div>
+
+<footer>
+  Passwort-Labor · Informatik Klasse 5 · Gymnasium Neue Sandkaul<br>
+  Keine Passwörter werden gespeichert oder übertragen — alle Berechnungen laufen lokal im Browser.
+</footer>
+
+<script>
+// ── WORD LIST ──────────────────────────────────────────────
+const WORDS = [
+  'Apfel','Banane','Birne','Kirsche','Erdbeere','Mango','Melone','Orange','Traube','Zitrone',
+  'Hund','Katze','Pferd','Elefant','Delfin','Pinguin','Panda','Fuchs','Eule','Krabbe',
+  'Regen','Schnee','Sturm','Nebel','Wolke','Donner','Hagel','Frost','Blitz','Wind',
+  'Pizza','Pasta','Suppe','Brot','Käse','Salat','Kuchen','Waffel','Pfannkuchen','Keks',
+  'Schule','Buch','Stift','Tafel','Heft','Rucksack','Lineal','Schere','Bleistift','Tisch',
+  'Fahrrad','Rakete','Boot','Zug','Traktor','Ballon','Drachen','Brücke','Turm','Burg',
+  'Gitarre','Trommel','Flöte','Geige','Radio','Bühne','Zelt','Lampe','Uhr','Spiegel',
+  'Löwe','Tiger','Bär','Wolf','Adler','Schlange','Frosch','Wal','Hai','Igel',
+  'Mond','Stern','Sonne','Komet','Planet','Galaxis','Teleskop','Himmel','Aurora','Nebula',
+  'Kaktus','Rose','Birke','Eiche','Palme','Pilz','Moos','Farn','Bambus','Tulpe'
+];
+
+const DICT = ['hallo','passwort','password','geheim','qwerty','qwertz','12345','123456',
+              'letmein','welcome','hund','katze','pferd','schule','test','admin','abc123'];
+
+let phraseWords = [], phraseSep = '-';
+
+// ── PASSPHRASE ─────────────────────────────────────────────
+function setSep(s, btn) {
+  phraseSep = s;
+  document.querySelectorAll('#phraseSeps .sep-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (phraseWords.length) renderPhrase();
+}
+
+function rollPhrase() {
+  const pool = [...WORDS].sort(() => Math.random() - 0.5);
+  phraseWords = pool.slice(0, 4);
+  renderPhrase();
+}
+
+function renderPhrase() {
+  const full = phraseWords.join(phraseSep);
+  let html = '';
+  phraseWords.forEach((w, i) => {
+    html += `<span class="phrase-word">${w}</span>`;
+    if (i < phraseWords.length - 1) html += `<span class="phrase-sep-inline">${phraseSep}</span>`;
+  });
+  document.getElementById('phraseWords').innerHTML = html;
+  document.getElementById('phraseFull').textContent = full;
+  document.getElementById('phraseFull').style.display = 'block';
+  document.getElementById('phraseStats').style.display = 'flex';
+  const s = calcScore(full);
+  document.getElementById('phraseLen').textContent = full.length;
+  document.getElementById('phraseCrack').textContent = s.crack;
+  document.getElementById('phraseScore').textContent = s.label;
+  document.getElementById('phraseScore').parentElement.querySelector('.entropy-val').style.color = s.color;
+}
+
+function testPhrase() {
+  if (!phraseWords.length) return;
+  switchTabByName('check');
+  const inp = document.getElementById('pwInput');
+  inp.value = phraseWords.join(phraseSep);
+  inp.type = 'text';
+  document.getElementById('toggleBtn').textContent = '🙈';
+  analyze();
+}
+
+// ── MASTER PASSWORD BUILDER ────────────────────────────────
+let masterSep = '_';
+
+function setMasterSep(s, btn) {
+  masterSep = s;
+  document.querySelectorAll('.sep-btn[onclick^="setMasterSep"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateMaster();
+}
+
+function updateMaster() {
+  const w1 = document.getElementById('mw1').value.trim();
+  const w2 = document.getElementById('mw2').value.trim();
+  const result = document.getElementById('masterResult');
+  if (!w1 || !w2) { result.classList.remove('show'); return; }
+  const master = w1 + masterSep + w2;
+  document.getElementById('masterDisplay').textContent = master;
+  const services = [
+    { id: 'mpw-schule', tag: 'Schule' },
+    { id: 'mpw-yt',     tag: 'YT' },
+    { id: 'mpw-mail',   tag: 'Mail' },
+    { id: 'mpw-game',   tag: 'Spiel' },
+  ];
+  services.forEach(({ id, tag }) => {
+    document.getElementById(id).innerHTML =
+      `<span class="pw-part1">${master}</span><span class="pw-part2">${tag}</span>`;
+  });
+  result.classList.add('show');
+}
+
+// ── ZETTEL ÜBUNG ───────────────────────────────────────────
+function zettelAnswer(which) {
+  document.getElementById('zettel-nein').classList.remove('show');
+  document.getElementById('zettel-ja').classList.remove('show');
+  document.getElementById('zettel-' + which).classList.add('show');
+}
+
+// ── BRUTE FORCE DEMO ───────────────────────────────────────
+let bruteTimer = null, bruteRunning = false;
+
+function toggleBruteDemo(btn) {
+  const demo = document.getElementById('bruteDemo');
+  if (bruteRunning) {
+    clearInterval(bruteTimer);
+    bruteTimer = null;
+    bruteRunning = false;
+    demo.style.display = 'none';
+    btn.textContent = 'Demo ansehen';
+    return;
+  }
+  demo.style.display = 'block';
+  btn.textContent = 'Demo stoppen';
+  bruteRunning = true;
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let count = 0, len = 1, idx = [0];
+  function next() {
+    let r = '';
+    for (let i = 0; i < idx.length; i++) r += chars[idx[i]];
+    let pos = idx.length - 1;
+    while (pos >= 0) { idx[pos]++; if (idx[pos] < chars.length) break; idx[pos] = 0; pos--; }
+    if (pos < 0) { idx = Array(++len).fill(0); }
+    return r;
+  }
+  bruteTimer = setInterval(() => {
+    for (let i = 0; i < 11; i++) { next(); count++; }
+    document.getElementById('bruteCurrent').textContent = next(); count++;
+    document.getElementById('bruteCount').textContent = count.toLocaleString('de') + ' Versuche';
+    if (count > 500000) {
+      clearInterval(bruteTimer); bruteRunning = false;
+      btn.textContent = 'Demo ansehen';
+      document.getElementById('bruteCount').textContent += ' — gestoppt (in Wirklichkeit: endlos)';
+    }
+  }, 25);
+}
+
+// ── SCORE ──────────────────────────────────────────────────
+function calcScore(pw) {
+  if (!pw) return { score: 0, label: '—', color: 'var(--ink3)', crack: '—', bar: 'var(--border)', c: {} };
+  const c = {
+    length: pw.length >= 12,
+    upper:  /[A-ZÄÖÜ]/.test(pw),
+    lower:  /[a-zäöü]/.test(pw),
+    number: /[0-9]/.test(pw),
+    special:/[^a-zA-ZäöüÄÖÜ0-9]/.test(pw),
+    nodict: !DICT.some(w => pw.toLowerCase().includes(w))
+  };
+  let cs = 0;
+  if (c.lower)   cs += 26;
+  if (c.upper)   cs += 26;
+  if (c.number)  cs += 10;
+  if (c.special) cs += 32;
+  cs = Math.max(cs, 26);
+  const entropy = pw.length * Math.log2(cs);
+  const secs = Math.pow(2, entropy) / 1.64e11;
+  let crack;
+  if      (secs < 1)               crack = 'Sofort';
+  else if (secs < 60)              crack = Math.round(secs) + ' Sek.';
+  else if (secs < 3600)            crack = Math.round(secs / 60) + ' Min.';
+  else if (secs < 86400)           crack = Math.round(secs / 3600) + ' Std.';
+  else if (secs < 86400 * 365)     crack = Math.round(secs / 86400) + ' Tage';
+  else if (secs < 86400 * 365e6)   crack = Math.round(secs / (86400 * 365)) + ' Jahre';
+  else if (secs < 86400 * 365e12)  crack = (secs / (86400 * 365e6)).toFixed(0) + ' Mio. Jahre';
+  else                              crack = '> 1 Billion Jahre';
+  let pts = 0;
+  if (pw.length >= 6)  pts += 10;
+  if (pw.length >= 10) pts += 15;
+  if (pw.length >= 12) pts += 15;
+  if (pw.length >= 16) pts += 10;
+  if (c.upper)   pts += 10;
+  if (c.lower)   pts += 10;
+  if (c.number)  pts += 10;
+  if (c.special) pts += 15;
+  if (c.nodict)  pts += 5;
+  let label, color, bar;
+  if      (pts < 20) { label = 'Sehr schwach'; color = '#c0392b'; bar = '#c0392b'; }
+  else if (pts < 40) { label = 'Schwach';       color = '#e67e22'; bar = '#e67e22'; }
+  else if (pts < 60) { label = 'Mittel';         color = '#b5651d'; bar = '#f0a500'; }
+  else if (pts < 80) { label = 'Stark';          color = '#2d6a4f'; bar = '#52b788'; }
+  else               { label = 'Sehr stark';     color = '#2d6a4f'; bar = '#2d6a4f'; }
+  return { score: pts, label, color, bar, crack, c };
+}
+
+function analyze() {
+  const pw = document.getElementById('pwInput').value;
+  const s  = calcScore(pw);
+  document.getElementById('sBar').style.width = pw ? Math.max(s.score, 3) + '%' : '0';
+  document.getElementById('sBar').style.background = s.bar;
+  document.getElementById('sLabel').textContent = pw ? s.label : '—';
+  document.getElementById('sLabel').style.color = pw ? s.color : 'var(--ink3)';
+  document.getElementById('crackShort').textContent = pw ? 'ca. ' + s.crack : '';
+  document.getElementById('crackVal').textContent = pw ? s.crack : '—';
+  document.getElementById('crackVal').style.color = pw ? s.color : 'var(--ink3)';
+  const map = { len: 'length', dict: 'nodict' };
+  for (const [k, v] of Object.entries(map)) {
+    document.getElementById('c-' + k).classList.toggle('met', !!s.c[v]);
+  }
+}
+
+function toggleVis() {
+  const inp = document.getElementById('pwInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  document.getElementById('toggleBtn').textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+// ── TABS ───────────────────────────────────────────────────
+const TAB_NAMES = ['angriffe', 'check', 'phrase', 'quiz'];
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'quiz') initQuiz();
+}
+
+function switchTabByName(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const i = TAB_NAMES.indexOf(name);
+  if (i >= 0) document.querySelectorAll('.tab-btn')[i].classList.add('active');
+}
+
+// ── QUIZ ───────────────────────────────────────────────────
+const Qs = [
+  {
+    q: 'Eine RTX 4090 probiert Passwörter aus. Welches hält am längsten?',
+    opts: ['K@t3! (5 Zeichen mit Sonderzeichen)', 'Hund2015! (9 Zeichen)', 'Katze-Regen-Brot-7 (18 Zeichen)', 'GEHEIMPASSWORT (14 Zeichen, nur Buchstaben)'],
+    ok: 2,
+    fb: ['Sonderzeichen helfen, aber 5 Zeichen sind viel zu kurz — unter einer Sekunde.',
+         '9 Zeichen mit Muster „Wort+Jahr+!" — der Wörterbuch-Angriff knackt das schnell.',
+         'Richtig. 18 Zeichen aus gemischten Wörtern schlägt alles andere. Länge gewinnt.',
+         'Nur Großbuchstaben — trotz Länge verhältnismäßig schnell zu knacken.']
+  },
+  {
+    q: 'Was ist ein Wörterbuch-Angriff?',
+    opts: ['Ein Programm probiert alle Wörter aus dem Duden automatisch durch', 'Ein Hacker versucht, das Passwort zu erraten', 'Ein Virus liest Passwörter aus dem Arbeitsspeicher', 'Alle möglichen Buchstabenkombinationen werden durchprobiert'],
+    ok: 0,
+    fb: ['Richtig — alle Wörter, dann alle mit Zahlen, dann mit Sonderzeichen. Automatisch, in Sekunden.',
+         'Das wäre Social Engineering — jemand fragt oder täuscht, kein automatisches Programm.',
+         'Das ist Malware — ein anderes Konzept.',
+         'Das wäre Brute-Force — alle Kombinationen, nicht nur Wörter aus dem Wörterbuch.']
+  },
+  {
+    q: 'Du nutzt überall dasselbe Passwort. Ein Spieleforum wird gehackt. Was passiert?',
+    opts: ['Nur das Forum-Konto ist betroffen', 'Angreifer können das Passwort auf anderen Diensten ausprobieren', 'Nichts — das Passwort ist ja stark', 'Das Passwort wird automatisch gesperrt'],
+    ok: 1,
+    fb: ['Falsch — Angreifer testen erbeutete Passwörter sofort auf E-Mail, Schullogin und allem anderen.',
+         'Genau. Deshalb braucht jeder Dienst ein eigenes Passwort.',
+         'Stärke spielt keine Rolle mehr, wenn das Passwort einmal bekannt ist.',
+         'Das passiert nicht automatisch — du musst es selbst ändern.']
+  },
+  {
+    q: 'Dein Masterpasswort ist „baum_wolke". Dein Kürzel für die Schule ist „Schule". Was tippst du beim Schullogin ein?',
+    opts: ['baum_wolke', 'Schule', 'baum_wolkeSchule', 'wolke_baum'],
+    ok: 2,
+    fb: ['Das ist nur Teil 1 — ohne das Kürzel kein vollständiges Schulpasswort.',
+         'Das ist nur Teil 2 — zu kurz und ohne Teil 1 unsicher.',
+         'Richtig. Teil 1 + Teil 2 kombiniert. Jeder Dienst bekommt so ein eigenes Passwort.',
+         'Die Reihenfolge wäre anders — und Teil 2 fehlt noch.']
+  },
+  {
+    q: 'Jemand schreibt dir: „Ich bin der IT-Admin. Gib mir kurz dein Passwort, ich muss deinen Account prüfen."',
+    opts: ['Ich gebe es weiter — wenn es ein echter Admin ist, muss ich helfen', 'Ich schicke es per verschlüsselter Nachricht', 'Ich gebe es nicht weiter — kein echter Dienst fragt nach Passwörtern', 'Ich ändere es danach sofort'],
+    ok: 2,
+    fb: ['Kein echter Administrator braucht dein Passwort — die haben andere Wege, Accounts zu verwalten.',
+         'Der Kanal ändert nichts daran. Das Passwort selbst solltest du gar nicht weitergeben.',
+         'Richtig. Das ist Social Engineering. Wer nach dem Passwort fragt, will betrügen.',
+         'Besser als Option 1 — aber unnötig, wenn du es von Anfang an nicht weitergibst.']
+  }
+];
+
+let qIdx = 0, qPts = 0, qAnswered = false;
+
+function initQuiz() { qIdx = 0; qPts = 0; renderQ(); }
+
+function renderQ() {
+  if (qIdx >= Qs.length) { renderScore(); return; }
+  const q = Qs[qIdx];
+  qAnswered = false;
+  document.getElementById('quizInner').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+      <div class="card-heading" style="margin:0;">Quiz</div>
+      <span class="quiz-prog">${qIdx + 1} / ${Qs.length}</span>
+    </div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">
+      ${q.opts.map((o, i) => `<button class="quiz-opt" id="o${i}" onclick="answer(${i})">${o}</button>`).join('')}
+    </div>
+    <div class="quiz-fb" id="fb"></div>
+    <div style="margin-top:4px;">
+      <button class="btn btn-primary" id="nextBtn" onclick="nextQ()" style="display:none">Weiter →</button>
+    </div>
+  `;
+}
+
+function answer(i) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const q = Qs[qIdx];
+  document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+  if (i === q.ok) {
+    qPts++;
+    document.getElementById('o' + i).classList.add('correct');
+    fb.textContent = q.fb[i];
+    fb.className = 'quiz-fb show ok';
+  } else {
+    document.getElementById('o' + i).classList.add('wrong');
+    document.getElementById('o' + q.ok).classList.add('correct');
+    fb.textContent = q.fb[i];
+    fb.className = 'quiz-fb show err';
+  }
+  document.getElementById('nextBtn').style.display = 'inline-flex';
+}
+
+function nextQ() { qIdx++; renderQ(); }
+
+function renderScore() {
+  const msg = qPts === 5 ? 'Alles richtig.' :
+              qPts >= 4  ? 'Fast perfekt.' :
+              qPts >= 3  ? 'Gut. Schau nochmal in die Angriffsmethoden.' :
+                           'Lies die Angriffsmethoden nochmal durch.';
+  document.getElementById('quizInner').innerHTML = `
+    <div class="card-heading">Ergebnis</div>
+    <div class="score-wrap">
+      <div class="score-num">${qPts}/${Qs.length}</div>
+      <div class="score-msg">${msg}</div>
+      <div style="margin-top:22px;"><button class="btn btn-primary" onclick="initQuiz()">Nochmal</button></div>
+    </div>
+  `;
+}
+
+initQuiz();
+</script>
+</body>
+</html>
