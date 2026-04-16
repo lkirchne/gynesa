@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vektoren: Sternen-Mission</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Dark Space Theme */
+  --bg:#070714;
+  --surface:#131426;
+  --ink:#e0e6ed;
+  --muted:#8892b0;
+  --border:#262a45;
+  --accent:#ff2a5f; /* Neon Pink/Red */
+  --blue:#00f0ff;   /* Cyan */
+  --green:#39ff14;  /* Neon Green */
+  --panel:#1a1c33;
+}
+html,body{height:100%;overflow:hidden;touch-action:none;} /* Verhindert systemweites Scrollen/Bouncen */
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:stretch;justify-content:space-between;flex-shrink:0;height:46px}
+.app-title{font-family:ui-monospace,monospace;font-size:14px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--blue);
+  display:flex;align-items:center;padding:0 20px;
+  text-shadow: 0 0 8px rgba(0,240,255,0.3);}
+
+.main{display:flex;flex:1;min-height:0}
+
+.map-wrap{position:relative;overflow:hidden;background:#03030b; flex:1;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.8); touch-action:none;} /* Touch auf Canvas abfangen */
+.map-wrap canvas{display:block;width:100%;height:100%;
+  position:absolute;top:0;left:0}
+#c2u{pointer-events:all;cursor:crosshair}
+#c2s,#c2g{pointer-events:none}
+
+.sidebar{width:320px;border-left:1px solid var(--border);background:var(--surface);
+  display:flex;flex-direction:column;overflow-y:auto;box-shadow:-5px 0 15px rgba(0,0,0,0.5)}
+.s-sec{padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.s-sec h2{font-family:ui-monospace,monospace;font-size:11px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+
+/* Scanner Anzeige */
+.scanner-box{background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:10px;}
+.coords-big{font-family:ui-monospace,monospace;font-size:24px;font-weight:700;
+  color:var(--blue);text-align:center;text-shadow: 0 0 10px rgba(0,240,255,0.2)}
+.coords-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;
+  font-family:ui-monospace,monospace;line-height:1.4}
+
+.vec-wrap{display:flex;align-items:center;justify-content:center;
+  gap:4px;margin-bottom:8px}
+.vp{font-size:64px;font-weight:300;color:var(--muted);
+  font-family:ui-monospace,monospace;line-height:1;margin-top:-4px;user-select:none}
+.vec-fields{display:flex;flex-direction:column;gap:6px;padding:4px 8px}
+.vec-fields input{font-family:ui-monospace,monospace;font-size:22px;font-weight:700;
+  width:78px;padding:8px 6px;border:1px solid var(--border);
+  background:var(--bg);color:var(--blue);outline:none;text-align:center;
+  transition:all .15s;-moz-appearance:textfield; border-radius:4px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5)}
+.vec-fields input::-webkit-inner-spin-button,
+.vec-fields input::-webkit-outer-spin-button{-webkit-appearance:none}
+.vec-fields input:focus{border-color:var(--blue);box-shadow: 0 0 8px rgba(0,240,255,0.3)}
+.vec-len{font-family:ui-monospace,monospace;font-size:12px;color:var(--muted);
+  text-align:center;padding:2px 0 8px}
+.vec-len b{color:var(--ink)}
+
+.btn{font-family:ui-monospace,monospace;font-size:11px;font-weight:700;
+  letter-spacing:.04em;padding:10px 10px;border:1px solid; border-radius:4px;
+  cursor:pointer;text-transform:uppercase;transition:all .12s;width:100%}
+.btn-add{background:rgba(0,240,255,0.1);color:var(--blue);border-color:var(--blue)}
+.btn-add:hover{background:rgba(0,240,255,0.2);box-shadow:0 0 10px rgba(0,240,255,0.3)}
+.btn-undo{background:rgba(255,42,95,0.05);color:var(--accent);border-color:var(--accent)}
+.btn-undo:hover{background:rgba(255,42,95,0.15);box-shadow:0 0 10px rgba(255,42,95,0.3)}
+.btn-run{background:var(--accent);color:#fff;border-color:var(--accent);margin-top:6px;
+  text-shadow:0 1px 2px rgba(0,0,0,0.5); box-shadow:0 0 8px rgba(255,42,95,0.4)}
+.btn-run:hover{background:#ff144b;box-shadow:0 0 15px rgba(255,42,95,0.6)}
+.btn-rst{background:var(--panel);color:var(--muted);border-color:var(--border);margin-top:6px}
+.btn-rst:hover{color:var(--ink);border-color:var(--muted)}
+.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none!important}
+
+.speed-row{display:flex;align-items:center;gap:10px;margin-top:10px}
+.speed-row label{font-family:ui-monospace,monospace;font-size:10px;
+  color:var(--muted);white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--blue); background:transparent; height:24px;}
+
+.goal-item{display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:6px;
+  border:1px solid var(--border);background:var(--panel); border-radius:4px;
+  font-family:ui-monospace,monospace;font-size:12px;transition:all .2s}
+.goal-item.done{border-color:var(--green);background:rgba(57,255,20,0.05);
+  box-shadow: 0 0 8px rgba(57,255,20,0.1)}
+.goal-icon{font-size:16px; filter:drop-shadow(0 0 2px rgba(255,255,255,0.5))}.goal-label{flex:1}
+.goal-item.done .goal-label{color:var(--green)}
+.goal-coords{color:var(--muted);font-size:11px}
+
+.cmd-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.cmd-header h2{margin-bottom:0 !important}
+.total-len{font-family:ui-monospace,monospace;font-size:11px;color:var(--muted);font-weight:700}
+.cmd-len{font-family:ui-monospace,monospace;font-size:10px;color:var(--muted);margin-right:6px;font-weight:normal}
+
+.cmd-list{flex:1;overflow-y:auto;padding:14px 16px;min-height:150px}
+.cmd-empty{font-size:12px;color:var(--muted);text-align:center;
+  padding:20px 0;font-style:italic}
+.cmd-item{display:flex;align-items:center;gap:6px;padding:6px 10px;margin-bottom:6px;
+  border:1px solid var(--border);background:var(--panel);transition:all .15s; border-radius:4px}
+.cmd-item.active{border-color:var(--blue);background:rgba(0,240,255,0.08);
+  box-shadow:0 0 8px rgba(0,240,255,0.2)}
+.cmd-item.error{border-color:var(--accent);background:rgba(255,42,95,0.08)}
+.cmd-idx{font-family:ui-monospace,monospace;font-size:12px;color:var(--muted);min-width:20px}
+.cmd-edit{
+  width: 30px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  color: var(--blue);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 3px;
+  padding: 3px 0;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.cmd-edit::-webkit-inner-spin-button,
+.cmd-edit::-webkit-outer-spin-button { -webkit-appearance: none; }
+.cmd-edit:focus{ border-color: var(--blue); box-shadow: 0 0 5px rgba(0,240,255,0.4); }
+.cmd-del{background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:16px;padding:0 4px;transition:all .12s}
+.cmd-del:hover{color:var(--accent); transform:scale(1.2)}
+
+.status-bar{padding:10px 16px;border-top:1px solid var(--border); background:var(--surface);
+  font-family:ui-monospace,monospace;font-size:11px;min-height:38px;flex-shrink:0;
+  display:flex;align-items:center;}
+.st-err{color:var(--accent); text-shadow:0 0 5px rgba(255,42,95,0.3)}
+.st-ok{color:var(--green); text-shadow:0 0 5px rgba(57,255,20,0.3)}
+.st-info{color:var(--muted)}
+
+/* Responsive für iPad Portrait-Modus & Smartphones */
+@media (max-width: 850px) {
+  .main { flex-direction: column; }
+  .sidebar { width: 100%; border-left: none; border-top: 1px solid var(--border); flex: auto; }
+  .map-wrap { min-height: 45vh; flex: none; }
+}
+
+/* Scrollbar styling for dark mode */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="app-title">Sternen-Mission</div>
+  <div style="float: right; padding: 10px">Gymnasium Neue Sandkaul</div>
+</header>
+
+<div class="main">
+  <div class="map-wrap" id="map2">
+    <canvas id="c2s"></canvas>
+    <canvas id="c2g"></canvas>
+    <canvas id="c2u"></canvas>
+  </div>
+  
+  <div class="sidebar">
+    <div class="s-sec">
+      <h2>Scanner (Radar)</h2>
+      <div class="scanner-box">
+        <div class="coords-big" id="hov-coords">– / –</div>
+        <div class="coords-hint">Radar berühren zum Scannen</div>
+      </div>
+    </div>
+    
+    <div class="s-sec">
+      <h2>Ziele</h2>
+      <div id="goal-list"></div>
+    </div>
+    
+    <div class="s-sec">
+      <h2>Flug-Vektor programmieren</h2>
+      <div class="vec-wrap">
+        <span class="vp">(</span>
+        <div class="vec-fields">
+          <input type="number" id="v-x" value="3" min="-20" max="20">
+          <input type="number" id="v-y" value="4" min="-20" max="20">
+        </div>
+        <span class="vp">)</span>
+      </div>
+      <!--<div class="vec-len" id="v-len">Strecke: <b>1.00</b> Ly</div>-->
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-add" id="v-add">+ Speichern</button>
+        <button class="btn btn-undo" id="v-undo">⮌ Löschen</button>
+      </div>
+      <button class="btn btn-run" id="v-run">▶ Triebwerke zünden</button>
+      <button class="btn btn-rst" id="v-rst">↺ Zurück zum Start</button>
+      
+      <div class="speed-row" style="margin-top:14px; border-top:1px dashed var(--border); padding-top:14px;">
+        <label>Raster</label>
+        <input type="range" id="grid-op" min="0" max="100" value="40" style="width:60px">
+        <label style="margin-left:10px">Tempo</label>
+        <input type="range" id="v-spd" min="1" max="10" value="6">
+      </div>
+    </div>
+    
+    <div class="cmd-list">
+      <div class="cmd-header">
+        <h2>Flug-Sequenz</h2>
+        <div class="total-len" id="v-total-len">Gesamt: <span style="color:var(--ink)">0.00 Ly</span></div>
+      </div>
+      <div id="v-cmds"><div class="cmd-empty">Kein Kurs programmiert.</div></div>
+    </div>
+    
+    <div class="status-bar st-info" id="v-stat">Systeme bereit. Warte auf Befehle...</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════
+// SPACE DEFINITION  (grid units)
+// ══════════════════════════════════════════════════════
+
+const GW = 16, GH = 12;
+
+const ASTEROIDS = [
+  {gx: 4.5, gy: 3.5, r: 1.8},
+  {gx: 11,  gy: 8,   r: 2.2},
+  {gx: 14,  gy: 2.5, r: 1.4},
+  {gx: 2,   gy: 9,   r: 1.5},
+  {gx: 8.5, gy: 5,   r: 1.2},
+  {gx: 7,   gy: 11,  r: 1.3}
+];
+
+function inAsteroid(x,y){
+  const collisionMargin = 0.3;
+  for(const a of ASTEROIDS) {
+    if(Math.hypot(x - a.gx, y - a.gy) < (a.r + collisionMargin)) return true;
+  }
+  return false;
+}
+
+function inSector(x,y){ 
+  const margin = 0.5;
+  return x >= margin && x <= GW-margin && y >= margin && y <= GH-margin; 
+}
+function isBlocked(x,y){ return !inSector(x,y) || inAsteroid(x,y); }
+
+function checkPath(x0,y0,x1,y1){
+  const dx=x1-x0,dy=y1-y0;
+  const n=Math.max(Math.abs(dx),Math.abs(dy),1)*10; 
+  for(let s=1;s<=n;s++){
+    const x=x0+dx*s/n,y=y0+dy*s/n;
+    if(isBlocked(x,y)) return{x:parseFloat(x.toFixed(1)),y:parseFloat(y.toFixed(1))};
+  }
+  return null;
+}
+
+// ══════════════════════════════════════════════════════
+// DRAWING UTILS
+// ══════════════════════════════════════════════════════
+const PAD = 1; 
+
+function getMetrics(C){
+  const usableW = C.width,  usableH = C.height;
+  const cellW = usableW / (GW + 2*PAD);
+  const cellH = usableH / (GH + 2*PAD);
+  const cell  = Math.min(cellW, cellH);
+  const ox = (usableW - cell*GW) / 2; 
+  const oy = C.height - (usableH - cell*GH) / 2; 
+  return {cell, ox, oy};
+}
+
+function g2c(C, gx, gy){
+  const {cell,ox,oy} = getMetrics(C);
+  return [ox + gx*cell, oy - gy*cell];
+}
+function c2g(C, cx, cy){
+  const {cell,ox,oy} = getMetrics(C);
+  return [(cx-ox)/cell, (oy-cy)/cell];
+}
+function s2g(C, clientX, clientY){
+  const r=C.getBoundingClientRect();
+  return c2g(C,
+    (clientX-r.left)*C.width/r.width,
+    (clientY-r.top)*C.height/r.height);
+}
+
+function drawSpace(C){
+  const ctx = C.getContext('2d');
+  const W=C.width, H=C.height;
+  ctx.clearRect(0,0,W,H);
+  const {cell} = getMetrics(C);
+
+  ctx.fillStyle='#050510';
+  ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle = '#ffffff';
+  for(let i=0; i<80; i++) {
+    let sx = (i * 137.5) % W;
+    let sy = (i * 93.1) % H;
+    let size = (i % 3 === 0) ? 1.5 : 0.8;
+    ctx.globalAlpha = 0.2 + (i%5)/10;
+    ctx.beginPath(); ctx.arc(sx, sy, size, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1.0;
+
+  ASTEROIDS.forEach(a=>{
+    const [ax,ay]=g2c(C,a.gx,a.gy);
+    const r = a.r * cell;
+    
+    const grad = ctx.createRadialGradient(ax, ay, r*0.8, ax, ay, r*1.2);
+    grad.addColorStop(0, 'rgba(40,40,60,1)');
+    grad.addColorStop(1, 'rgba(10,10,20,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(ax, ay, r*1.2, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle='#2b2c3a';
+    ctx.beginPath(); ctx.arc(ax, ay, r, 0, Math.PI*2); ctx.fill();
+    
+    ctx.fillStyle='#1e1f2b';
+    ctx.beginPath(); ctx.arc(ax-r*0.3, ay-r*0.2, r*0.25, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ax+r*0.4, ay+r*0.3, r*0.15, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ax-r*0.1, ay+r*0.5, r*0.2, 0, Math.PI*2); ctx.fill();
+
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(ax, ay, r, 0, Math.PI*2); ctx.stroke();
+  });
+}
+
+function drawGrid(C, alpha){
+  const ctx=C.getContext('2d');
+  ctx.clearRect(0,0,C.width,C.height);
+  if(alpha<0.02)return;
+  ctx.save(); ctx.globalAlpha=alpha;
+  const {cell,ox,oy}=getMetrics(C);
+
+  ctx.strokeStyle='rgba(0, 240, 255, 0.2)'; ctx.lineWidth=0.5;
+  for(let gx=0;gx<=GW;gx++){
+    const [px]=g2c(C,gx,0);
+    ctx.beginPath();ctx.moveTo(px,oy-GH*cell);ctx.lineTo(px,oy);ctx.stroke();
+  }
+  for(let gy=0;gy<=GH;gy++){
+    const [,py]=g2c(C,0,gy);
+    ctx.beginPath();ctx.moveTo(ox,py);ctx.lineTo(ox+GW*cell,py);ctx.stroke();
+  }
+
+  ctx.strokeStyle='#00f0ff'; ctx.lineWidth=2;
+  ctx.shadowColor = '#00f0ff'; ctx.shadowBlur = 8;
+  ctx.beginPath();ctx.moveTo(ox,oy-GH*cell-15);ctx.lineTo(ox,oy+15);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox-15,oy);ctx.lineTo(ox+GW*cell+15,oy);ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  const fs=Math.max(9,Math.min(cell*0.28,14));
+  ctx.fillStyle='#00f0ff'; ctx.font=`${fs}px ui-monospace,monospace`;
+  for(let gx=1;gx<=GW;gx++){
+    const [px]=g2c(C,gx,0);
+    ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillText(gx,px,oy+6);
+  }
+  for(let gy=1;gy<=GH;gy++){
+    const [,py]=g2c(C,0,gy);
+    ctx.textAlign='right'; ctx.textBaseline='middle'; ctx.fillText(gy,ox-6,py);
+  }
+  ctx.font=`bold ${fs+3}px ui-monospace,monospace`;
+  ctx.textAlign='left'; ctx.fillText('x',ox+GW*cell+8,oy-cell*0.5);
+  ctx.textAlign='center'; ctx.fillText('y',ox+cell*0.5,oy-GH*cell-12);
+
+  ctx.restore();
+}
+
+function drawArrow(ctx,C,gx1,gy1,gx2,gy2,col,lw,lbl, isGhost=false){
+  const[x1,y1]=g2c(C,gx1,gy1),[x2,y2]=g2c(C,gx2,gy2);
+  const dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+  if(len<2)return;
+  const hL=Math.min(14,len*0.32),ang=Math.atan2(dy,dx);
+  ctx.save();
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=lw;ctx.lineCap='round';
+  
+  if(!isGhost) {
+    ctx.shadowColor = col; 
+    ctx.shadowBlur = 8;
+  } else {
+    ctx.setLineDash([4,4]);
+    ctx.globalAlpha = 0.5;
+  }
+
+  ctx.beginPath();ctx.moveTo(x1,y1);
+  ctx.lineTo(x2-Math.cos(ang)*hL*0.72,y2-Math.sin(ang)*hL*0.72);
+  ctx.stroke();
+  
+  ctx.setLineDash([]);
+  ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-hL*Math.cos(ang-Math.PI/7),y2-hL*Math.sin(ang-Math.PI/7));
+  ctx.lineTo(x2-hL*Math.cos(ang+Math.PI/7),y2-hL*Math.sin(ang+Math.PI/7));
+  ctx.closePath();ctx.fill();
+  
+  ctx.shadowBlur = 0; 
+  ctx.globalAlpha = 1.0;
+
+  if(lbl){
+    const nx=-Math.sin(ang)*16,ny=Math.cos(ang)*16;
+    const mx=(x1+x2)/2+nx,my=(y1+y2)/2+ny;
+    ctx.font='bold 11px ui-monospace,monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const tw=ctx.measureText(lbl).width;
+    
+    ctx.fillStyle='rgba(10,10,20,0.8)';
+    ctx.beginPath(); ctx.roundRect(mx-tw/2-3,my-9,tw+6,18,3); ctx.fill();
+    ctx.strokeStyle=col; ctx.lineWidth=1; ctx.stroke();
+    
+    ctx.fillStyle=col; ctx.fillText(lbl,mx,my);
+  }
+  ctx.restore();
+}
+
+function drawShip(ctx,C,gx,gy,lbl, angleRad=0){
+  const[px,py]=g2c(C,gx,gy);
+  const{cell}=getMetrics(C);
+  
+  const size = cell*0.6;
+  
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(angleRad);
+  
+  ctx.shadowColor='#00f0ff'; ctx.shadowBlur=10;
+  ctx.fillStyle='#00f0ff';
+  ctx.beginPath(); ctx.arc(-size*0.4, 0, size*0.2, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  
+  ctx.fillStyle='#e0e6ed';
+  ctx.strokeStyle='#ffffff';
+  ctx.lineWidth=1.5;
+  ctx.beginPath(); 
+  ctx.moveTo(size*0.8, 0); 
+  ctx.lineTo(-size*0.6, size*0.5); 
+  ctx.lineTo(-size*0.3, 0); 
+  ctx.lineTo(-size*0.6, -size*0.5); 
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  
+  ctx.fillStyle='#ff2a5f';
+  ctx.beginPath();
+  ctx.ellipse(size*0.1, 0, size*0.3, size*0.15, 0, 0, Math.PI*2);
+  ctx.fill();
+  
+  ctx.restore();
+
+  if(lbl){
+    ctx.save();
+    ctx.font='bold 10px ui-monospace,monospace';
+    const tw=ctx.measureText(lbl).width;
+    const bx=px-tw/2-5, by=py-size-22, bw=tw+10, bh=16;
+    ctx.fillStyle='rgba(10,10,20,0.85)';
+    ctx.strokeStyle='#00f0ff'; ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(bx,by,bw,bh,3);ctx.fill(); ctx.stroke();
+    ctx.beginPath();ctx.moveTo(px-4,by+bh);ctx.lineTo(px+4,by+bh);ctx.lineTo(px,by+bh+5);ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#00f0ff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(lbl,px,by+bh/2);
+    ctx.restore();
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// MAIN LOGIC
+// ══════════════════════════════════════════════════════
+const C2S=document.getElementById('c2s');
+const C2G=document.getElementById('c2g');
+const C2U=document.getElementById('c2u');
+let gridAlpha=0.4;
+
+const V_START={x:1.5, y:2};
+
+const V_GOALS=[
+  {x: 7,   y: 8,  label:'Satellit Alpha', icon:'🛰️', done:false},
+  {x: 14,  y: 10, label:'Satellit Beta',  icon:'🛰️', done:false},
+  {x: 10,  y: 2,  label:'Satellit Gamma', icon:'🛰️', done:false},
+];
+
+let vCmds=[], vPos={...V_START}, vAnim=null, currentAngle = 0; 
+let pointerPos = null; // Für den Touch-Scanner
+
+function drawTab2(aPos,aC,errC){
+  drawSpace(C2S);
+  drawGrid(C2G,gridAlpha);
+  const ctx=C2U.getContext('2d'),C=C2U;
+  ctx.clearRect(0,0,C.width,C.height);
+  const{cell}=getMetrics(C);
+
+  V_GOALS.forEach(g=>{
+    const[px,py]=g2c(C,g.x,g.y);
+    
+    ctx.save();
+    if(g.done){
+      ctx.fillStyle='rgba(57,255,20,.1)'; 
+      ctx.strokeStyle='#39ff14'; 
+      ctx.setLineDash([]);
+      ctx.lineWidth=2;
+      ctx.shadowColor='#39ff14'; ctx.shadowBlur=15;
+    }else{
+      ctx.fillStyle='rgba(0,240,255,.1)';
+      ctx.strokeStyle='#00f0ff'; 
+      ctx.setLineDash([3,3]);
+      ctx.lineWidth=1.5;
+      ctx.shadowColor='#00f0ff'; ctx.shadowBlur=10;
+    }
+    
+    const R = cell*0.8;
+    ctx.beginPath(); ctx.arc(px, py, R, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur=0;
+    
+    ctx.font='20px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(g.done ? '✓' : g.icon, px, py);
+    
+    const lbl=`(${g.x},${g.y})`;
+    ctx.font='bold 10px ui-monospace,monospace';
+    const textW=ctx.measureText(lbl).width;
+    ctx.fillStyle='rgba(10,10,25,.8)';
+    ctx.beginPath();ctx.roundRect(px-textW/2-3,py+R+4,textW+6,16,2);ctx.fill();
+    ctx.fillStyle=g.done?'#39ff14':'#00f0ff';
+    ctx.textBaseline='middle';
+    ctx.fillText(lbl,px,py+R+12);
+    ctx.restore();
+  });
+
+  if(vCmds.length){
+    let cur={...V_START};
+    vCmds.forEach((c,i)=>{
+      const nxt={x:cur.x+c.x,y:cur.y+c.y};
+      let col='#00f0ff',lw=2.5; 
+      if(errC!==null){
+        col=i===errC?'#ff2a5f':i<errC?'#8892b0':'#3d435c';
+        lw=i===errC?3:1.5;
+      }else if(aPos!==null){
+        col=i===aC?'#39ff14':i<aC?'#8892b0':'#3d435c'; 
+        lw=i===aC?3:1.5;
+      }
+      drawArrow(ctx,C,cur.x,cur.y,nxt.x,nxt.y,col,lw,`(${c.x}, ${c.y})`, (aPos!==null && i>aC));
+      cur=nxt;
+    });
+  }
+
+  const rp=aPos||vPos;
+  drawShip(ctx,C,rp.x,rp.y,`(${+(rp.x.toFixed(1))},${+(rp.y.toFixed(1))})`, currentAngle);
+
+  // Scanner Crosshair (Mouse/Touch hover)
+  if(pointerPos && !vAnim) {
+    const [px, py] = g2c(C, pointerPos.x, pointerPos.y);
+    ctx.save();
+    ctx.strokeStyle='rgba(0, 240, 255, 0.8)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(px-12, py); ctx.lineTo(px+12, py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, py-12); ctx.lineTo(px, py+12); ctx.stroke();
+    ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.stroke();
+    
+    const lbl=`(${pointerPos.x},${pointerPos.y})`;
+    ctx.font='bold 12px ui-monospace,monospace';
+    const tw=ctx.measureText(lbl).width;
+    ctx.fillStyle='rgba(10,10,25,.9)';
+    ctx.beginPath();ctx.roundRect(px-tw/2-5,py-32,tw+10,20,3);ctx.fill();
+    ctx.strokeStyle='#00f0ff'; ctx.stroke();
+    ctx.fillStyle='#00f0ff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(lbl,px,py-22);
+    ctx.restore();
+  }
+}
+
+function vUpdGoals(){
+  document.getElementById('goal-list').innerHTML=V_GOALS.map(g=>`
+    <div class="goal-item ${g.done?'done':''}">
+      <span class="goal-icon">${g.done?'✓':g.icon}</span>
+      <span class="goal-label">${g.label}</span>
+      <span class="goal-coords">(${g.x},${g.y})</span>
+    </div>`).join('');
+}
+function vStat(m,c){const e=document.getElementById('v-stat');e.className='status-bar '+c;e.textContent=m;}
+function vUpdLen(){
+  const x=+document.getElementById('v-x').value||0,y=+document.getElementById('v-y').value||0;
+  //document.getElementById('v-len').innerHTML=`Flugstrecke: <b>${Math.floor(Math.sqrt(x*x+y*y).toFixed(2))} - ${Math.floor(Math.sqrt(x*x+y*y).toFixed(2))+1}</b> Ly`;
+}
+function vEdit(i, axis, val) {
+  vCmds[i][axis] = +val || 0;
+  vRenderCmds();
+  drawTab2(null, null, null);
+}
+function vRenderCmds(){
+  const el=document.getElementById('v-cmds');
+  let total = 0;
+  if(!vCmds.length){
+    el.innerHTML='<div class="cmd-empty">Kein Kurs programmiert.</div>';
+    document.getElementById('v-total-len').innerHTML='Gesamt: <span style="color:var(--blue)">0.00 Ly</span>';
+    currentAngle = 0;
+    return;
+  }
+  el.innerHTML=vCmds.map((c,i)=>{
+    const len = Math.sqrt(c.x*c.x+c.y*c.y);
+    total += len;
+    const xs=c.x, ys=c.y;
+    return `<div class="cmd-item" id="vc${i}">
+      <span class="cmd-idx">${i+1}.</span>
+      <div class="cmd-vec" style="font-family:ui-monospace,monospace;font-size:14px;font-weight:700;color:var(--ink);flex:1;gap:3px;">
+        (<input type="number" class="cmd-edit" value="${xs}" onchange="vEdit(${i}, 'x', this.value)">, 
+         <input type="number" class="cmd-edit" value="${ys}" onchange="vEdit(${i}, 'y', this.value)">)
+      </div>
+      <!--<span class="cmd-len">L=${len.toFixed(2)}</span>-->
+      <button class="cmd-del" onclick="vDel(${i})">✕</button>
+    </div>`;
+  }).join('');
+  document.getElementById('v-total-len').innerHTML=`Gesamt: <span style="color:var(--blue)">${Math.floor(total.toFixed(2))} - ${Math.floor(total.toFixed(2))+1} Ly</span>`;
+  
+  if(!vAnim) {
+     const lastCmd = vCmds[vCmds.length-1];
+     currentAngle = -Math.atan2(lastCmd.y, lastCmd.x); 
+  }
+}
+function vAdd(){
+  const x=+document.getElementById('v-x').value||0,y=+document.getElementById('v-y').value||0;
+  if(!x&&!y)return;
+  vCmds.push({x,y});vRenderCmds();drawTab2(null,null,null);vStat('Kurs-Daten empfangen.','st-info');
+}
+function vUndo(){
+  if(!vCmds.length)return;
+  vCmds.pop();vRenderCmds();drawTab2(null,null,null);vStat('Letzter Befehl gelöscht.','st-info');
+}
+function vDel(i){vCmds.splice(i,1);vRenderCmds();drawTab2(null,null,null);}
+function vBtns(on){['v-add','v-undo','v-run','v-rst'].forEach(id=>document.getElementById(id).disabled=!on);}
+function vHL(i,err){
+  document.querySelectorAll('#v-cmds .cmd-item').forEach((el,j)=>{
+    el.classList.toggle('active',j===i&&!err);
+    el.classList.toggle('error',j===i&&err);
+  });
+}
+function checkGoal(x,y){
+  V_GOALS.forEach(g=>{
+    if(!g.done&&Math.abs(x-g.x)<0.8&&Math.abs(y-g.y)<0.8){
+      g.done=true;vUpdGoals();vStat(`✓ ${g.label} gesichert!`,'st-ok');
+    }
+  });
+}
+function vRun(){
+  if(vAnim||!vCmds.length)return;
+  V_GOALS.forEach(g=>g.done=false);
+  vPos={...V_START};vUpdGoals();vStat('Flugsequenz initiiert...','st-info');
+  const spc=Math.max(4,40-(+document.getElementById('v-spd').value)*3);
+  let ci=0,step=0,pos={...V_START};
+  vBtns(false);
+  
+  function tick(){
+    if(ci>=vCmds.length){
+      vAnim=null;vPos=pos;drawTab2(null,null,null);
+      document.querySelectorAll('#v-cmds .cmd-item').forEach(el=>el.classList.remove('active','error'));
+      vBtns(true);
+      const allDone=V_GOALS.every(g=>g.done);
+      vStat(allDone?'🎉 Mission erfolgreich! Alle Ziele erreicht.':'Flug beendet. Mission unvollständig.',allDone?'st-ok':'st-info');
+      return;
+    }
+    const cmd=vCmds[ci],to={x:pos.x+cmd.x,y:pos.y+cmd.y};
+    
+    currentAngle = -Math.atan2(cmd.y, cmd.x);
+
+    if(step===0){
+      const hit=checkPath(pos.x,pos.y,to.x,to.y);
+      if(hit){
+        vAnim=null;vPos=pos;drawTab2(null,null,ci);
+        vHL(ci,true);vBtns(true);
+        vStat(`💥 Kollision bei (${hit.x}, ${hit.y})! Asteroid im Weg.`,'st-err');
+        return;
+      }
+    }
+    vHL(ci,false);
+    const t=step/spc;
+    const cur={x:pos.x+(to.x-pos.x)*t,y:pos.y+(to.y-pos.y)*t};
+    drawTab2(cur,ci,null);
+    if(++step>spc){step=0;pos=to;checkGoal(pos.x,pos.y);ci++;}
+    vAnim=requestAnimationFrame(tick);
+  }
+  vAnim=requestAnimationFrame(tick);
+}
+function vReset(){
+  if(vAnim){cancelAnimationFrame(vAnim);vAnim=null;}
+  vCmds=[];vPos={...V_START};V_GOALS.forEach(g=>g.done=false);
+  vRenderCmds();drawTab2(null,null,null);vUpdGoals();vStat('Schiff im Dock. Warte auf Befehle.','st-info');vBtns(true);
+  document.querySelectorAll('#v-cmds .cmd-item').forEach(el=>el.classList.remove('active','error'));
+}
+
+// ══════════════════════════════════════════════════════
+// EVENT LISTENERS & TOUCH SCANNER
+// ══════════════════════════════════════════════════════
+
+function updatePointer(e) {
+  if(e.touches) {
+    e.preventDefault(); // Verhindert Scrollen beim Wischen auf dem Radar
+    const touch = e.touches[0];
+    const [gx,gy] = s2g(C2U, touch.clientX, touch.clientY);
+    pointerPos = {x: Math.round(gx*10)/10, y: Math.round(gy*10)/10};
+  } else {
+    const [gx,gy] = s2g(C2U, e.clientX, e.clientY);
+    pointerPos = {x: Math.round(gx*10)/10, y: Math.round(gy*10)/10};
+  }
+  document.getElementById('hov-coords').textContent = `(${pointerPos.x.toFixed(1)}, ${pointerPos.y.toFixed(1)})`;
+  if(!vAnim) drawTab2(null, null, null); 
+}
+
+function clearPointer() {
+  pointerPos = null;
+  document.getElementById('hov-coords').textContent = '– / –';
+  if(!vAnim) drawTab2(null, null, null);
+}
+
+C2U.addEventListener('mousemove', updatePointer);
+C2U.addEventListener('mouseleave', clearPointer);
+C2U.addEventListener('touchstart', updatePointer, {passive: false});
+C2U.addEventListener('touchmove', updatePointer, {passive: false});
+C2U.addEventListener('touchend', clearPointer);
+C2U.addEventListener('touchcancel', clearPointer);
+
+document.getElementById('grid-op').addEventListener('input',function(){
+  gridAlpha=this.value/100; if(!vAnim) drawTab2(null,null,null);
+});
+document.getElementById('v-add').addEventListener('click',vAdd);
+document.getElementById('v-undo').addEventListener('click',vUndo);
+document.getElementById('v-run').addEventListener('click',vRun);
+document.getElementById('v-rst').addEventListener('click',vReset);
+['v-x','v-y'].forEach(id=>document.getElementById(id).addEventListener('input',vUpdLen));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.activeElement.id&&document.activeElement.id.startsWith('v-'))vAdd();
+});
+
+// Resize
+function resizeGroup(wrap,...cc){cc.forEach(c=>{c.width=wrap.clientWidth;c.height=wrap.clientHeight;})}
+function redrawAll(){
+  resizeGroup(document.getElementById('map2'),C2S,C2G,C2U);
+  drawTab2(null,null,null);
+}
+
+window.addEventListener('resize',redrawAll);
+window.addEventListener('DOMContentLoaded',()=>{redrawAll();vUpdLen();vUpdGoals();vRenderCmds();});
+</script>
+</body>
+</html>
