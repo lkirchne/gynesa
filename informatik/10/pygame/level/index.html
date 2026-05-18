@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Level-Klasse in Pygame</title>
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=source-serif-4:400,600,700|fira-mono:400,500" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Source Serif 4',Georgia,serif;background:#faf9f6;color:#1a1a1a;line-height:1.75;font-size:16px}
+a{color:#004E92}
+.topbar{background:#222;color:#fff;padding:.6rem 1.5rem;font-family:'Fira Mono',monospace;font-size:.75rem;letter-spacing:.03em;display:flex;justify-content:space-between;align-items:center}
+.topbar a{color:#ccc;text-decoration:none}.topbar a:hover{color:#fff}
+main{max-width:820px;margin:0 auto;padding:2rem 1.5rem 4rem}
+h1{font-size:1.6rem;font-weight:700;margin:1.5rem 0 .3rem;color:#1a1a1a;line-height:1.3}
+h1 code{font-family:'Fira Mono',monospace;background:#e8e4dc;padding:.1em .3em;border-radius:3px;font-size:.85em}
+.lead{color:#555;font-size:1.05rem;margin-bottom:2rem;border-left:3px solid #FF8E00;padding-left:.8rem}
+.tldr{background:#fff;border:2px solid #1a1a1a;padding:1.2rem 1.4rem;margin-bottom:1.5rem}
+.tldr h2{font-family:'Fira Mono',monospace;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.8rem;color:#FF8E00}
+.tldr pre{background:#f5f3ee;border:1px solid #ddd;padding:.8rem 1rem;font-size:.82rem;line-height:1.6;overflow-x:auto;margin:.5rem 0}
+.tldr p{font-size:.92rem;margin-bottom:.5rem}
+.tldr code{font-family:'Fira Mono',monospace;font-size:.85em}
+.tab-bar{display:flex;gap:0;border-bottom:2px solid #1a1a1a;margin-bottom:0}
+.tab-btn{font-family:'Fira Mono',monospace;font-size:.8rem;padding:.6rem 1.2rem;background:#e8e4dc;border:2px solid #1a1a1a;border-bottom:none;cursor:pointer;position:relative;top:2px;margin-right:-2px;color:#555;transition:background .15s}
+.tab-btn:hover{background:#ddd8cc}
+.tab-btn.active{background:#faf9f6;color:#1a1a1a;font-weight:500;z-index:1}
+.tab-panel{display:none;border:2px solid #1a1a1a;border-top:none;padding:1.5rem;background:#faf9f6}
+.tab-panel.active{display:block}
+.tab-panel h2{font-size:1.15rem;font-weight:700;margin:1.8rem 0 .6rem;color:#004E92;padding-bottom:.3rem;border-bottom:1px solid #ddd}
+.tab-panel h2:first-child{margin-top:0}
+.tab-panel h3{font-size:.95rem;font-weight:600;color:#1a1a1a;margin:1.2rem 0 .4rem;font-family:'Fira Mono',monospace}
+.tab-panel p{margin-bottom:.7rem}
+pre{background:#2b2b2b;color:#d4d4d4;border-radius:3px;padding:1rem 1.2rem;overflow-x:auto;margin:.6rem 0 1rem;font-size:.82rem;line-height:1.65;border-left:3px solid #FF8E00}
+code{font-family:'Fira Mono',monospace;font-size:.85em}
+p code,li code,td code{background:#e8e4dc;padding:.1em .35em;border-radius:2px;font-size:.82em;color:#1a1a1a}
+.k{color:#c586c0}.f{color:#dcdcaa}.s{color:#ce9178}.c{color:#6a9955;font-style:italic}
+.n{color:#b5cea8}.v{color:#9cdcfe}.t{color:#4ec9b0}.o{color:#569cd6}
+.hint{padding:.8rem 1rem;margin:.8rem 0;font-size:.9rem;border-left:3px solid #aaa;background:#fff}
+.hint.orange{border-left-color:#FF8E00}
+.hint.blue{border-left-color:#004E92}
+.hint.green{border-left-color:#89BA17}
+.hint strong{font-weight:600}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:.8rem 0}
+.vs>div{border:1px solid #ccc;padding:.8rem;background:#fff}
+.vs>div h4{font-family:'Fira Mono',monospace;font-size:.78rem;margin-bottom:.5rem}
+.vs .old h4{color:#c44}.vs .new h4{color:#2a7}
+.vs pre{font-size:.75rem;padding:.6rem .8rem;margin:0}
+@media(max-width:650px){.vs{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;margin:.6rem 0 1rem;font-size:.88rem}
+th,td{text-align:left;padding:.45rem .7rem;border:1px solid #ccc}
+th{background:#e8e4dc;font-weight:600;font-size:.8rem}
+.uml{background:#fff;border:2px solid #1a1a1a;padding:0;margin:.8rem 0;font-family:'Fira Mono',monospace;font-size:.78rem;max-width:400px}
+.uml .title{background:#1a1a1a;color:#fff;padding:.3rem .6rem;font-weight:700;text-align:center;font-size:.85rem}
+.uml .attrs,.uml .methods{padding:.4rem .7rem}
+.uml .attrs{border-bottom:1px solid #ccc}
+.uml .attrs div,.uml .methods div{padding:.15rem 0}
+.uml .type{color:#888}
+ul,ol{margin:.5rem 0 1rem 1.5rem}li{margin-bottom:.3rem}
+footer{text-align:center;padding:1.5rem;color:#999;font-size:.75rem;border-top:1px solid #ddd;margin-top:2rem;font-family:'Fira Mono',monospace}
+footer a{color:#888;text-decoration:none}footer a:hover{color:#555}
+@media(max-width:600px){main{padding:1rem .8rem 3rem}h1{font-size:1.3rem}.tab-btn{font-size:.7rem;padding:.5rem .7rem}pre{font-size:.75rem;padding:.7rem}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span>Informatik &middot; Klasse 10 &middot; Pygame</span>
+  <a href="https://github.com/lkirchne">lkirchne</a>
+</div>
+
+<main>
+
+<h1>Die <code>Level</code>-Klasse</h1>
+<p class="lead">Drei Wege, wie du deine Spielobjekte in eine Level-Klasse packen kannst &ndash; von Textdatei &uuml;ber verschachtelte Klassen bis zur direkten Platzierung.</p>
+
+<table>
+<tr><th></th><th>A &ndash; Textdatei</th><th>B &ndash; Verschachtelt</th><th>C &ndash; Direkt</th></tr>
+<tr><td>Sprite-Klassen</td><td>eigenst&auml;ndig</td><td>in Level verschachtelt</td><td>eigenst&auml;ndig</td></tr>
+<tr><td>Level-Daten</td><td>externe .txt</td><td>Koordinaten im Code</td><td>Koordinaten im Code</td></tr>
+<tr><td>Raster n&ouml;tig?</td><td>ja</td><td>nein, frei platzierbar</td><td>nein, frei platzierbar</td></tr>
+<tr><td>Neues Level</td><td>neue Datei anlegen</td><td>neue Methode schreiben</td><td>neue Methode schreiben</td></tr>
+<tr><td>Aufwand</td><td>mittel</td><td>hoch</td><td>niedrig</td></tr>
+<tr><td>Geeignet f&uuml;r</td><td>gr&ouml;&szlig;ere Projekte</td><td>Spezialfall</td><td>Prototypen</td></tr>
+</table>
+
+<div class="hint orange" style="margin-bottom:1.5rem"><strong>Empfehlung f&uuml;r den Einstieg:</strong> Variante C ist am schnellsten umgesetzt. Wenn das Spiel w&auml;chst und du viele Level brauchst, lohnt sich der Umstieg auf Variante A.</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab(0)">A &ndash; Textdatei</button>
+  <button class="tab-btn" onclick="showTab(1)">B &ndash; Verschachtelt</button>
+  <button class="tab-btn" onclick="showTab(2)">C &ndash; Direkt</button>
+</div>
+
+<!-- ==================== TAB A ==================== -->
+<div class="tab-panel active" id="tab0">
+
+<div class="tldr">
+<h2>TL;DR</h2>
+<p>Sprite-Klassen bleiben eigenst&auml;ndig. Die <code>Level</code>-Klasse liest eine <strong>Textdatei</strong> ein und baut daraus alle Objekte. Exits/Backs sind Sprite-Gruppen (Multi-Tile). Level-Wechsel per Modulo.</p>
+<pre><code>level_dateien = [<span class="s">"level_1.txt"</span>, <span class="s">"level_2.txt"</span>, <span class="s">"level_3.txt"</span>]
+level_nr = <span class="n">0</span>
+level = <span class="t">Level</span>(level_dateien[level_nr])
+
+<span class="c"># Vorw&auml;rts:</span>  level_nr = (level_nr + <span class="n">1</span>) % <span class="f">len</span>(level_dateien)
+<span class="c"># Zur&uuml;ck:</span>    level_nr = (level_nr - <span class="n">1</span>) % <span class="f">len</span>(level_dateien)
+level = <span class="t">Level</span>(level_dateien[level_nr])</code></pre>
+</div>
+
+<h2>Idee</h2>
+<p>Deine Sprite-Klassen (<code>Wall</code>, <code>Coin</code>, &hellip;) bleiben eigenst&auml;ndig. Die <code>Level</code>-Klasse liest eine Textdatei ein und erzeugt daraus die Objekte. Das trennt Level-Design (Textdatei) sauber vom Code.</p>
+
+<h2>Die Level-Datei</h2>
+<p>Jedes Zeichen = eine Kachel:</p>
+<table>
+<tr><th>Zeichen</th><th>Bedeutung</th></tr>
+<tr><td><code>W</code></td><td>Wand</td></tr>
+<tr><td><code>.</code></td><td>Leer</td></tr>
+<tr><td><code>S</code></td><td>Spielerin-Start</td></tr>
+<tr><td><code>C</code></td><td>M&uuml;nze</td></tr>
+<tr><td><code>E</code></td><td>Gegnerin</td></tr>
+<tr><td><code>X</code></td><td>Ausgang &rarr; n&auml;chstes Level</td></tr>
+<tr><td><code>B</code></td><td>R&uuml;ckgang &rarr; vorheriges Level</td></tr>
+</table>
+
+<pre><code><span class="c"># level_2.txt &ndash; breiter Ausgang (2x2) und R&uuml;ckgang (2 Tiles)</span>
+WWWWWWWWWWWWWWWW
+W..............W
+B..S...........W
+B..........C...W
+W....WWWWWW....W
+W..............W
+W..E.......C..XX
+W.............XX
+WWWWWWWWWWWWWWWW</code></pre>
+
+<h2>Exit- und Back-Sprite</h2>
+<pre><code><span class="k">class</span> <span class="t">Exit</span>(pygame.sprite.<span class="t">Sprite</span>):
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+        <span class="f">super</span>().<span class="f">__init__</span>()
+        <span class="v">self</span>.image = pygame.<span class="t">Surface</span>((TILE_SIZE, TILE_SIZE))
+        <span class="v">self</span>.image.<span class="f">fill</span>(<span class="s">"dodgerblue"</span>)
+        <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))
+
+<span class="k">class</span> <span class="t">Back</span>(pygame.sprite.<span class="t">Sprite</span>):
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+        <span class="f">super</span>().<span class="f">__init__</span>()
+        <span class="v">self</span>.image = pygame.<span class="t">Surface</span>((TILE_SIZE, TILE_SIZE))
+        <span class="v">self</span>.image.<span class="f">fill</span>(<span class="s">"orange"</span>)
+        <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))</code></pre>
+
+<div class="hint orange">Da <code>exits</code> und <code>backs</code> Sprite-Gruppen sind, funktioniert die Kollision auch wenn der Ausgang aus 2&times;2 oder 3&times;1 Tiles besteht &ndash; <code>spritecollideany</code> pr&uuml;ft gegen <em>jedes</em> Sprite in der Gruppe.</div>
+
+<h2>Die Level-Klasse</h2>
+
+<pre><code><span class="k">class</span> <span class="t">Level</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, dateiname):
+        <span class="v">self</span>.walls   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.coins   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.enemies = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.exits   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.backs   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.player  = <span class="o">None</span>
+        <span class="v">self</span>.<span class="f">_laden</span>(dateiname)
+
+    <span class="k">def</span> <span class="f">_laden</span>(<span class="v">self</span>, dateiname):
+        <span class="k">with</span> <span class="f">open</span>(dateiname) <span class="k">as</span> datei:
+            <span class="k">for</span> zeile_nr, zeile <span class="k">in</span> <span class="f">enumerate</span>(datei):
+                <span class="k">for</span> spalte_nr, zeichen <span class="k">in</span> <span class="f">enumerate</span>(zeile.<span class="f">strip</span>()):
+                    x = spalte_nr * TILE_SIZE
+                    y = zeile_nr  * TILE_SIZE
+
+                    <span class="k">if</span> zeichen == <span class="s">"W"</span>:
+                        <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(x, y))
+                    <span class="k">elif</span> zeichen == <span class="s">"C"</span>:
+                        <span class="v">self</span>.coins.<span class="f">add</span>(<span class="t">Coin</span>(x, y))
+                    <span class="k">elif</span> zeichen == <span class="s">"E"</span>:
+                        <span class="v">self</span>.enemies.<span class="f">add</span>(<span class="t">Enemy</span>(x, y))
+                    <span class="k">elif</span> zeichen == <span class="s">"S"</span>:
+                        <span class="v">self</span>.player = <span class="t">Player</span>(x, y)
+                    <span class="k">elif</span> zeichen == <span class="s">"X"</span>:
+                        <span class="v">self</span>.exits.<span class="f">add</span>(<span class="t">Exit</span>(x, y))
+                    <span class="k">elif</span> zeichen == <span class="s">"B"</span>:
+                        <span class="v">self</span>.backs.<span class="f">add</span>(<span class="t">Back</span>(x, y))
+
+    <span class="k">def</span> <span class="f">update</span>(<span class="v">self</span>):
+        <span class="v">self</span>.player.<span class="f">update</span>(<span class="v">self</span>.walls)
+        <span class="v">self</span>.enemies.<span class="f">update</span>(<span class="v">self</span>.walls)
+        gesammelt = pygame.sprite.<span class="f">spritecollide</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.coins, <span class="o">True</span>
+        )
+        <span class="k">return</span> <span class="f">len</span>(gesammelt)
+
+    <span class="k">def</span> <span class="f">draw</span>(<span class="v">self</span>, screen):
+        <span class="v">self</span>.walls.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.coins.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.enemies.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.exits.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.backs.<span class="f">draw</span>(screen)
+        screen.<span class="f">blit</span>(<span class="v">self</span>.player.image, <span class="v">self</span>.player.rect)
+
+    <span class="k">def</span> <span class="f">ausgang_erreicht</span>(<span class="v">self</span>):
+        <span class="k">return</span> pygame.sprite.<span class="f">spritecollideany</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.exits
+        )
+
+    <span class="k">def</span> <span class="f">rueckgang_erreicht</span>(<span class="v">self</span>):
+        <span class="k">return</span> pygame.sprite.<span class="f">spritecollideany</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.backs
+        )</code></pre>
+
+<h2>Level wechseln mit Modulo</h2>
+<pre><code>level_dateien = [<span class="s">"level_1.txt"</span>, <span class="s">"level_2.txt"</span>, <span class="s">"level_3.txt"</span>]
+level_nr = <span class="n">0</span>
+level = <span class="t">Level</span>(level_dateien[level_nr])
+
+<span class="c"># Im Game Loop:</span>
+<span class="k">if</span> level.<span class="f">ausgang_erreicht</span>():
+    level_nr = (level_nr + <span class="n">1</span>) % <span class="f">len</span>(level_dateien)
+    level = <span class="t">Level</span>(level_dateien[level_nr])
+
+<span class="k">elif</span> level.<span class="f">rueckgang_erreicht</span>():
+    level_nr = (level_nr - <span class="n">1</span>) % <span class="f">len</span>(level_dateien)
+    level = <span class="t">Level</span>(level_dateien[level_nr])</code></pre>
+
+<div class="hint green"><strong>Warum Modulo?</strong> <code>(0 - 1) % 3</code> ergibt <code>2</code> &ndash; geht vom ersten Level zum letzten. <code>(2 + 1) % 3</code> ergibt <code>0</code> &ndash; geht vom letzten zum ersten. Kein <code>if</code> n&ouml;tig.</div>
+
+</div>
+
+<!-- ==================== TAB B ==================== -->
+<div class="tab-panel" id="tab1">
+
+<div class="tldr">
+<h2>TL;DR</h2>
+<p>Alle Sprite-Klassen leben <strong>innerhalb</strong> von <code>Level</code> (nested classes). Die Objekte werden <strong>direkt mit Koordinaten</strong> platziert &ndash; keine Textdatei, kein Zeichenraster.</p>
+<pre><code>level = <span class="t">Level</span>(<span class="n">0</span>)       <span class="c"># Level per Nummer</span>
+level.<span class="f">update</span>()
+level.<span class="f">draw</span>(screen)
+
+<span class="c"># Intern: Level.Wall(x,y), Level.Coin(x,y), ...</span>
+<span class="c"># Positionen werden direkt in _aufbauen() gesetzt</span></code></pre>
+</div>
+
+<h2>Idee</h2>
+<p>Die Sprite-Klassen werden <strong>innerhalb</strong> der Level-Klasse definiert (nested classes). Statt einer Textdatei platzierst du Objekte <strong>direkt mit Pixelkoordinaten</strong> oder per Schleife. Alles steckt in einer Methode pro Level.</p>
+
+<div class="hint blue"><strong>Wann sinnvoll?</strong> Wenn du volle Kontrolle &uuml;ber Positionen brauchst (z.B. Objekte nicht im Raster) und die Sprite-Klassen nur f&uuml;r das Level existieren.</div>
+
+<h2>Die Level-Klasse</h2>
+
+<pre><code><span class="k">class</span> <span class="t">Level</span>:
+
+    <span class="c"># ---- Verschachtelte Sprite-Klassen ----</span>
+
+    <span class="k">class</span> <span class="t">Wall</span>(pygame.sprite.<span class="t">Sprite</span>):
+        <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+            <span class="f">super</span>().<span class="f">__init__</span>()
+            <span class="v">self</span>.image = pygame.<span class="t">Surface</span>((TILE_SIZE, TILE_SIZE))
+            <span class="v">self</span>.image.<span class="f">fill</span>(<span class="s">"gray"</span>)
+            <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))
+
+    <span class="k">class</span> <span class="t">Coin</span>(pygame.sprite.<span class="t">Sprite</span>):
+        <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+            <span class="f">super</span>().<span class="f">__init__</span>()
+            <span class="v">self</span>.image = pygame.<span class="t">Surface</span>(
+                (TILE_SIZE, TILE_SIZE), pygame.SRCALPHA
+            )
+            pygame.draw.<span class="f">circle</span>(
+                <span class="v">self</span>.image, <span class="s">"gold"</span>,
+                (TILE_SIZE // <span class="n">2</span>, TILE_SIZE // <span class="n">2</span>), TILE_SIZE // <span class="n">3</span>
+            )
+            <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))
+
+    <span class="k">class</span> <span class="t">Enemy</span>(pygame.sprite.<span class="t">Sprite</span>):
+        <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+            <span class="f">super</span>().<span class="f">__init__</span>()
+            <span class="v">self</span>.image = pygame.<span class="t">Surface</span>((TILE_SIZE, TILE_SIZE))
+            <span class="v">self</span>.image.<span class="f">fill</span>(<span class="s">"red"</span>)
+            <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))
+            <span class="v">self</span>.speed = <span class="n">2</span>
+            <span class="v">self</span>.direction = <span class="n">1</span>
+
+        <span class="k">def</span> <span class="f">update</span>(<span class="v">self</span>, walls):
+            <span class="v">self</span>.rect.x += <span class="v">self</span>.speed * <span class="v">self</span>.direction
+            <span class="k">if</span> pygame.sprite.<span class="f">spritecollideany</span>(<span class="v">self</span>, walls):
+                <span class="v">self</span>.rect.x -= <span class="v">self</span>.speed * <span class="v">self</span>.direction
+                <span class="v">self</span>.direction *= -<span class="n">1</span>
+
+    <span class="k">class</span> <span class="t">Player</span>(pygame.sprite.<span class="t">Sprite</span>):
+        <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+            <span class="f">super</span>().<span class="f">__init__</span>()
+            <span class="v">self</span>.image = pygame.<span class="t">Surface</span>((TILE_SIZE, TILE_SIZE))
+            <span class="v">self</span>.image.<span class="f">fill</span>(<span class="s">"limegreen"</span>)
+            <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))
+            <span class="v">self</span>.speed = <span class="n">4</span>
+
+        <span class="k">def</span> <span class="f">update</span>(<span class="v">self</span>, walls):
+            keys = pygame.key.<span class="f">get_pressed</span>()
+            dx, dy = <span class="n">0</span>, <span class="n">0</span>
+            <span class="k">if</span> keys[pygame.K_LEFT]:  dx = -<span class="v">self</span>.speed
+            <span class="k">if</span> keys[pygame.K_RIGHT]: dx =  <span class="v">self</span>.speed
+            <span class="k">if</span> keys[pygame.K_UP]:    dy = -<span class="v">self</span>.speed
+            <span class="k">if</span> keys[pygame.K_DOWN]:  dy =  <span class="v">self</span>.speed
+
+            <span class="v">self</span>.rect.x += dx
+            <span class="k">for</span> w <span class="k">in</span> pygame.sprite.<span class="f">spritecollide</span>(<span class="v">self</span>, walls, <span class="o">False</span>):
+                <span class="k">if</span> dx > <span class="n">0</span>: <span class="v">self</span>.rect.right  = w.rect.left
+                <span class="k">if</span> dx < <span class="n">0</span>: <span class="v">self</span>.rect.left   = w.rect.right
+            <span class="v">self</span>.rect.y += dy
+            <span class="k">for</span> w <span class="k">in</span> pygame.sprite.<span class="f">spritecollide</span>(<span class="v">self</span>, walls, <span class="o">False</span>):
+                <span class="k">if</span> dy > <span class="n">0</span>: <span class="v">self</span>.rect.bottom = w.rect.top
+                <span class="k">if</span> dy < <span class="n">0</span>: <span class="v">self</span>.rect.top    = w.rect.bottom
+
+    <span class="k">class</span> <span class="t">Exit</span>(pygame.sprite.<span class="t">Sprite</span>):
+        <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+            <span class="f">super</span>().<span class="f">__init__</span>()
+            <span class="v">self</span>.image = pygame.<span class="t">Surface</span>((TILE_SIZE, TILE_SIZE))
+            <span class="v">self</span>.image.<span class="f">fill</span>(<span class="s">"dodgerblue"</span>)
+            <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))
+
+    <span class="k">class</span> <span class="t">Back</span>(pygame.sprite.<span class="t">Sprite</span>):
+        <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, x, y):
+            <span class="f">super</span>().<span class="f">__init__</span>()
+            <span class="v">self</span>.image = pygame.<span class="t">Surface</span>((TILE_SIZE, TILE_SIZE))
+            <span class="v">self</span>.image.<span class="f">fill</span>(<span class="s">"orange"</span>)
+            <span class="v">self</span>.rect = <span class="v">self</span>.image.<span class="f">get_rect</span>(topleft=(x, y))
+
+    <span class="c"># ---- Anzahl Level (f&uuml;r Modulo) ----</span>
+    ANZAHL_LEVELS = <span class="n">2</span>
+
+    <span class="c"># ---- Level-eigene Methoden ----</span>
+
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, level_nr):
+        <span class="v">self</span>.walls   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.coins   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.enemies = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.exits   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.backs   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.player  = <span class="o">None</span>
+
+        <span class="c"># Passende Aufbau-Methode aufrufen</span>
+        <span class="k">if</span> level_nr == <span class="n">0</span>:
+            <span class="v">self</span>.<span class="f">_level_0</span>()
+        <span class="k">elif</span> level_nr == <span class="n">1</span>:
+            <span class="v">self</span>.<span class="f">_level_1</span>()
+
+    <span class="k">def</span> <span class="f">_level_0</span>(<span class="v">self</span>):
+        T = TILE_SIZE
+        <span class="c"># Rahmen: obere und untere Wand</span>
+        <span class="k">for</span> x <span class="k">in</span> <span class="f">range</span>(<span class="n">0</span>, <span class="n">10</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(x, <span class="n">0</span>))
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(x, <span class="n">6</span> * T))
+        <span class="c"># Rahmen: linke und rechte Wand</span>
+        <span class="k">for</span> y <span class="k">in</span> <span class="f">range</span>(T, <span class="n">6</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(<span class="n">0</span>, y))
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(<span class="n">9</span> * T, y))
+        <span class="c"># Innenwand</span>
+        <span class="k">for</span> x <span class="k">in</span> <span class="f">range</span>(<span class="n">3</span> * T, <span class="n">7</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(x, <span class="n">3</span> * T))
+
+        <span class="v">self</span>.player = Level.<span class="t">Player</span>(<span class="n">2</span> * T, <span class="n">1</span> * T)
+        <span class="v">self</span>.coins.<span class="f">add</span>(Level.<span class="t">Coin</span>(<span class="n">7</span> * T, <span class="n">2</span> * T))
+        <span class="v">self</span>.coins.<span class="f">add</span>(Level.<span class="t">Coin</span>(<span class="n">5</span> * T, <span class="n">5</span> * T))
+        <span class="v">self</span>.enemies.<span class="f">add</span>(Level.<span class="t">Enemy</span>(<span class="n">4</span> * T, <span class="n">5</span> * T))
+        <span class="v">self</span>.exits.<span class="f">add</span>(Level.<span class="t">Exit</span>(<span class="n">8</span> * T, <span class="n">5</span> * T))
+
+    <span class="k">def</span> <span class="f">_level_1</span>(<span class="v">self</span>):
+        T = TILE_SIZE
+        <span class="c"># Gr&ouml;&szlig;eres Level, &auml;hnliches Muster ...</span>
+        <span class="k">for</span> x <span class="k">in</span> <span class="f">range</span>(<span class="n">0</span>, <span class="n">14</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(x, <span class="n">0</span>))
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(x, <span class="n">8</span> * T))
+        <span class="k">for</span> y <span class="k">in</span> <span class="f">range</span>(T, <span class="n">8</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(<span class="n">0</span>, y))
+            <span class="v">self</span>.walls.<span class="f">add</span>(Level.<span class="t">Wall</span>(<span class="n">13</span> * T, y))
+
+        <span class="v">self</span>.player = Level.<span class="t">Player</span>(<span class="n">2</span> * T, <span class="n">2</span> * T)
+        <span class="v">self</span>.coins.<span class="f">add</span>(Level.<span class="t">Coin</span>(<span class="n">6</span> * T, <span class="n">3</span> * T))
+        <span class="v">self</span>.coins.<span class="f">add</span>(Level.<span class="t">Coin</span>(<span class="n">10</span> * T, <span class="n">5</span> * T))
+        <span class="v">self</span>.enemies.<span class="f">add</span>(Level.<span class="t">Enemy</span>(<span class="n">8</span> * T, <span class="n">2</span> * T))
+        <span class="c"># Breiter Ausgang (2 Tiles)</span>
+        <span class="v">self</span>.exits.<span class="f">add</span>(Level.<span class="t">Exit</span>(<span class="n">12</span> * T, <span class="n">6</span> * T))
+        <span class="v">self</span>.exits.<span class="f">add</span>(Level.<span class="t">Exit</span>(<span class="n">12</span> * T, <span class="n">7</span> * T))
+        <span class="c"># R&uuml;ckgang (2 Tiles am linken Rand)</span>
+        <span class="v">self</span>.backs.<span class="f">add</span>(Level.<span class="t">Back</span>(<span class="n">1</span> * T, <span class="n">6</span> * T))
+        <span class="v">self</span>.backs.<span class="f">add</span>(Level.<span class="t">Back</span>(<span class="n">1</span> * T, <span class="n">7</span> * T))
+
+    <span class="k">def</span> <span class="f">update</span>(<span class="v">self</span>):
+        <span class="v">self</span>.player.<span class="f">update</span>(<span class="v">self</span>.walls)
+        <span class="v">self</span>.enemies.<span class="f">update</span>(<span class="v">self</span>.walls)
+        gesammelt = pygame.sprite.<span class="f">spritecollide</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.coins, <span class="o">True</span>
+        )
+        <span class="k">return</span> <span class="f">len</span>(gesammelt)
+
+    <span class="k">def</span> <span class="f">draw</span>(<span class="v">self</span>, screen):
+        <span class="v">self</span>.walls.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.coins.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.enemies.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.exits.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.backs.<span class="f">draw</span>(screen)
+        screen.<span class="f">blit</span>(<span class="v">self</span>.player.image, <span class="v">self</span>.player.rect)
+
+    <span class="k">def</span> <span class="f">ausgang_erreicht</span>(<span class="v">self</span>):
+        <span class="k">return</span> pygame.sprite.<span class="f">spritecollideany</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.exits
+        )
+
+    <span class="k">def</span> <span class="f">rueckgang_erreicht</span>(<span class="v">self</span>):
+        <span class="k">return</span> pygame.sprite.<span class="f">spritecollideany</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.backs
+        )</code></pre>
+
+<h2>Level wechseln</h2>
+<pre><code>level_nr = <span class="n">0</span>
+level = <span class="t">Level</span>(level_nr)
+
+<span class="c"># Im Game Loop:</span>
+<span class="k">if</span> level.<span class="f">ausgang_erreicht</span>():
+    level_nr = (level_nr + <span class="n">1</span>) % <span class="t">Level</span>.ANZAHL_LEVELS
+    level = <span class="t">Level</span>(level_nr)
+
+<span class="k">elif</span> level.<span class="f">rueckgang_erreicht</span>():
+    level_nr = (level_nr - <span class="n">1</span>) % <span class="t">Level</span>.ANZAHL_LEVELS
+    level = <span class="t">Level</span>(level_nr)</code></pre>
+
+<div class="hint orange"><strong>Achtung:</strong> Verschachtelte Klassen sind in Python eher selten. In Java w&auml;ren sie &uuml;blicher. Nutze sie nur, wenn die Sprite-Klassen wirklich <em>nur</em> im Level vorkommen.</div>
+
+<div class="hint green"><strong>Vorteil:</strong> Du kannst Objekte pixelgenau platzieren &ndash; sie m&uuml;ssen nicht im Raster liegen. <strong>Nachteil:</strong> Jedes Level ist eine eigene Methode mit vielen Koordinaten &ndash; wird bei gro&szlig;en Levels un&uuml;bersichtlich.</div>
+
+</div>
+
+<!-- ==================== TAB C ==================== -->
+<div class="tab-panel" id="tab2">
+
+<div class="tldr">
+<h2>TL;DR</h2>
+<p>Keine Datei, keine nested classes. Sprite-Klassen bleiben extern. Die Objekte werden <strong>direkt mit Koordinaten</strong> in der Level-Klasse platziert.</p>
+<pre><code>level = <span class="t">Level</span>(<span class="n">0</span>)       <span class="c"># Level per Nummer</span>
+level.<span class="f">update</span>()
+level.<span class="f">draw</span>(screen)
+
+<span class="c"># Vorw&auml;rts:</span>  level_nr = (level_nr + <span class="n">1</span>) % <span class="t">Level</span>.ANZAHL_LEVELS
+<span class="c"># Zur&uuml;ck:</span>    level_nr = (level_nr - <span class="n">1</span>) % <span class="t">Level</span>.ANZAHL_LEVELS</code></pre>
+</div>
+
+<h2>Idee</h2>
+<p>Die einfachste Variante: Sprite-Klassen existieren wie gehabt global. Die Level-Klasse hat pro Level eine eigene Aufbau-Methode, die Objekte <strong>direkt per Koordinaten</strong> erzeugt. Keine Datei, kein Zeichenraster, keine verschachtelten Klassen.</p>
+
+<div class="hint blue"><strong>Wann sinnvoll?</strong> F&uuml;r schnelle Prototypen oder wenn du wenige, kleine Level hast und einfach loslegen willst.</div>
+
+<h2>Die Level-Klasse</h2>
+
+<pre><code><span class="k">class</span> <span class="t">Level</span>:
+
+    ANZAHL_LEVELS = <span class="n">2</span>
+
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="v">self</span>, level_nr):
+        <span class="v">self</span>.walls   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.coins   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.enemies = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.exits   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.backs   = pygame.sprite.<span class="t">Group</span>()
+        <span class="v">self</span>.player  = <span class="o">None</span>
+
+        <span class="k">if</span> level_nr == <span class="n">0</span>:
+            <span class="v">self</span>.<span class="f">_level_0</span>()
+        <span class="k">elif</span> level_nr == <span class="n">1</span>:
+            <span class="v">self</span>.<span class="f">_level_1</span>()
+
+    <span class="k">def</span> <span class="f">_level_0</span>(<span class="v">self</span>):
+        T = TILE_SIZE
+        <span class="c"># Rahmen</span>
+        <span class="k">for</span> x <span class="k">in</span> <span class="f">range</span>(<span class="n">0</span>, <span class="n">10</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(x, <span class="n">0</span>))
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(x, <span class="n">6</span> * T))
+        <span class="k">for</span> y <span class="k">in</span> <span class="f">range</span>(T, <span class="n">6</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(<span class="n">0</span>, y))
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(<span class="n">9</span> * T, y))
+        <span class="c"># Innenwand</span>
+        <span class="k">for</span> x <span class="k">in</span> <span class="f">range</span>(<span class="n">3</span> * T, <span class="n">7</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(x, <span class="n">3</span> * T))
+
+        <span class="v">self</span>.player = <span class="t">Player</span>(<span class="n">2</span> * T, <span class="n">1</span> * T)
+        <span class="v">self</span>.coins.<span class="f">add</span>(<span class="t">Coin</span>(<span class="n">7</span> * T, <span class="n">2</span> * T))
+        <span class="v">self</span>.coins.<span class="f">add</span>(<span class="t">Coin</span>(<span class="n">5</span> * T, <span class="n">5</span> * T))
+        <span class="v">self</span>.enemies.<span class="f">add</span>(<span class="t">Enemy</span>(<span class="n">4</span> * T, <span class="n">5</span> * T))
+        <span class="v">self</span>.exits.<span class="f">add</span>(<span class="t">Exit</span>(<span class="n">8</span> * T, <span class="n">5</span> * T))
+
+    <span class="k">def</span> <span class="f">_level_1</span>(<span class="v">self</span>):
+        T = TILE_SIZE
+        <span class="k">for</span> x <span class="k">in</span> <span class="f">range</span>(<span class="n">0</span>, <span class="n">14</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(x, <span class="n">0</span>))
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(x, <span class="n">8</span> * T))
+        <span class="k">for</span> y <span class="k">in</span> <span class="f">range</span>(T, <span class="n">8</span> * T, T):
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(<span class="n">0</span>, y))
+            <span class="v">self</span>.walls.<span class="f">add</span>(<span class="t">Wall</span>(<span class="n">13</span> * T, y))
+
+        <span class="v">self</span>.player = <span class="t">Player</span>(<span class="n">2</span> * T, <span class="n">2</span> * T)
+        <span class="v">self</span>.coins.<span class="f">add</span>(<span class="t">Coin</span>(<span class="n">6</span> * T, <span class="n">3</span> * T))
+        <span class="v">self</span>.coins.<span class="f">add</span>(<span class="t">Coin</span>(<span class="n">10</span> * T, <span class="n">5</span> * T))
+        <span class="v">self</span>.enemies.<span class="f">add</span>(<span class="t">Enemy</span>(<span class="n">8</span> * T, <span class="n">2</span> * T))
+        <span class="c"># Breiter Ausgang</span>
+        <span class="v">self</span>.exits.<span class="f">add</span>(<span class="t">Exit</span>(<span class="n">12</span> * T, <span class="n">6</span> * T))
+        <span class="v">self</span>.exits.<span class="f">add</span>(<span class="t">Exit</span>(<span class="n">12</span> * T, <span class="n">7</span> * T))
+        <span class="c"># R&uuml;ckgang</span>
+        <span class="v">self</span>.backs.<span class="f">add</span>(<span class="t">Back</span>(<span class="n">1</span> * T, <span class="n">6</span> * T))
+        <span class="v">self</span>.backs.<span class="f">add</span>(<span class="t">Back</span>(<span class="n">1</span> * T, <span class="n">7</span> * T))
+
+    <span class="k">def</span> <span class="f">update</span>(<span class="v">self</span>):
+        <span class="v">self</span>.player.<span class="f">update</span>(<span class="v">self</span>.walls)
+        <span class="v">self</span>.enemies.<span class="f">update</span>(<span class="v">self</span>.walls)
+        gesammelt = pygame.sprite.<span class="f">spritecollide</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.coins, <span class="o">True</span>
+        )
+        <span class="k">return</span> <span class="f">len</span>(gesammelt)
+
+    <span class="k">def</span> <span class="f">draw</span>(<span class="v">self</span>, screen):
+        <span class="v">self</span>.walls.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.coins.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.enemies.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.exits.<span class="f">draw</span>(screen)
+        <span class="v">self</span>.backs.<span class="f">draw</span>(screen)
+        screen.<span class="f">blit</span>(<span class="v">self</span>.player.image, <span class="v">self</span>.player.rect)
+
+    <span class="k">def</span> <span class="f">ausgang_erreicht</span>(<span class="v">self</span>):
+        <span class="k">return</span> pygame.sprite.<span class="f">spritecollideany</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.exits
+        )
+
+    <span class="k">def</span> <span class="f">rueckgang_erreicht</span>(<span class="v">self</span>):
+        <span class="k">return</span> pygame.sprite.<span class="f">spritecollideany</span>(
+            <span class="v">self</span>.player, <span class="v">self</span>.backs
+        )</code></pre>
+
+<h2>Level wechseln</h2>
+<pre><code>level_nr = <span class="n">0</span>
+level = <span class="t">Level</span>(level_nr)
+
+<span class="c"># Im Game Loop:</span>
+<span class="k">if</span> level.<span class="f">ausgang_erreicht</span>():
+    level_nr = (level_nr + <span class="n">1</span>) % <span class="t">Level</span>.ANZAHL_LEVELS
+    level = <span class="t">Level</span>(level_nr)
+
+<span class="k">elif</span> level.<span class="f">rueckgang_erreicht</span>():
+    level_nr = (level_nr - <span class="n">1</span>) % <span class="t">Level</span>.ANZAHL_LEVELS
+    level = <span class="t">Level</span>(level_nr)</code></pre>
+
+<div class="hint green"><strong>Modulo-Trick:</strong> <code>(0 - 1) % 2</code> ergibt <code>1</code> &ndash; vom ersten zum letzten. <code>(1 + 1) % 2</code> ergibt <code>0</code> &ndash; vom letzten zum ersten.</div>
+
+</div>
+
+</main>
+
+<footer>
+  <a href="https://github.com/lkirchne">github.com/lkirchne</a>
+</footer>
+
+<script>
+function showTab(n){
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('active',i===n)});
+  document.querySelectorAll('.tab-panel').forEach(function(p,i){p.classList.toggle('active',i===n)});
+}
+</script>
+</body>
+</html>
