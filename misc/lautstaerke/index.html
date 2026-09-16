@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Lautstärke → Farbe</title>
+<style>
+  :root{
+    --ink:#1b1b18;
+    --paper:#faf9f6;
+    --line:#dcd8cf;
+    --sub:#6b675f;
+    --blue:#004E92;
+
+    --c1:#4C8C2B;
+    --c2:#89BA17;
+    --c3:#F5C400;
+    --c4:#FF8E00;
+    --c5:#E5383B;
+    --c6:#7B2D8E;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#efeee9;
+      --paper:#1c1b18;
+      --line:#3a3833;
+      --sub:#a6a294;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#efeee9;
+    --paper:#1c1b18;
+    --line:#3a3833;
+    --sub:#a6a294;
+  }
+
+  * { box-sizing: border-box; }
+  html,body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body{
+    padding: 28px 20px 60px;
+  }
+  main{
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .mono{
+    font-family: "Fira Mono", "SFMono-Regular", Consolas, monospace;
+  }
+
+  header{ margin-bottom: 28px; }
+  h1{
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .lead{
+    color: var(--sub);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  /* --- Lookup tool --- */
+  .lookup{
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px;
+    margin-bottom: 32px;
+  }
+  .field-row{
+    display:flex;
+    align-items:baseline;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  label[for="dbInput"]{
+    font-size: 0.85rem;
+    color: var(--sub);
+  }
+  #dbInput{
+    font-family: "Fira Mono", monospace;
+    font-size: 1.6rem;
+    font-weight: 600;
+    width: 5.2ch;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--blue);
+    color: var(--ink);
+    padding: 2px 0;
+  }
+  #dbInput:focus{ outline: none; }
+  .unit{ font-size: 1rem; color: var(--sub); }
+
+  input[type="range"]{
+    width: 100%;
+    -webkit-appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3), var(--c4), var(--c5), var(--c6));
+    margin: 4px 0 20px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    cursor: pointer;
+  }
+
+  .result{
+    display:flex;
+    align-items:center;
+    gap: 16px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+  .swatch{
+    width: 64px; height: 64px;
+    border-radius: 4px;
+    flex: none;
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .result-text .name{
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin: 0 0 2px;
+  }
+  .result-text .hex{
+    color: var(--sub);
+    font-size: 0.85rem;
+  }
+  .result-text .example{
+    font-size: 0.85rem;
+    color: var(--sub);
+    margin-top: 4px;
+  }
+
+  /* --- Legend table --- */
+  h2{
+    font-size: 0.85rem;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--sub);
+    font-weight: 600;
+    margin: 0 0 12px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+  }
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  td, th{
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+  th{
+    font-weight: 600;
+    color: var(--sub);
+    font-size: 0.78rem;
+  }
+  .sw-cell{ width: 34px; }
+  .sw{
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.15);
+    display:block;
+  }
+  .band-range{
+    font-family: "Fira Mono", monospace;
+    white-space: nowrap;
+  }
+  .band-example{ color: var(--sub); }
+
+  .row-active{
+    background: color-mix(in srgb, var(--blue) 8%, transparent);
+  }
+
+  footer{
+    margin-top: 34px;
+    font-size: 0.8rem;
+    color: var(--sub);
+    line-height: 1.6;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+
+  @media print{
+    body{ padding: 0; }
+    .lookup{ display:none; }
+    h2{ border:none; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>Lautstärke → Farbe</h1>
+    <p class="lead">Trag euren gemessenen dB-Wert ein und lest ab, mit welcher Farbe ihr den Punkt auf der Karte markiert.</p>
+  </header>
+
+  <section class="lookup">
+    <div class="field-row">
+      <label for="dbInput">Messwert</label>
+      <input type="number" id="dbInput" value="65" min="20" max="110" step="1">
+      <span class="unit">dB</span>
+    </div>
+
+    <input type="range" id="dbSlider" min="20" max="110" step="1" value="65">
+
+    <div class="result">
+      <span class="swatch" id="swatch"></span>
+      <div class="result-text">
+        <p class="name" id="bandName">–</p>
+        <p class="hex mono" id="bandHex">–</p>
+        <p class="example" id="bandExample">–</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Farblegende für die Karte</h2>
+    <table id="legendTable">
+      <thead>
+        <tr>
+          <th class="sw-cell"></th>
+          <th>Bereich</th>
+          <th>Bezeichnung</th>
+          <th>Beispiel</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <footer>
+    dB ist selbst bereits eine logarithmische Größe (Verhältnis von Schalldruck zu einer Bezugsgröße). Die Farbskala oben ordnet den Messwerten deshalb direkt – ohne weitere Umrechnung – Farben in gleichmäßigen dB-Schritten zu. Bereiche unter 20 dB bzw. über 110 dB werden auf die äußersten Farben begrenzt.
+  </footer>
+
+</main>
+
+<script>
+  const bands = [
+    { max: 40,  name: "Sehr leise",  example: "Flüstern, Bibliothek",              color: "#4C8C2B" },
+    { max: 55,  name: "Leise",       example: "Ruhige Wohnstraße",                 color: "#89BA17" },
+    { max: 65,  name: "Mäßig",       example: "Normales Gespräch",                 color: "#F5C400" },
+    { max: 75,  name: "Laut",        example: "Reger Straßenverkehr",              color: "#FF8E00" },
+    { max: 90,  name: "Sehr laut",   example: "LKW/Motorrad in der Nähe",          color: "#E5383B" },
+    { max: Infinity, name: "Extrem laut", example: "Presslufthammer, Martinshorn", color: "#7B2D8E" },
+  ];
+
+  function bandFor(db){
+    return bands.find(b => db <= b.max) || bands[bands.length - 1];
+  }
+
+  function rangeLabel(i){
+    const lo = i === 0 ? "< " + bands[0].max : (bands[i-1].max + 1) + "–" + bands[i].max;
+    if (bands[i].max === Infinity) return "> " + bands[i-1].max + " dB";
+    return (i === 0 ? "< " + bands[0].max : (bands[i-1].max + 1) + "–" + bands[i].max) + " dB";
+  }
+
+  const dbInput = document.getElementById('dbInput');
+  const dbSlider = document.getElementById('dbSlider');
+  const swatch = document.getElementById('swatch');
+  const bandName = document.getElementById('bandName');
+  const bandHex = document.getElementById('bandHex');
+  const bandExample = document.getElementById('bandExample');
+  const tbody = document.querySelector('#legendTable tbody');
+
+  bands.forEach((b, i) => {
+    const tr = document.createElement('tr');
+    tr.dataset.index = i;
+    tr.innerHTML = `
+      <td class="sw-cell"><span class="sw" style="background:${b.color}"></span></td>
+      <td class="band-range">${rangeLabel(i)}</td>
+      <td>${b.name}</td>
+      <td class="band-example">${b.example}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  function update(db){
+    db = Math.max(20, Math.min(110, db));
+    const b = bandFor(db);
+    swatch.style.background = b.color;
+    bandName.textContent = b.name;
+    bandHex.textContent = b.color;
+    bandExample.textContent = b.example;
+
+    [...tbody.children].forEach(tr => {
+      tr.classList.toggle('row-active', bands[tr.dataset.index] === b);
+    });
+  }
+
+  dbInput.addEventListener('input', () => {
+    const v = parseInt(dbInput.value, 10);
+    if (!isNaN(v)){ dbSlider.value = v; update(v); }
+  });
+  dbSlider.addEventListener('input', () => {
+    dbInput.value = dbSlider.value;
+    update(parseInt(dbSlider.value, 10));
+  });
+
+  update(parseInt(dbInput.value, 10));
+</script>
+
+</body>
+</html>
