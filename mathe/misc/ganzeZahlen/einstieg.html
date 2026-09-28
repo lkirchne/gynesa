@@ -1,13 +1,48 @@
 <!DOCTYPE html>
+<!--
+  Ganze Zahlen – interaktives Lernwerkzeug für Klasse 6
+  Auf Basis eigenen Codes erstellt und erweitert mit freundlicher Unterstützung von Claude Opus 5.5 :)
+  Doppellizenz:
+  - Programmcode (HTML, CSS, JavaScript): MIT-Lizenz, siehe unten.
+  - Inhalte (Aufgabentexte, Erklärungen, Illustrationen, didaktisches Konzept):
+    CC BY-SA 4.0, https://creativecommons.org/licenses/by-sa/4.0/deed.de
+  Frei nutzen, verändern und weitergeben – die Lizenzhinweise müssen erhalten bleiben.
+  Quelltext: https://github.com/lkirchne/
+
+  MIT License
+
+  Copyright (c) 2026 lkirchne (https://github.com/lkirchne/)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+-->
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Negative Zahlen – Klasse 6</title>
+<title>Ganze Zahlen – Klasse 6</title>
+<meta name="license" content="Code: MIT; Inhalte: CC BY-SA 4.0">
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link rel="stylesheet" href="https://fonts.bunny.net/css?family=fredoka:500,600,700|inter:400,500,600,700|fira-mono:500,700&display=swap">
 <style>
 :root{
+  /* ===== Logo-Fläche: Hintergrundfarbe hier anpassen (z. B. #ffffff, transparent, #004E92) ===== */
+  --logo-bg:#ffffff;
   --ink:#0E2238; --blue:#004E92; --blue-2:#2A6FB0; --blue-l:#E4EEF8;
   --green:#89BA17; --green-d:#4E7A06; --green-l:#EEF6DA;
   --orange:#FF8E00; --orange-d:#AD5A00; --orange-l:#FFEBD2;
@@ -25,7 +60,7 @@ button:disabled{cursor:not-allowed}
 :focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 
 /* Feste Bühne 1400 × 780, wird auf das Fenster skaliert (MacBook Air 13" ≈ 1440 × 780 Browserfläche) */
-#stage{position:absolute;left:50%;top:50%;width:1400px;height:780px;transform:translate(-50%,-50%) scale(var(--s,1));display:grid;grid-template-rows:64px 1fr}
+#stage{position:absolute;left:50%;top:50%;width:1400px;height:806px;transform:translate(-50%,-50%) scale(var(--s,1));display:grid;grid-template-rows:64px 1fr 26px}
 
 /* Kopfzeile */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--blue);color:#fff;border-bottom:3px solid var(--ink)}
@@ -33,6 +68,12 @@ button:disabled{cursor:not-allowed}
 .logo svg{width:40px;height:40px}
 .logo h1{font:600 25px/1 var(--display);letter-spacing:.2px}
 .logo p{font-size:13px;opacity:.8;margin-top:3px}
+.logo-box{display:flex;align-items:center;justify-content:center;height:48px;max-width:170px;padding:4px 10px;background:var(--logo-bg);border:2px solid var(--ink);border-radius:10px}
+.logo-box img{display:block;max-height:100%;max-width:150px;width:auto;height:auto;object-fit:contain}
+.footer{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 24px;font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
+.footer>span{white-space:nowrap}
+.footer a{color:var(--blue);font-weight:600;text-decoration:none}
+.footer a:hover{text-decoration:underline}
 .tabs{display:flex;gap:8px}
 .tab{display:flex;align-items:center;gap:8px;padding:8px 16px;border:2px solid transparent;border-radius:12px;font:600 16px var(--display);color:#fff}
 .tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -236,14 +277,17 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
 
 <header class="topbar">
   <div class="logo">
-    <svg viewBox="0 0 40 40" aria-hidden="true">
+    <div class="logo-box" id="logo-box">
+      <img src="logo.png" alt="Schullogo">
+    </div>
+    <svg id="logo-mark" viewBox="0 0 40 40" aria-hidden="true" hidden>
       <rect x="1" y="1" width="38" height="38" rx="10" fill="#fff" stroke="#0E2238" stroke-width="2"/>
       <path d="M6 22h28" stroke="#0E2238" stroke-width="2.5" stroke-linecap="round"/>
       <path d="M10 17v10" stroke="#FF8E00" stroke-width="3" stroke-linecap="round"/>
       <path d="M20 14v16" stroke="#004E92" stroke-width="3.5" stroke-linecap="round"/>
       <path d="M30 17v10" stroke="#89BA17" stroke-width="3" stroke-linecap="round"/>
     </svg>
-    <div><h1>Negative Zahlen</h1><p>Mathematik, Klasse 6</p></div>
+    <div><h1>Ganze Zahlen</h1><p>Mathematik, Klasse 6</p></div>
   </div>
   <nav class="tabs" role="tablist" aria-label="Modell wählen">
     <button class="tab" role="tab" id="t-lift" data-tab="lift" aria-controls="m-lift" aria-selected="true" title="Taste 1">
@@ -450,9 +494,20 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
 </section>
 
 </main>
+<footer class="footer">
+  <span>Code: <a href="https://opensource.org/license/mit" target="_blank" rel="license noopener">MIT</a>, Inhalte: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.de" target="_blank" rel="license noopener">CC BY-SA 4.0</a></span>
+  <span>Auf Basis eigenen Codes erstellt und erweitert mit freundlicher Unterstützung von Claude Opus 5.5 :)</span>
+  <span>Quelltext: <a href="https://github.com/lkirchne/" target="_blank" rel="noopener">github.com/lkirchne</a></span>
+</footer>
 </div>
 
 <script>
+/* Logo: fehlt logo.png, wird das eingebaute Zeichen angezeigt */
+(function () {
+  const img = document.querySelector('#logo-box img');
+  const fail = () => { document.getElementById('logo-box').hidden = true; document.getElementById('logo-mark').removeAttribute('hidden'); };
+  if (img.complete && !img.naturalWidth) fail(); else img.addEventListener('error', fail);
+})();
 /* ================= Helfer ================= */
 const MINUS = '\u2212', abs = Math.abs, $ = id => document.getElementById(id);
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -513,7 +568,7 @@ function eqHTML(a, b, c, caps, opt = {}) {
 
 /* ================= Bühne skalieren ================= */
 function fit() {
-  const s = Math.min(innerWidth / 1400, innerHeight / 780);
+  const s = Math.min(innerWidth / 1400, innerHeight / 806);
   document.documentElement.style.setProperty('--s', s);
 }
 addEventListener('resize', fit);
