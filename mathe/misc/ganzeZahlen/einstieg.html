@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Negative Zahlen – Klasse 6</title>
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=fredoka:500,600,700|inter:400,500,600,700|fira-mono:500,700&display=swap">
+<style>
+:root{
+  --ink:#0E2238; --blue:#004E92; --blue-2:#2A6FB0; --blue-l:#E4EEF8;
+  --green:#89BA17; --green-d:#4E7A06; --green-l:#EEF6DA;
+  --orange:#FF8E00; --orange-d:#AD5A00; --orange-l:#FFEBD2;
+  --muted:#5B6B7F; --line:#C9D4E2; --bg:#E6EDF5; --card:#fff;
+  --display:'Fredoka','Inter',system-ui,sans-serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'Fira Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:disabled{cursor:not-allowed}
+:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+
+/* Feste Bühne 1400 × 780, wird auf das Fenster skaliert (MacBook Air 13" ≈ 1440 × 780 Browserfläche) */
+#stage{position:absolute;left:50%;top:50%;width:1400px;height:780px;transform:translate(-50%,-50%) scale(var(--s,1));display:grid;grid-template-rows:64px 1fr}
+
+/* Kopfzeile */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--blue);color:#fff;border-bottom:3px solid var(--ink)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo svg{width:40px;height:40px}
+.logo h1{font:600 25px/1 var(--display);letter-spacing:.2px}
+.logo p{font-size:13px;opacity:.8;margin-top:3px}
+.tabs{display:flex;gap:8px}
+.tab{display:flex;align-items:center;gap:8px;padding:8px 16px;border:2px solid transparent;border-radius:12px;font:600 16px var(--display);color:#fff}
+.tab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab:hover{background:rgba(255,255,255,.14)}
+.tab[aria-selected="true"]{background:#fff;color:var(--blue);border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+
+main{position:relative;padding:18px 18px 22px;min-height:0}
+.module{display:none;height:100%;min-height:0}
+
+/* Karten und Knöpfe: kräftige Kontur, harter Schatten */
+.card{background:var(--card);border:2px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--ink);padding:16px 18px;min-height:0;min-width:0}
+.h{font:600 18px/1.2 var(--display);margin-bottom:10px}
+.h.small{font-size:15px;margin-bottom:6px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border:2px solid var(--ink);border-radius:10px;background:#fff;font:600 15px/1.2 var(--display);color:var(--ink);box-shadow:0 3px 0 var(--ink);transition:transform .07s,box-shadow .07s}
+.btn:hover:not(:disabled){filter:brightness(.95)}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn:disabled{opacity:.4}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.pos{background:var(--green-l);color:var(--green-d)}
+.btn.neg{background:var(--orange-l);color:var(--orange-d)}
+.btn[aria-pressed="true"]{background:var(--blue-l);color:var(--blue)}
+.btn.small{padding:6px 11px;font-size:14px}
+.btn.sq{width:44px;height:44px;padding:0;font-size:26px}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px}
+.hint{min-height:20px;font-size:13px;color:var(--orange-d);font-weight:500}
+.explain{font-size:15px;line-height:1.5;color:var(--ink)}
+.explain b{font-family:var(--display);font-weight:600}
+.pos-t{color:var(--green-d)} .neg-t{color:var(--orange-d)}
+.placeholder{color:var(--muted);font-size:15px;padding:14px 0}
+.custom{display:flex;gap:10px}
+.custom input,.answer input{flex:1;min-width:0;padding:8px 12px;border:2px solid var(--ink);border-radius:10px;font:600 18px var(--display);color:var(--ink);background:#fff}
+.custom input::placeholder{font:500 14px var(--sans);color:#8A97A8}
+.custom input:focus,.answer input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-l)}
+
+/* Gleichung: Startzustand + (Veränderung) = Endzustand */
+.eq{display:flex;align-items:flex-start;gap:10px}
+.eq .part{display:flex;flex-direction:column;align-items:center;gap:5px}
+.eq .tile{min-width:88px;padding:4px 14px;border:2px solid var(--ink);border-radius:12px;background:#fff;text-align:center;font:600 40px/1.15 var(--display);color:var(--blue);box-shadow:0 3px 0 var(--ink);white-space:nowrap}
+.eq .tile.pos{background:var(--green-l);color:var(--green-d)}
+.eq .tile.neg{background:var(--orange-l);color:var(--orange-d)}
+.eq .tile.zero{color:var(--muted)}
+.eq .tile.q{border-style:dashed;background:#F4F7FB;color:var(--muted);box-shadow:none}
+.eq .op{font:500 38px/1.15 var(--display);color:var(--muted);padding-top:6px}
+.eq .cap{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.eq.sm .tile{font-size:32px;min-width:70px;padding:3px 10px}
+.eq.sm .op{font-size:30px;padding-top:5px}
+
+.scene{padding:0;overflow:hidden}
+.scene svg{display:block;width:100%;height:100%}
+.scene text{font-family:var(--display);font-weight:600}
+
+/* ============ Zahlenstrahl ============ */
+#m-line.active{display:grid;grid-template-rows:150px 1fr 146px;gap:20px}
+.nl-top{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.nl-right{display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.nl-right .btn-row{justify-content:flex-end;align-items:center}
+.row-label{font-size:13px;color:var(--muted);font-weight:600;margin-right:2px}
+.nl-ctrl{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ctrl{display:flex;align-items:center;gap:20px}
+.ctrl-val{flex:none;width:124px;height:100px;border:2px solid var(--ink);border-radius:14px;display:flex;align-items:center;justify-content:center;font:600 52px var(--display);color:var(--blue);box-shadow:0 3px 0 var(--ink);background:#fff}
+.ctrl-val.pos{background:var(--green-l);color:var(--green-d)}
+.ctrl-val.neg{background:var(--orange-l);color:var(--orange-d)}
+.ctrl-val.zero{color:var(--muted)}
+.ctrl-body{flex:1;min-width:0}
+.ctrl-body .h{margin-bottom:4px}
+.ctrl-row{display:flex;align-items:center;gap:12px}
+.ctrl-note{font-size:14px;color:var(--muted);margin-top:6px;min-height:20px}
+.ctrl-note b{font-family:var(--display);font-weight:600;color:var(--ink)}
+input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor:pointer}
+
+/* ============ Fahrstuhl ============ */
+#m-lift.active{display:grid;grid-template-columns:300px 560px 1fr;gap:20px}
+.panel{border:2px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);padding:18px;display:flex;flex-direction:column;gap:18px;
+  background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.55) 1px,transparent 1.6px) 0 0/8px 8px,linear-gradient(165deg,#E6EAEF,#B6BFCA)}
+.lcd{border:6px solid #28313D;border-radius:10px;padding:8px 14px;background:#B9D46E;color:#1B290B;font-family:var(--mono);
+  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px);box-shadow:inset 0 0 12px rgba(0,0,0,.18)}
+.lcd-top{display:flex;align-items:baseline;justify-content:space-between}
+.lcd-num{font:700 46px/1.05 var(--mono)}
+.lcd-dir{font:700 28px var(--mono);min-width:1em}
+.lcd-small{font:500 12px var(--mono);opacity:.75}
+.lcd-txt{font:500 14px var(--mono);min-height:20px}
+.panel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 8px;justify-items:center;padding:6px 0}
+.lbtn{width:62px;height:62px;border-radius:50%;border:2px solid var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;
+  background:radial-gradient(circle at 35% 30%,#fff,#D7DDE4 60%,#AAB4C0);
+  box-shadow:0 0 0 5px #8E98A5,0 0 0 7px var(--ink),inset 0 -3px 5px rgba(0,0,0,.22);
+  font:600 24px var(--display);transition:box-shadow .2s,background .2s}
+.lbtn small{font:600 10px var(--sans);color:var(--muted);margin-top:2px}
+.lbtn.pos{color:var(--green-d)} .lbtn.neg{color:var(--orange-d)} .lbtn.zero{color:var(--blue)}
+.lbtn:active:not(:disabled){transform:scale(.95)}
+.lbtn.here{background:radial-gradient(circle at 35% 30%,#fff,#B9D3EC 60%,#6F9FCF)}
+.lbtn.lit{background:radial-gradient(circle at 35% 30%,#FFF6E6,#FFBE66 55%,#FF8E00);color:var(--ink);box-shadow:0 0 0 5px #8E98A5,0 0 0 7px var(--ink),0 0 20px 8px rgba(255,142,0,.5)}
+.lbtn.lit small{color:var(--ink)}
+.lbtn:disabled:not(.lit):not(.here){opacity:.7}
+.panel-steps{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.panel-steps .btn{white-space:nowrap;padding:8px 6px;font-size:14px}
+.panel .spacer{flex:1}
+.lift-right{display:grid;grid-template-rows:auto 1fr;gap:20px;min-height:0}
+.lift-right .explain{margin-top:14px;min-height:46px}
+#car .door{transition:transform .35s ease;transform-box:fill-box}
+#car .door.l{transform-origin:left center}
+#car .door.r{transform-origin:right center}
+#car.open .door{transform:scaleX(.1)}
+
+.log{list-style:none;overflow:hidden}
+.log li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:2px dashed var(--line);font-size:14px}
+.log li:last-child{border-bottom:0}
+.log .leq{font:600 19px var(--display);white-space:nowrap}
+.log .route{color:var(--muted);font-size:13px;white-space:nowrap}
+.log li:first-child .leq{font-size:22px}
+.log .empty{color:var(--muted);justify-content:flex-start}
+
+/* ============ Konto ============ */
+#m-bank.active{display:grid;grid-template-columns:150px 1fr 500px;gap:20px}
+.bank-mid{display:grid;grid-template-rows:200px 150px 1fr;gap:20px;min-height:0}
+.bankcard{position:relative;overflow:hidden;border:2px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);padding:18px 24px;color:#fff;
+  background:linear-gradient(135deg,#004E92 0%,#0B62AE 60%,#2B80C8 100%);display:flex;flex-direction:column;justify-content:space-between}
+.bankcard::after{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.08)}
+.bc-top{display:flex;justify-content:space-between;align-items:center;font:600 17px var(--display)}
+.bc-chip{width:46px;height:34px;border-radius:7px;border:2px solid var(--ink);background:linear-gradient(135deg,#F8DC80,#D6A62C);position:relative;z-index:1}
+.bc-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.bc-label{font-size:13px;opacity:.85}
+.bc-bal{font:600 66px/1 var(--display)}
+.status{display:inline-block;padding:6px 16px;border:2px solid var(--ink);border-radius:999px;font:600 17px var(--display);color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+.status.pos{background:var(--green)} .status.neg{background:var(--orange)} .status.zero{background:#fff}
+.money{display:flex;flex-direction:column;overflow:hidden}
+.tok-cap{font-size:14px;color:var(--muted);margin:-4px 0 12px}
+.tok-cap b{font-family:var(--display);font-weight:600;color:var(--ink)}
+.tok-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.note{position:relative;width:98px;height:50px;border:2px solid var(--ink);border-radius:6px;display:flex;align-items:center;justify-content:center;font:600 21px var(--display)}
+.note::before{content:"";position:absolute;inset:4px;border:1.5px solid currentColor;border-radius:3px;opacity:.45}
+.note.pos{color:var(--green-d);background:repeating-linear-gradient(45deg,#E7F2C9 0 6px,#DDEDB6 6px 12px)}
+.note.neg{color:var(--orange-d);background:repeating-linear-gradient(45deg,#FFF1DF 0 6px,#FFE6C8 6px 12px);border-style:dashed}
+.coin{width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font:600 16px var(--display);box-shadow:inset 0 0 0 4px rgba(255,255,255,.55)}
+.coin.pos{color:var(--green-d);background:radial-gradient(circle at 35% 30%,#F6FBE8,#C8E08A)}
+.coin.neg{color:var(--orange-d);background:radial-gradient(circle at 35% 30%,#FFF6EA,#FFC47A)}
+.bank-right{display:flex;flex-direction:column;gap:12px}
+.book-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.book{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border:2px solid var(--ink);border-radius:12px;box-shadow:0 3px 0 var(--ink);background:#fff;text-align:left;transition:transform .07s,box-shadow .07s}
+.book:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.book.pos{background:var(--green-l)} .book.neg{background:var(--orange-l)}
+.book .amt{font:600 24px/1.1 var(--display)}
+.book.pos .amt{color:var(--green-d)} .book.neg .amt{color:var(--orange-d)}
+.book .desc{font-size:13px;color:var(--ink)}
+.statement{list-style:none;flex:1;min-height:0;overflow:hidden}
+.statement li{display:grid;grid-template-columns:1fr 90px 110px;gap:8px;padding:7px 0;border-bottom:2px dashed var(--line);font-size:14px;align-items:center}
+.statement .num{text-align:right;font:600 17px var(--display)}
+.statement .head{font-size:12px;color:var(--muted);font-weight:600;border-bottom:2px solid var(--line)}
+.statement .head .num{font:600 12px var(--sans)}
+
+/* ============ U-Boot ============ */
+#m-sub.active{display:grid;grid-template-columns:600px 1fr;gap:20px}
+.sub-right{display:grid;grid-template-rows:212px 1fr;gap:20px;min-height:0}
+.sub-top{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.sub-top .explain{margin-top:12px;min-height:44px;max-width:470px}
+.gauge{flex:none;width:200px}
+.gauge svg{width:200px;height:150px;display:block}
+.gauge text{font-family:var(--display);font-weight:600}
+.sub-panel{display:flex;flex-direction:column;gap:12px}
+.sub-head{display:flex;justify-content:space-between;align-items:center}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:12px;overflow:hidden;box-shadow:0 3px 0 var(--ink);background:#fff}
+.seg button{padding:8px 16px;font:600 15px var(--display);border-right:2px solid var(--ink)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.seg.small{box-shadow:none;border-radius:10px}
+.seg.small button{padding:5px 12px;font-size:13px;border-right-width:1.5px}
+.score{font:600 16px var(--display);color:var(--blue);background:var(--blue-l);border:2px solid var(--blue);border-radius:999px;padding:4px 14px}
+.move-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.move-grid .btn{min-width:74px;font-size:18px}
+.sub-free,.sub-mission{display:flex;flex-direction:column;gap:12px;min-height:0}
+.mission-no{font:600 14px var(--display);color:var(--muted)}
+.mission-text{font:500 21px/1.45 var(--display);min-height:92px}
+.mission-text b{font-weight:600;color:var(--blue)}
+.answer{display:flex;align-items:center;gap:12px}
+.answer label{font-size:14px;font-weight:600;color:var(--muted)}
+.answer input{flex:none;width:170px;text-align:center;font-size:24px}
+.fb{min-height:50px;padding:10px 14px;border-radius:12px;border:2px solid transparent;font-size:15px;line-height:1.4}
+.fb.ok{background:var(--green-l);border-color:var(--green);color:var(--green-d)}
+.fb.err{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+.fb.info{background:var(--blue-l);border-color:var(--blue-2);color:var(--blue)}
+.fb b{font-family:var(--display);font-weight:600}
+.bubble{fill:rgba(255,255,255,.35);stroke:#fff;stroke-width:1.2;animation:rise 1.2s ease-out forwards;transform-box:fill-box;transform-origin:center}
+@keyframes rise{from{opacity:.9}to{transform:translateY(-55px);opacity:0}}
+
+@media (prefers-reduced-motion:reduce){
+  #car .door{transition:none}
+  .bubble{display:none}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<header class="topbar">
+  <div class="logo">
+    <svg viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="#fff" stroke="#0E2238" stroke-width="2"/>
+      <path d="M6 22h28" stroke="#0E2238" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M10 17v10" stroke="#FF8E00" stroke-width="3" stroke-linecap="round"/>
+      <path d="M20 14v16" stroke="#004E92" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M30 17v10" stroke="#89BA17" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <div><h1>Negative Zahlen</h1><p>Mathematik, Klasse 6</p></div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Modell wählen">
+    <button class="tab" role="tab" id="t-line" data-tab="line" aria-controls="m-line" aria-selected="true" title="Taste 1">
+      <svg viewBox="0 0 24 24"><path d="M2 13h20M6 10v6M12 8v10M18 10v6"/></svg>Zahlenstrahl</button>
+    <button class="tab" role="tab" id="t-lift" data-tab="lift" aria-controls="m-lift" aria-selected="false" tabindex="-1" title="Taste 2">
+      <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 10l3-3 3 3M9 14l3 3 3-3"/></svg>Fahrstuhl</button>
+    <button class="tab" role="tab" id="t-bank" data-tab="bank" aria-controls="m-bank" aria-selected="false" tabindex="-1" title="Taste 3">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M15 15h3"/></svg>Konto</button>
+    <button class="tab" role="tab" id="t-sub" data-tab="sub" aria-controls="m-sub" aria-selected="false" tabindex="-1" title="Taste 4">
+      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="15" rx="9" ry="4"/><path d="M9 11V8h5v3M12 8V4h3"/></svg>U-Boot</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ======================= Zahlenstrahl ======================= -->
+<section id="m-line" class="module active" role="tabpanel" aria-labelledby="t-line">
+  <div class="card nl-top">
+    <div>
+      <div class="h">Rechnung</div>
+      <div id="nl-eq" aria-live="polite"></div>
+    </div>
+    <div class="nl-right">
+      <div class="btn-row">
+        <span class="row-label">Beispiele</span>
+        <button class="btn small" data-preset="3,-5">3 + (−5)</button>
+        <button class="btn small" data-preset="-3,7">−3 + (+7)</button>
+        <button class="btn small" data-preset="-2,-5">−2 + (−5)</button>
+        <button class="btn small" data-preset="-4,4">−4 + (+4)</button>
+        <button class="btn small" data-preset="6,-9">6 + (−9)</button>
+        <button class="btn small" data-preset="-8,3">−8 + (+3)</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn small" id="nl-hops" aria-pressed="false">Einzelschritte</button>
+        <button class="btn small" id="nl-hide" aria-pressed="false">Ergebnis verdecken</button>
+        <button class="btn small primary" id="nl-reveal" hidden>Auflösen</button>
+        <button class="btn small" id="nl-reset">Zurücksetzen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card scene">
+    <svg id="nl-svg" viewBox="0 0 1360 336" role="img" aria-label="Zahlenstrahl von −10 bis 10 mit Spielfigur"></svg>
+  </div>
+
+  <div class="nl-ctrl">
+    <div class="card ctrl">
+      <div class="ctrl-val" id="nl-start-out">3</div>
+      <div class="ctrl-body">
+        <div class="h">Startwert</div>
+        <div class="ctrl-row">
+          <button class="btn sq" data-nl="start,-1" aria-label="Startwert verringern">−</button>
+          <input type="range" id="nl-start" min="-10" max="10" step="1" aria-label="Startwert">
+          <button class="btn sq" data-nl="start,1" aria-label="Startwert erhöhen">+</button>
+        </div>
+        <p class="ctrl-note">Hier steht die Figur am Anfang.</p>
+      </div>
+    </div>
+    <div class="card ctrl">
+      <div class="ctrl-val" id="nl-change-out">−5</div>
+      <div class="ctrl-body">
+        <div class="h">Veränderung</div>
+        <div class="ctrl-row">
+          <button class="btn sq" data-nl="change,-1" aria-label="Veränderung verringern">−</button>
+          <input type="range" id="nl-change" min="-10" max="10" step="1" aria-label="Veränderung">
+          <button class="btn sq" data-nl="change,1" aria-label="Veränderung erhöhen">+</button>
+        </div>
+        <p class="ctrl-note" id="nl-info" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Fahrstuhl ======================= -->
+<section id="m-lift" class="module" role="tabpanel" aria-labelledby="t-lift">
+  <div class="panel">
+    <div class="lcd" aria-live="polite">
+      <div class="lcd-top"><span class="lcd-small">ETAGE</span><span class="lcd-dir" id="lcd-dir"></span></div>
+      <div class="lcd-num" id="lcd-num">0</div>
+      <div class="lcd-txt" id="lcd-txt">Erdgeschoss</div>
+    </div>
+    <div class="panel-grid" id="lift-buttons"></div>
+    <div class="panel-steps">
+      <button class="btn pos" id="lift-up">▲ +1 Etage</button>
+      <button class="btn neg" id="lift-down">▼ −1 Etage</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="lift-reset">Neu starten im EG</button>
+  </div>
+
+  <div class="card scene">
+    <svg id="lift-svg" viewBox="0 0 556 672" role="img" aria-label="Gebäude mit Etagen von 5 bis −3 und senkrechtem Zahlenstrahl"></svg>
+  </div>
+
+  <div class="lift-right">
+    <div class="card">
+      <div class="h">Rechnung zur Fahrt</div>
+      <div id="lift-eq" aria-live="polite"><p class="placeholder">Noch keine Fahrt. Drück eine Etagentaste.</p></div>
+      <p class="explain" id="lift-explain">Der Fahrstuhl wartet im Erdgeschoss, also in Etage 0.</p>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column">
+      <div class="h">Fahrtenbuch</div>
+      <ol class="log" id="lift-log"></ol>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Konto ======================= -->
+<section id="m-bank" class="module" role="tabpanel" aria-labelledby="t-bank">
+  <div class="card scene">
+    <svg id="bank-svg" viewBox="0 0 146 672" role="img" aria-label="Senkrechte Skala für den Kontostand"></svg>
+  </div>
+
+  <div class="bank-mid">
+    <div class="bankcard">
+      <div class="bc-top"><span>Taschengeldkonto</span><span class="bc-chip"></span></div>
+      <div class="bc-row">
+        <div>
+          <div class="bc-label">Kontostand</div>
+          <div class="bc-bal" id="bank-balance" aria-live="polite">+15 €</div>
+        </div>
+        <span class="status" id="bank-status">Guthaben</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="h">Letzte Buchung (in €)</div>
+      <div id="bank-eq"></div>
+    </div>
+    <div class="card money">
+      <div class="h">In Scheinen und Münzen</div>
+      <p class="tok-cap" id="tok-cap"></p>
+      <div id="tokens"></div>
+    </div>
+  </div>
+
+  <div class="card bank-right">
+    <div class="h" style="margin-bottom:0">Buchen</div>
+    <div class="book-grid" id="book-grid"></div>
+    <div class="custom">
+      <input type="text" id="bank-input" inputmode="numeric" placeholder="Eigener Betrag, z. B. -8 oder 12" aria-label="Eigener Betrag in Euro">
+      <button class="btn primary" id="bank-book">Buchen</button>
+    </div>
+    <p class="hint" id="bank-hint" aria-live="polite"></p>
+    <div class="h" style="margin-bottom:0">Kontoauszug</div>
+    <ul class="statement" id="statement"></ul>
+    <button class="btn" id="bank-reset">Neu starten mit +15 €</button>
+  </div>
+</section>
+
+<!-- ======================= U-Boot ======================= -->
+<section id="m-sub" class="module" role="tabpanel" aria-labelledby="t-sub">
+  <div class="card scene">
+    <svg id="sub-svg" viewBox="0 0 596 672" role="img" aria-label="Meer im Querschnitt mit U-Boot und Höhenskala in Metern"></svg>
+  </div>
+
+  <div class="sub-right">
+    <div class="card sub-top">
+      <div>
+        <div class="h">Rechnung (in m)</div>
+        <div id="sub-eq" aria-live="polite"></div>
+        <p class="explain" id="sub-explain"></p>
+      </div>
+      <div class="gauge"><svg id="gauge" viewBox="0 0 200 150" aria-hidden="true"></svg></div>
+    </div>
+
+    <div class="card sub-panel">
+      <div class="sub-head">
+        <div class="seg" id="sub-mode">
+          <button data-mode="free" aria-pressed="true">Freies Tauchen</button>
+          <button data-mode="mission" aria-pressed="false">Missionen</button>
+        </div>
+        <span class="score" id="sub-score" hidden></span>
+      </div>
+
+      <div class="sub-free" id="sub-free">
+        <div class="move-grid">
+          <div><div class="h small">Auftauchen</div>
+            <div class="btn-row"><button class="btn pos" data-move="5">+5</button><button class="btn pos" data-move="10">+10</button><button class="btn pos" data-move="25">+25</button></div></div>
+          <div><div class="h small">Abtauchen</div>
+            <div class="btn-row"><button class="btn neg" data-move="-5">−5</button><button class="btn neg" data-move="-10">−10</button><button class="btn neg" data-move="-25">−25</button></div></div>
+        </div>
+        <div class="custom">
+          <input type="text" id="sub-input" placeholder="Eigene Veränderung in m, z. B. -15" aria-label="Eigene Veränderung in Metern">
+          <button class="btn primary" id="sub-go">Fahren</button>
+        </div>
+        <p class="hint" id="sub-hint" aria-live="polite"></p>
+        <div class="h small">Tauchprotokoll</div>
+        <ol class="log" id="sub-log"></ol>
+      </div>
+
+      <div class="sub-mission" id="sub-mission" hidden>
+        <div class="seg small" id="ms-type">
+          <button data-type="end" aria-pressed="false">Ziel finden</button>
+          <button data-type="change" aria-pressed="false">Veränderung finden</button>
+          <button data-type="start" aria-pressed="false">Start finden</button>
+          <button data-type="mix" aria-pressed="true">Gemischt</button>
+        </div>
+        <div>
+          <p class="mission-no" id="ms-no"></p>
+          <p class="mission-text" id="ms-text"></p>
+        </div>
+        <div class="answer">
+          <label for="ms-input" id="ms-ask"></label>
+          <input type="text" id="ms-input" autocomplete="off" placeholder="?">
+          <button class="btn primary" id="ms-check">Prüfen</button>
+        </div>
+        <div class="fb" id="ms-fb" aria-live="polite"></div>
+        <div class="btn-row">
+          <button class="btn" id="ms-solve" hidden>Lösung zeigen</button>
+          <button class="btn" id="ms-next">Nächste Mission</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+/* ================= Helfer ================= */
+const MINUS = '\u2212', abs = Math.abs, $ = id => document.getElementById(id);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NS = 'http://www.w3.org/2000/svg';
+const C = { ink:'#0E2238', blue:'#004E92', green:'#89BA17', greenD:'#4E7A06', orange:'#FF8E00', orangeD:'#AD5A00', muted:'#5B6B7F' };
+
+const fmtState = n => n < 0 ? MINUS + abs(n) : String(n);          // Zustand
+const fmtSigned = n => n > 0 ? '+' + n : n < 0 ? MINUS + abs(n) : '0'; // Veränderung mit Vorzeichen
+const sc = n => n > 0 ? 'pos' : n < 0 ? 'neg' : 'zero';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const colOf = n => n > 0 ? C.greenD : n < 0 ? C.orangeD : C.blue;
+
+function S(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function T(parent, x, y, str, attrs) {
+  const t = S('text', Object.assign({ x, y }, attrs || {}), parent);
+  t.textContent = str;
+  return t;
+}
+const easeIO = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+function tween(dur, frame, done) {
+  if (RM || dur <= 0) { frame(1); if (done) done(); return () => {}; }
+  let t0 = null, alive = true;
+  const step = ts => {
+    if (!alive) return;
+    if (t0 === null) t0 = ts;
+    const p = Math.min(1, (ts - t0) / dur);
+    frame(easeIO(p));
+    if (p < 1) requestAnimationFrame(step); else if (done) done();
+  };
+  requestAnimationFrame(step);
+  return () => { alive = false; };
+}
+function parseNum(str) {
+  const t = String(str).replace(/[\u2212\u2013\u2014]/g, '-').replace(/\s|m|€/gi, '');
+  return /^[+-]?\d+$/.test(t) ? parseInt(t, 10) : null;
+}
+function eqHTML(a, b, c, caps, opt = {}) {
+  const tile = (v, cls, cap, hid) =>
+    `<div class="part"><div class="tile ${hid ? 'q' : cls}">${hid ? '?' : v}</div><div class="cap">${cap}</div></div>`;
+  return `<div class="eq${opt.sm ? ' sm' : ''}">` +
+    tile(fmtState(a), 'state', caps[0], opt.hide === 'a') + '<div class="op">+</div>' +
+    tile('(' + fmtSigned(b) + ')', sc(b), caps[1], opt.hide === 'b') + '<div class="op">=</div>' +
+    tile(fmtState(c), 'state', caps[2], opt.hide === 'c') + '</div>';
+}
+
+/* ================= Bühne skalieren ================= */
+function fit() {
+  const s = Math.min(innerWidth / 1400, innerHeight / 780);
+  document.documentElement.style.setProperty('--s', s);
+}
+addEventListener('resize', fit);
+fit();
+
+/* ================= Tabs ================= */
+const TABS = ['line', 'lift', 'bank', 'sub'];
+function showTab(name) {
+  TABS.forEach(t => {
+    const on = t === name, tab = $('t-' + t);
+    tab.setAttribute('aria-selected', on);
+    tab.tabIndex = on ? 0 : -1;
+    $('m-' + t).classList.toggle('active', on);
+  });
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input')) return;
+  const i = ['1', '2', '3', '4'].indexOf(e.key);
+  if (i >= 0) showTab(TABS[i]);
+});
+
+/* ================= 1. Zahlenstrahl ================= */
+const nl = { start: 3, change: -5, hide: false, revealed: false, hops: false };
+const NY = 240, nx = v => 110 + (v + 10) * 57;
+let nlStop = null;
+
+function nlSet(s, c, animate = true) {
+  nl.start = clamp(s, -10, 10);
+  nl.change = clamp(c, Math.max(-10, -10 - nl.start), Math.min(10, 10 - nl.start));
+  nl.revealed = false;
+  nlRender(animate);
+  return nl.change === c;
+}
+
+function nlRender(animate) {
+  const s = nl.start, d = nl.change, e = s + d, hidden = nl.hide && !nl.revealed;
+  $('nl-start').value = s;
+  $('nl-change').value = d;
+  const so = $('nl-start-out'); so.textContent = fmtState(s); so.className = 'ctrl-val';
+  const co = $('nl-change-out'); co.textContent = fmtSigned(d); co.className = 'ctrl-val ' + sc(d);
+  $('nl-change').style.accentColor = d > 0 ? C.green : d < 0 ? C.orange : C.blue;
+  $('nl-eq').innerHTML = eqHTML(s, d, e, ['Start', 'Veränderung', 'Ende'], { hide: hidden ? 'c' : null });
+  $('nl-info').innerHTML = d === 0 ? 'Keine Veränderung: Die Figur bleibt stehen.'
+    : `Vorzeichen <b class="${sc(d)}-t">${d > 0 ? '+' : MINUS}</b>: nach ${d > 0 ? 'rechts' : 'links'}. ` +
+      `Betrag <b>|${fmtSigned(d)}| = ${abs(d)}</b>: ${abs(d)} ${abs(d) === 1 ? 'Schritt' : 'Schritte'}.`;
+  $('nl-reveal').hidden = !hidden;
+  $('nl-hide').setAttribute('aria-pressed', nl.hide);
+  $('nl-hops').setAttribute('aria-pressed', nl.hops);
+  nlDraw(animate && !hidden);
+}
+
+function makePawn(svg) {
+  const g = S('g', {}, svg);
+  S('ellipse', { cx: 0, cy: 4, rx: 15, ry: 4, fill: 'rgba(14,34,56,.18)' }, g);
+  S('path', { d: 'M-14 0 Q-14 -24 0 -30 Q14 -24 14 0 Z', fill: C.blue, stroke: C.ink, 'stroke-width': 2.5, 'stroke-linejoin': 'round' }, g);
+  S('circle', { cx: 0, cy: -40, r: 11, fill: C.blue, stroke: C.ink, 'stroke-width': 2.5 }, g);
+  S('circle', { cx: -4, cy: -44, r: 3.5, fill: '#fff', opacity: .55 }, g);
+  return g;
+}
+const placeAt = (g, x, y) => g.setAttribute('transform', `translate(${x} ${y})`);
+
+function arc(svg, x1, x2, y0, h, col, w) {
+  const mx = (x1 + x2) / 2, cy = y0 - 2 * h;
+  const path = S('path', { d: `M${x1} ${y0} Q${mx} ${cy} ${x2} ${y0}`, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round' }, svg);
+  const L = path.getTotalLength();
+  const ang = Math.atan2(y0 - cy, x2 - mx), sz = w * 3 + 4;
+  const bx = x2 - Math.cos(ang) * sz, by = y0 - Math.sin(ang) * sz;
+  const px = -Math.sin(ang) * sz * .6, py = Math.cos(ang) * sz * .6;
+  const head = S('polygon', { points: `${x2},${y0} ${bx + px},${by + py} ${bx - px},${by - py}`, fill: col, stroke: C.ink, 'stroke-width': 1.5, 'stroke-linejoin': 'round' }, svg);
+  return { path, L, head };
+}
+
+function nlDraw(animate) {
+  if (nlStop) { nlStop(); nlStop = null; }
+  const svg = $('nl-svg');
+  svg.innerHTML = '';
+  const s = nl.start, d = nl.change, e = s + d, hidden = nl.hide && !nl.revealed;
+
+  T(svg, 28, 40, '← negative Zahlen', { 'font-size': 17, fill: C.orangeD });
+  T(svg, 1332, 40, 'positive Zahlen →', { 'font-size': 17, fill: C.greenD, 'text-anchor': 'end' });
+  S('line', { x1: 50, y1: NY, x2: 1300, y2: NY, stroke: C.ink, 'stroke-width': 4, 'stroke-linecap': 'round' }, svg);
+  S('polygon', { points: `1298,${NY - 10} 1322,${NY} 1298,${NY + 10}`, fill: C.ink }, svg);
+  for (let i = -10; i <= 10; i++) {
+    const x = nx(i), z = i === 0;
+    S('line', { x1: x, y1: NY - (z ? 18 : 10), x2: x, y2: NY + (z ? 18 : 10), stroke: z ? C.blue : C.ink, 'stroke-width': z ? 5 : 2.5 }, svg);
+    T(svg, x, NY + (z ? 48 : 42), fmtState(i), { 'text-anchor': 'middle', 'font-size': z ? 26 : 20, fill: colOf(i) });
+  }
+  S('circle', { cx: nx(s), cy: NY, r: 9, fill: '#fff', stroke: C.blue, 'stroke-width': 4 }, svg);
+  const capY = NY + 78, y0 = NY - 5;
+  T(svg, nx(s), capY, (d === 0 && !hidden) ? 'Start = Ende' : 'Start', { 'text-anchor': 'middle', 'font-size': 15, fill: C.muted });
+
+  if (hidden || d === 0) { placeAt(makePawn(svg), nx(s), y0); return; }
+
+  const col = d > 0 ? C.green : C.orange, ink = d > 0 ? C.greenD : C.orangeD, st = Math.sign(d);
+  const bigH = Math.min(160, 40 + abs(d) * 12), apex = nl.hops ? 30 : bigH;
+  const segs = [];
+  if (nl.hops) for (let k = 0; k < abs(d); k++) segs.push(arc(svg, nx(s + k * st), nx(s + (k + 1) * st), y0, 30, col, 3.5));
+  else segs.push(arc(svg, nx(s), nx(e), y0, bigH, col, 4.5));
+
+  const extras = [];
+  extras.push(S('circle', { cx: nx(e), cy: NY, r: 9, fill: C.blue, stroke: '#fff', 'stroke-width': 3 }, svg));
+  extras.push(T(svg, nx(e), capY, 'Ende', { 'text-anchor': 'middle', 'font-size': 15, fill: C.ink }));
+  const lx = (nx(s) + nx(e)) / 2, ly = y0 - apex - 32, txt = fmtSigned(d), w = txt.length * 14 + 30;
+  const pill = S('g', {}, svg);
+  S('rect', { x: lx - w / 2, y: ly - 18, width: w, height: 36, rx: 18, fill: '#fff', stroke: col, 'stroke-width': 3 }, pill);
+  T(pill, lx, ly + 8, txt, { 'text-anchor': 'middle', 'font-size': 22, fill: ink });
+  extras.push(pill);
+
+  const pawn = makePawn(svg);
+  if (!animate || RM) { placeAt(pawn, nx(e), y0); return; }
+
+  extras.forEach(x => x.style.opacity = 0);
+  segs.forEach(g => { g.head.style.opacity = 0; g.path.style.strokeDasharray = g.L; g.path.style.strokeDashoffset = g.L; });
+  placeAt(pawn, nx(s), y0);
+  const dur = nl.hops ? 300 : Math.min(1400, 550 + abs(d) * 60);
+  let i = 0, stop = null;
+  const run = () => {
+    if (i >= segs.length) {
+      extras.forEach(x => { x.style.transition = 'opacity .3s'; x.style.opacity = 1; });
+      nlStop = null;
+      return;
+    }
+    const g = segs[i];
+    stop = tween(dur, k => {
+      g.path.style.strokeDashoffset = g.L * (1 - k);
+      const p = g.path.getPointAtLength(g.L * k);
+      placeAt(pawn, p.x, p.y);
+    }, () => { g.head.style.transition = 'opacity .2s'; g.head.style.opacity = 1; i++; run(); });
+  };
+  nlStop = () => { if (stop) stop(); };
+  run();
+}
+
+$('nl-start').addEventListener('input', e => nlSet(+e.target.value, nl.change, false));
+$('nl-start').addEventListener('change', () => nlRender(true));
+$('nl-change').addEventListener('input', e => {
+  const want = +e.target.value;
+  if (!nlSet(nl.start, want, false)) $('nl-info').textContent = 'Weiter geht es nicht: Das Ende läge außerhalb des Zahlenstrahls.';
+});
+$('nl-change').addEventListener('change', () => nlRender(true));
+document.querySelectorAll('[data-nl]').forEach(b => b.addEventListener('click', () => {
+  const [which, delta] = b.dataset.nl.split(',');
+  if (which === 'start') nlSet(nl.start + +delta, nl.change);
+  else if (!nlSet(nl.start, nl.change + +delta)) $('nl-info').textContent = 'Weiter geht es nicht: Das Ende läge außerhalb des Zahlenstrahls.';
+}));
+document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+  const [s, c] = b.dataset.preset.split(',').map(Number);
+  nlSet(s, c);
+}));
+$('nl-hide').addEventListener('click', () => { nl.hide = !nl.hide; nl.revealed = false; nlRender(false); });
+$('nl-reveal').addEventListener('click', () => { nl.revealed = true; nlRender(true); });
+$('nl-hops').addEventListener('click', () => { nl.hops = !nl.hops; nlRender(true); });
+$('nl-reset').addEventListener('click', () => nlSet(0, 0, false));
+
+/* ================= 2. Fahrstuhl ================= */
+const FLOORS = [5, 4, 3, 2, 1, 0, -1, -2, -3];
+const floorName = f => f > 0 ? `${f}. OG` : f === 0 ? 'EG' : `${abs(f)}. UG`;
+const floorLong = f => f > 0 ? `${f}. Obergeschoss` : f === 0 ? 'Erdgeschoss' : `${abs(f)}. Untergeschoss`;
+const FT = f => 44 + (5 - f) * 64;   // Oberkante einer Etage
+const lift = { floor: 0, busy: false, target: null, log: [] };
+
+function carSVG(x, y, col) {
+  return `<g transform="translate(${x} ${y})">
+    <path d="M2 20 V12 Q2 7 9 7 L20 7 L29 0 L56 0 L66 7 Q82 7 82 13 V20 Z" fill="${col}" stroke="${C.ink}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M32 3 L54 3 L60 7 L28 7 Z" fill="#CFE6F6"/>
+    <circle cx="18" cy="21" r="6" fill="${C.ink}"/><circle cx="66" cy="21" r="6" fill="${C.ink}"/></g>`;
+}
+
+function buildLift() {
+  let h = `<defs><linearGradient id="liftSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A9D6F2"/><stop offset="1" stop-color="#E6F4FC"/></linearGradient></defs>
+    <rect width="556" height="428" fill="url(#liftSky)"/>
+    <g fill="#fff" stroke="${C.ink}" stroke-width="2"><path d="M430 34 Q430 22 442 22 Q446 10 460 14 Q472 8 478 22 Q490 22 490 34 Z"/>
+      <path d="M110 26 Q110 18 118 18 Q121 10 131 13 Q139 9 143 18 Q151 18 151 26 Z"/></g>
+    <rect y="428" width="556" height="244" fill="#D6BC93"/>
+    <rect y="520" width="556" height="50" fill="#CBAE82"/>
+    <rect y="610" width="556" height="62" fill="#BC9C6E"/>
+    <g fill="#A88A60"><ellipse cx="470" cy="500" rx="9" ry="5"/><ellipse cx="505" cy="596" rx="14" ry="7"/><ellipse cx="440" cy="650" rx="10" ry="5"/></g>
+    <rect y="418" width="556" height="10" fill="#89BA17"/>
+    <line x1="0" y1="428" x2="556" y2="428" stroke="${C.ink}" stroke-width="2.5"/>
+    <rect x="96" y="428" width="304" height="192" fill="#A7B0BB" stroke="${C.ink}" stroke-width="2.5"/>
+    <rect x="88" y="620" width="320" height="12" fill="#7E8793" stroke="${C.ink}" stroke-width="2"/>
+    <rect x="96" y="44" width="304" height="384" fill="#E4EBF2" stroke="${C.ink}" stroke-width="2.5"/>
+    <rect x="90" y="36" width="316" height="10" rx="2" fill="#C5D1DD" stroke="${C.ink}" stroke-width="2"/>
+    <rect x="206" y="14" width="84" height="22" fill="#C5D1DD" stroke="${C.ink}" stroke-width="2"/>
+    <path d="M272 14 V2 M266 6 H278" stroke="${C.ink}" stroke-width="2" fill="none"/>`;
+  for (let k = 1; k <= 8; k++) if (k !== 6)
+    h += `<line x1="97" x2="399" y1="${44 + k * 64}" y2="${44 + k * 64}" stroke="${k < 6 ? '#9DB0C4' : '#7E8793'}" stroke-width="2"/>`;
+  const carCols = ['#4F8FD0', '#89BA17', '#FF8E00'];
+  FLOORS.forEach(f => {
+    const top = FT(f);
+    const win = (x, i) => `<rect x="${x}" y="${top + 18}" width="38" height="30" rx="2" fill="${(f * 7 + i * 3) % 5 === 0 ? '#FFD66E' : '#A7D3F0'}" stroke="${C.ink}" stroke-width="2"/>
+      <line x1="${x + 19}" x2="${x + 19}" y1="${top + 18}" y2="${top + 48}" stroke="${C.ink}" stroke-width="1.5"/>`;
+    if (f > 0) h += win(108, 0) + win(156, 1) + win(294, 2) + win(342, 3);
+    else if (f === 0) h += `<rect x="112" y="372" width="62" height="8" fill="${C.orange}" stroke="${C.ink}" stroke-width="2"/>
+      <rect x="120" y="380" width="46" height="48" fill="#A7D3F0" stroke="${C.ink}" stroke-width="2"/>
+      <line x1="143" x2="143" y1="380" y2="428" stroke="${C.ink}" stroke-width="2"/>` + win(294, 2) + win(342, 3);
+    else h += carSVG(114, top + 30, carCols[-f - 1]) +
+      `<rect x="330" y="${top + 16}" width="30" height="30" rx="6" fill="${C.blue}" stroke="${C.ink}" stroke-width="2"/>
+       <text x="345" y="${top + 38}" text-anchor="middle" font-size="20" fill="#fff">P</text>`;
+  });
+  h += `<rect x="214" y="44" width="68" height="576" fill="#3E5470" stroke="${C.ink}" stroke-width="2.5"/>
+    <line x1="222" x2="222" y1="46" y2="618" stroke="#5F7792" stroke-width="3"/>
+    <line x1="274" x2="274" y1="46" y2="618" stroke="#5F7792" stroke-width="3"/>`;
+  // Senkrechter Zahlenstrahl
+  h += `<line x1="66" x2="66" y1="652" y2="24" stroke="${C.ink}" stroke-width="3"/>
+    <polygon points="66,10 58,26 74,26" fill="${C.ink}"/>`;
+  FLOORS.forEach(f => {
+    const cy = FT(f) + 32, z = f === 0;
+    h += `<line x1="${z ? 56 : 60}" x2="${z ? 76 : 72}" y1="${cy}" y2="${cy}" stroke="${z ? C.blue : C.ink}" stroke-width="${z ? 4 : 2.5}"/>
+      <text x="50" y="${cy + 7}" text-anchor="end" font-size="${z ? 23 : 19}" fill="${colOf(f)}">${fmtState(f)}</text>
+      <text x="414" y="${cy + 6}" font-size="16" fill="${z ? C.ink : C.muted}">${floorName(f)}</text>`;
+  });
+  h += `<text x="414" y="423" font-size="12" fill="${C.ink}">Erdoberfläche</text>`;
+  // Kabine (gezeichnet in Etage 5, verschoben per transform)
+  h += `<g id="car" class="open" transform="translate(0 320)">
+    <line x1="74" y1="76" x2="219" y2="76" stroke="${C.orange}" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <circle cx="66" cy="76" r="8" fill="${C.orange}" stroke="#fff" stroke-width="2.5"/>
+    <rect x="219" y="50" width="58" height="52" rx="3" fill="#F4F7FA" stroke="${C.ink}" stroke-width="2.5"/>
+    <rect x="223" y="54" width="50" height="44" fill="#FFE3A8"/>
+    <circle cx="252" cy="68" r="6" fill="${C.blue}"/><rect x="246" y="75" width="12" height="23" rx="5" fill="${C.blue}"/>
+    <rect class="door l" x="223" y="54" width="25" height="44" fill="#C4CDD7" stroke="#6F7C8B" stroke-width="1.5"/>
+    <rect class="door r" x="248" y="54" width="25" height="44" fill="#C4CDD7" stroke="#6F7C8B" stroke-width="1.5"/>
+    <circle id="lamp" cx="248" cy="45" r="4" fill="${C.green}" stroke="${C.ink}" stroke-width="1.5"/></g>`;
+  $('lift-svg').innerHTML = h;
+
+  const grid = $('lift-buttons');
+  FLOORS.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'lbtn ' + sc(f);
+    b.dataset.floor = f;
+    b.innerHTML = fmtState(f) + `<small>${floorName(f)}</small>`;
+    b.setAttribute('aria-label', `Etage ${fmtState(f)}, ${floorLong(f)}`);
+    b.addEventListener('click', () => liftGo(f));
+    grid.appendChild(b);
+  });
+  $('lift-up').addEventListener('click', () => liftGo(lift.floor + 1));
+  $('lift-down').addEventListener('click', () => liftGo(lift.floor - 1));
+  $('lift-reset').addEventListener('click', liftReset);
+  renderLiftLog();
+  liftUI();
+}
+
+function liftUI() {
+  document.querySelectorAll('.lbtn').forEach(b => {
+    const f = +b.dataset.floor;
+    b.classList.toggle('here', !lift.busy && f === lift.floor);
+    b.classList.toggle('lit', f === lift.target);
+    b.disabled = lift.busy || f === lift.floor;
+  });
+  $('lift-up').disabled = lift.busy || lift.floor >= 5;
+  $('lift-down').disabled = lift.busy || lift.floor <= -3;
+  $('lift-reset').disabled = lift.busy;
+}
+
+function liftGo(t) {
+  if (lift.busy || t === lift.floor || t < -3 || t > 5) return;
+  const s = lift.floor, d = t - s, car = $('car');
+  lift.busy = true; lift.target = t; liftUI();
+  $('lamp').setAttribute('fill', C.orange);
+  car.classList.remove('open');
+  $('lcd-dir').textContent = d > 0 ? '▲' : '▼';
+  $('lcd-txt').textContent = `fährt nach ${d > 0 ? 'oben' : 'unten'}`;
+  $('lift-explain').textContent = 'Türen schließen, der Fahrstuhl fährt los …';
+  setTimeout(() => {
+    const y0 = (5 - s) * 64, y1 = (5 - t) * 64;
+    tween(450 + abs(d) * 320, k => {
+      const y = y0 + (y1 - y0) * k;
+      car.setAttribute('transform', `translate(0 ${y})`);
+      $('lcd-num').textContent = fmtState(5 - Math.round(y / 64));
+    }, () => {
+      car.classList.add('open');
+      $('lamp').setAttribute('fill', C.green);
+      $('lcd-dir').textContent = '';
+      $('lcd-num').textContent = fmtState(t);
+      $('lcd-txt').textContent = floorLong(t);
+      lift.floor = t; lift.busy = false; lift.target = null;
+      liftTrip(s, d, t);
+      liftUI();
+    });
+  }, RM ? 0 : 380);
+}
+
+function liftTrip(s, d, t) {
+  $('lift-eq').innerHTML = eqHTML(s, d, t, ['Startetage', 'Veränderung', 'Zieletage'], { sm: true });
+  const n = abs(d);
+  $('lift-explain').innerHTML = `Start in Etage <b>${fmtState(s)}</b> (${floorName(s)}). Der Fahrstuhl fährt ` +
+    `<b class="${sc(d)}-t">${n} ${n === 1 ? 'Etage' : 'Etagen'} nach ${d > 0 ? 'oben' : 'unten'}</b> und hält in Etage <b>${fmtState(t)}</b> (${floorName(t)}).`;
+  lift.log.unshift({ s, d, t });
+  lift.log = lift.log.slice(0, 7);
+  renderLiftLog();
+}
+
+function renderLiftLog() {
+  $('lift-log').innerHTML = lift.log.length
+    ? lift.log.map(({ s, d, t }) => `<li><span class="leq">${fmtState(s)} + (<span class="${sc(d)}-t">${fmtSigned(d)}</span>) = ${fmtState(t)}</span><span class="route">${floorName(s)} bis ${floorName(t)}</span></li>`).join('')
+    : '<li class="empty">Hier erscheinen die letzten Fahrten.</li>';
+}
+
+function liftReset() {
+  if (lift.busy) return;
+  lift.floor = 0; lift.log = [];
+  $('car').setAttribute('transform', 'translate(0 320)');
+  $('lcd-num').textContent = '0'; $('lcd-txt').textContent = 'Erdgeschoss'; $('lcd-dir').textContent = '';
+  $('lift-eq').innerHTML = '<p class="placeholder">Noch keine Fahrt. Drück eine Etagentaste.</p>';
+  $('lift-explain').textContent = 'Der Fahrstuhl wartet im Erdgeschoss, also in Etage 0.';
+  renderLiftLog(); liftUI();
+}
+
+/* ================= 3. Konto ================= */
+const BANK = { min: -60, max: 100, start: 15 };
+const ACTIONS = [['Taschengeld', 10], ['Geschenk', 20], ['Flohmarkt', 5], ['Kinokarte', -9], ['Einkauf', -15], ['Handyrechnung', -25]];
+const bank = { bal: BANK.start, shown: BANK.start, last: null, log: [] };
+const bankY = v => 50 + (100 - v) * 3.5625;
+let bankStop = null;
+
+function buildBank() {
+  const svg = $('bank-svg');
+  T(svg, 73, 26, 'Kontostand', { 'text-anchor': 'middle', 'font-size': 15, fill: C.ink });
+  S('line', { x1: 46, x2: 46, y1: bankY(-60) + 8, y2: bankY(100) - 10, stroke: C.ink, 'stroke-width': 3 }, svg);
+  S('polygon', { points: `46,${bankY(100) - 22} 39,${bankY(100) - 8} 53,${bankY(100) - 8}`, fill: C.ink }, svg);
+  for (let v = -60; v <= 100; v += 10) {
+    const y = bankY(v), z = v === 0;
+    S('line', { x1: z ? 36 : 40, x2: z ? 56 : 52, y1: y, y2: y, stroke: z ? C.blue : C.ink, 'stroke-width': z ? 4 : 2 }, svg);
+    if (v % 20 === 0) T(svg, 33, y + 5, fmtState(v), { 'text-anchor': 'end', 'font-size': z ? 17 : 14, fill: colOf(v) });
+  }
+  S('line', { x1: 20, x2: 140, y1: bankY(-60), y2: bankY(-60), stroke: C.orange, 'stroke-width': 2.5, 'stroke-dasharray': '5 4' }, svg);
+  T(svg, 73, bankY(-60) + 24, 'Dispo-Grenze', { 'text-anchor': 'middle', 'font-size': 12, fill: C.orangeD });
+  S('rect', { id: 'bank-bar', x: 54, width: 24, y: bankY(0), height: 0, stroke: C.ink, 'stroke-width': 2 }, svg);
+  const m = S('g', { id: 'bank-mark' }, svg);
+  S('polygon', { points: '82,0 92,-7 92,7', fill: C.ink }, m);
+  S('rect', { x: 92, y: -13, width: 50, height: 26, rx: 7, fill: '#fff', stroke: C.ink, 'stroke-width': 2 }, m);
+  T(m, 117, 6, '', { id: 'bank-mark-t', 'text-anchor': 'middle', 'font-size': 15 });
+
+  ACTIONS.forEach(([desc, amt]) => {
+    const b = document.createElement('button');
+    b.className = 'book ' + sc(amt);
+    b.innerHTML = `<span class="amt">${fmtSigned(amt)} €</span><span class="desc">${desc}</span>`;
+    b.addEventListener('click', () => book(desc, amt));
+    $('book-grid').appendChild(b);
+  });
+  $('bank-book').addEventListener('click', bookCustom);
+  $('bank-input').addEventListener('keydown', e => { if (e.key === 'Enter') bookCustom(); });
+  $('bank-reset').addEventListener('click', resetBank);
+  resetBank();
+}
+
+function setBankScale(v) {
+  const bar = $('bank-bar'), y0 = bankY(0), y = bankY(v);
+  bar.setAttribute('y', Math.min(y0, y));
+  bar.setAttribute('height', abs(y - y0));
+  bar.setAttribute('fill', v >= 0 ? C.green : C.orange);
+  $('bank-mark').setAttribute('transform', `translate(0 ${y})`);
+  $('bank-mark-t').textContent = fmtSigned(Math.round(v));
+  $('bank-mark-t').setAttribute('fill', colOf(Math.round(v)));
+}
+
+function book(desc, amt) {
+  const nb = bank.bal + amt;
+  if (nb < BANK.min) { $('bank-hint').textContent = `Das geht nicht: Die Bank erlaubt höchstens ${abs(BANK.min)} € Schulden (Dispo-Grenze).`; return false; }
+  if (nb > BANK.max) { $('bank-hint').textContent = `In dieser Übung sind höchstens +${BANK.max} € möglich.`; return false; }
+  $('bank-hint').textContent = '';
+  bank.last = { old: bank.bal, amt, nb };
+  bank.bal = nb;
+  bank.log.unshift({ desc, amt, bal: nb });
+  bank.log = bank.log.slice(0, 6);
+  renderBank(true);
+  return true;
+}
+
+function bookCustom() {
+  const inp = $('bank-input'), v = parseNum(inp.value);
+  if (v === null || v === 0 || abs(v) > 100) { $('bank-hint').textContent = 'Gib eine ganze Zahl zwischen -100 und 100 ein (nicht 0), zum Beispiel -8.'; return; }
+  if (book(v > 0 ? 'Einzahlung' : 'Ausgabe', v)) inp.value = '';
+}
+
+function renderBank(animate) {
+  const b = bank.bal;
+  $('bank-balance').textContent = fmtSigned(b) + ' €';
+  const st = $('bank-status');
+  st.textContent = b > 0 ? 'Guthaben' : b < 0 ? 'Schulden' : 'Ausgeglichen';
+  st.className = 'status ' + sc(b);
+  $('bank-eq').innerHTML = bank.last
+    ? eqHTML(bank.last.old, bank.last.amt, bank.last.nb, ['alter Stand', 'Buchung', 'neuer Stand'], { sm: true })
+    : '<p class="placeholder">Noch keine Buchung. Wähle rechts eine Einnahme oder Ausgabe.</p>';
+  renderTokens(b);
+  $('statement').innerHTML = '<li class="head"><span>Buchung</span><span class="num">Betrag</span><span class="num">Kontostand</span></li>' +
+    bank.log.map(({ desc, amt, bal }) => `<li><span>${desc}</span><span class="num ${sc(amt)}-t">${fmtSigned(amt)} €</span><span class="num ${sc(bal)}-t">${fmtSigned(bal)} €</span></li>`).join('');
+  if (bankStop) bankStop();
+  const from = bank.shown;
+  bankStop = tween(animate ? 600 : 0, k => { bank.shown = from + (b - from) * k; setBankScale(bank.shown); });
+}
+
+function renderTokens(b) {
+  const cap = $('tok-cap'), box = $('tokens');
+  if (b === 0) { cap.textContent = 'Kein Guthaben und keine Schulden.'; box.innerHTML = ''; return; }
+  const n10 = Math.floor(abs(b) / 10), n1 = abs(b) % 10, cls = sc(b), sg = b > 0 ? '+' : MINUS;
+  const parts = [];
+  if (n10) parts.push(`<b>${n10} × (${sg}10 €)</b>`);
+  if (n1) parts.push(`<b>${n1} × (${sg}1 €)</b>`);
+  cap.innerHTML = `${b > 0 ? 'Guthaben' : 'Schulden'}: ` + parts.join(' und ');
+  let h = '';
+  if (n10) h += '<div class="tok-row">' + `<span class="note ${cls}">${sg}10 €</span>`.repeat(n10) + '</div>';
+  if (n1) h += '<div class="tok-row">' + `<span class="coin ${cls}">${sg}1</span>`.repeat(n1) + '</div>';
+  box.innerHTML = h;
+}
+
+function resetBank() {
+  bank.bal = BANK.start; bank.last = null;
+  bank.log = [{ desc: 'Startguthaben', amt: BANK.start, bal: BANK.start }];
+  $('bank-hint').textContent = '';
+  renderBank(true);
+}
+
+/* ================= 4. U-Boot ================= */
+const SY = v => 100 - v * 5.25;   // 0 m = Meeresspiegel, −100 m = Meeresgrund
+const SUBX = 300;
+const sub = { pos: -20, busy: false, log: [], last: null, mode: 'free', type: 'mix', m: null, solved: 0, total: 0, count: 0 };
+
+function fish(x, y, col, s) {
+  return `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 Q14 -10 28 0 Q14 10 0 0 Z" fill="${col}" stroke="${C.ink}" stroke-width="1.5"/>
+    <path d="M1 0 L-10 -7 V7 Z" fill="${col}" stroke="${C.ink}" stroke-width="1.5" stroke-linejoin="round"/><circle cx="21" cy="-1.5" r="1.8" fill="${C.ink}"/></g>`;
+}
+
+function buildSub() {
+  let h = `<defs>
+    <linearGradient id="subSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ED2F1"/><stop offset="1" stop-color="#E3F3FC"/></linearGradient>
+    <linearGradient id="subSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FB0E2"/><stop offset=".45" stop-color="#1673B3"/><stop offset="1" stop-color="#062E52"/></linearGradient></defs>
+    <rect width="596" height="100" fill="url(#subSky)"/>
+    <rect y="100" width="596" height="572" fill="url(#subSea)"/>
+    <circle cx="545" cy="40" r="20" fill="#FFD66E" stroke="${C.ink}" stroke-width="2"/>
+    <path d="M450 56 q7 -8 14 0 q7 -8 14 0" fill="none" stroke="${C.ink}" stroke-width="2.5" stroke-linecap="round"/>
+    <g fill="#fff" opacity=".07"><polygon points="150,100 185,100 260,560 200,560"/><polygon points="330,100 360,100 420,520 370,520"/><polygon points="470,100 495,100 560,480 520,480"/></g>`;
+  let wave = 'M80 100';
+  for (let x = 80; x < 596; x += 24) wave += ' q6 -6 12 0 q6 6 12 0';
+  h += `<path d="${wave}" fill="none" stroke="#fff" stroke-width="2.5"/>`;
+  h += fish(420, 225, '#FFD66E', 1) + fish(452, 236, '#FFD66E', 1) + fish(428, 250, '#FFD66E', 1) + fish(468, 220, '#FFD66E', 1) +
+       fish(170, 389, '#FF8E00', 1.4) + fish(470, 478, '#F2F6FA', 1.7);
+  h += `<g transform="translate(528 318)"><path d="M-16 0 Q-16 -18 0 -18 Q16 -18 16 0 Z" fill="#F7C4E0" stroke="${C.ink}" stroke-width="1.5"/>
+    <path d="M-10 0 q-3 10 0 20 M0 0 q3 12 0 24 M10 0 q-3 10 0 20" fill="none" stroke="#F7C4E0" stroke-width="2"/></g>`;
+  h += `<path d="M440 642 L452 604 L566 596 L582 632 Z" fill="#5B4636" stroke="${C.ink}" stroke-width="2"/>
+    <rect x="488" y="584" width="36" height="16" fill="#6E5645" stroke="${C.ink}" stroke-width="2" transform="rotate(-4 506 592)"/>
+    <line x1="530" y1="600" x2="552" y2="560" stroke="${C.ink}" stroke-width="3"/>
+    <circle cx="470" cy="620" r="5" fill="#2A1E16"/><circle cx="500" cy="618" r="5" fill="#2A1E16"/>
+    <text x="512" y="580" text-anchor="middle" font-size="13" fill="#fff">Wrack</text>`;
+  h += `<path d="M80 652 Q140 640 200 650 T320 648 T440 654 T596 648 V672 H80 Z" fill="#D9C08C" stroke="${C.ink}" stroke-width="2"/>
+    <g fill="none" stroke="#3E8E3A" stroke-width="5" stroke-linecap="round"><path d="M130 652 q-8 -20 0 -40 q8 -20 0 -40"/><path d="M146 652 q8 -16 0 -32 q-8 -16 0 -30"/><path d="M400 654 q-8 -18 0 -36 q8 -18 0 -36"/></g>
+    <g fill="#8C8F95" stroke="${C.ink}" stroke-width="1.5"><ellipse cx="260" cy="652" rx="16" ry="8"/><ellipse cx="282" cy="656" rx="10" ry="6"/></g>`;
+  // Skala
+  h += `<rect width="80" height="672" fill="rgba(255,255,255,.92)"/><line x1="80" x2="80" y1="0" y2="672" stroke="${C.ink}" stroke-width="2"/>
+    <line x1="66" x2="66" y1="660" y2="26" stroke="${C.ink}" stroke-width="3"/><polygon points="66,12 58,28 74,28" fill="${C.ink}"/>
+    <text x="30" y="24" text-anchor="middle" font-size="13" fill="${C.muted}">in m</text>`;
+  for (let v = 10; v >= -100; v -= 5) {
+    const y = SY(v), big = v % 10 === 0, z = v === 0;
+    h += `<line x1="${z ? 54 : big ? 58 : 62}" x2="${z ? 78 : big ? 74 : 70}" y1="${y}" y2="${y}" stroke="${z ? C.blue : C.ink}" stroke-width="${z ? 4 : big ? 2.5 : 1.5}"/>`;
+    if (big) h += `<text x="52" y="${y + 5}" text-anchor="end" font-size="${z ? 18 : 15}" fill="${colOf(v)}">${fmtState(v)}</text>`;
+  }
+  h += `<text x="92" y="92" font-size="13" fill="${C.ink}">Meeresspiegel</text>
+    <text x="92" y="668" font-size="13" fill="${C.ink}">Meeresgrund</text>`;
+  // Ziel, Blasen, Markierung, U-Boot
+  h += `<g id="sub-target" style="display:none"><line x1="80" x2="596" y1="0" y2="0" stroke="#FFB347" stroke-width="2.5" stroke-dasharray="9 6"/>
+      <rect x="500" y="-14" width="80" height="26" rx="13" fill="${C.orange}" stroke="${C.ink}" stroke-width="2"/>
+      <text id="sub-target-t" x="540" y="5" text-anchor="middle" font-size="14" fill="${C.ink}">Ziel</text></g>
+    <g id="bubbles"></g>
+    <g id="sub-mark"><line x1="82" x2="${SUBX - 76}" y1="0" y2="0" stroke="#fff" stroke-width="2" stroke-dasharray="6 5" opacity=".9"/>
+      <circle cx="66" cy="0" r="8" fill="${C.orange}" stroke="#fff" stroke-width="2.5"/></g>
+    <g id="sub">
+      <ellipse cx="-68" cy="0" rx="4" ry="12" fill="#5B6B7F" stroke="${C.ink}" stroke-width="2"/>
+      <polygon points="-54,0 -72,-14 -72,14" fill="${C.orangeD}" stroke="${C.ink}" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M8 -34 V-48 H20" fill="none" stroke="${C.ink}" stroke-width="4" stroke-linecap="round"/>
+      <rect x="-18" y="-34" width="34" height="22" rx="6" fill="${C.orange}" stroke="${C.ink}" stroke-width="2.5"/>
+      <ellipse cx="0" cy="0" rx="60" ry="20" fill="${C.orange}" stroke="${C.ink}" stroke-width="2.5"/>
+      <path d="M-48 8 Q0 17 48 8" fill="none" stroke="${C.orangeD}" stroke-width="3" opacity=".6"/>
+      <g fill="#BFE3F7" stroke="${C.ink}" stroke-width="2"><circle cx="-26" cy="-1" r="6"/><circle cx="0" cy="-1" r="6"/><circle cx="26" cy="-1" r="6"/></g>
+      <rect x="74" y="-15" width="80" height="30" rx="15" fill="#fff" stroke="${C.ink}" stroke-width="2"/>
+      <text id="sub-pill" x="114" y="6" text-anchor="middle" font-size="17" fill="${C.ink}"></text>
+    </g>`;
+  $('sub-svg').innerHTML = h;
+
+  // Tiefenmesser
+  let g = `<text x="100" y="16" text-anchor="middle" font-size="13" fill="${C.muted}">Tiefenmesser</text>
+    <path d="M20 112 A80 80 0 0 1 180 112" fill="none" stroke="#DCE6F0" stroke-width="16"/>
+    <path d="M20 112 A80 80 0 0 1 180 112" fill="none" stroke="${C.ink}" stroke-width="2"/>`;
+  for (let m = 0; m <= 100; m += 10) {
+    const a = Math.PI - (m / 100) * Math.PI, r1 = m % 50 === 0 ? 62 : 68;
+    g += `<line x1="${100 + r1 * Math.cos(a)}" y1="${112 - r1 * Math.sin(a)}" x2="${100 + 76 * Math.cos(a)}" y2="${112 - 76 * Math.sin(a)}" stroke="${C.ink}" stroke-width="${m % 50 === 0 ? 3 : 1.5}"/>`;
+  }
+  g += `<text x="58" y="116" text-anchor="middle" font-size="12" fill="${C.blue}">0</text>
+    <text x="100" y="74" text-anchor="middle" font-size="12" fill="${C.orangeD}">${MINUS}50</text>
+    <text x="140" y="116" text-anchor="middle" font-size="12" fill="${C.orangeD}">${MINUS}100</text>
+    <g id="needle"><line x1="100" y1="112" x2="34" y2="112" stroke="${C.ink}" stroke-width="4" stroke-linecap="round"/></g>
+    <circle cx="100" cy="112" r="8" fill="${C.orange}" stroke="${C.ink}" stroke-width="2"/>
+    <text id="gauge-t" x="100" y="146" text-anchor="middle" font-size="22" fill="${C.ink}"></text>`;
+  $('gauge').innerHTML = g;
+
+  document.querySelectorAll('[data-move]').forEach(b => b.addEventListener('click', () => subFree(+b.dataset.move)));
+  $('sub-go').addEventListener('click', subCustom);
+  $('sub-input').addEventListener('keydown', e => { if (e.key === 'Enter') subCustom(); });
+  document.querySelectorAll('#sub-mode button').forEach(b => b.addEventListener('click', () => setSubMode(b.dataset.mode)));
+  document.querySelectorAll('#ms-type button').forEach(b => b.addEventListener('click', () => {
+    sub.type = b.dataset.type;
+    document.querySelectorAll('#ms-type button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    newMission();
+  }));
+  $('ms-check').addEventListener('click', checkMission);
+  $('ms-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkMission(); });
+  $('ms-next').addEventListener('click', newMission);
+  $('ms-solve').addEventListener('click', solveMission);
+
+  setSub(sub.pos);
+  renderSubLog();
+  showFreeEq();
+}
+
+function setSub(v) {
+  const y = SY(v);
+  $('sub').setAttribute('transform', `translate(${SUBX} ${y})`);
+  $('sub-mark').setAttribute('transform', `translate(0 ${y})`);
+  $('sub-pill').textContent = `${fmtState(Math.round(v))} m`;
+  $('needle').setAttribute('transform', `rotate(${(-v / 100) * 180} 100 112)`);
+  $('gauge-t').textContent = `${fmtState(Math.round(v))} m`;
+}
+
+function spawnBubble(v) {
+  const y = SY(v);
+  if (y < 108) return;
+  const c = S('circle', { cx: SUBX - 72 + Math.random() * 10, cy: y + Math.random() * 10 - 5, r: 2 + Math.random() * 3, class: 'bubble' }, $('bubbles'));
+  setTimeout(() => c.remove(), 1300);
+}
+
+function subMove(to, done) {
+  const from = sub.pos;
+  sub.busy = true; subUI();
+  let lastB = 0;
+  tween(500 + abs(to - from) * 16, k => {
+    const v = from + (to - from) * k;
+    setSub(v);
+    const now = performance.now();
+    if (!RM && now - lastB > 90) { lastB = now; spawnBubble(v); }
+  }, () => { sub.pos = to; setSub(to); sub.busy = false; subUI(); if (done) done(); });
+}
+
+function subUI() {
+  document.querySelectorAll('[data-move], #sub-go, #ms-check, #ms-next, #ms-solve, #ms-type button, #sub-mode button').forEach(b => b.disabled = sub.busy);
+}
+
+const moveText = (s, c, e) => `Das U-Boot ${c > 0 ? 'steigt' : 'taucht'} <b class="${sc(c)}-t">${abs(c)} m ${c > 0 ? 'auf' : 'ab'}</b>: von <b>${fmtState(s)} m</b> auf <b>${fmtState(e)} m</b>.`;
+
+function subFree(c) {
+  if (sub.busy) return;
+  const s = sub.pos, e = s + c;
+  if (e > 0) { $('sub-hint').textContent = 'Höher geht es nicht: Bei 0 m ist das U-Boot an der Wasseroberfläche.'; return; }
+  if (e < -100) { $('sub-hint').textContent = `Tiefer geht es nicht: Bei ${MINUS}100 m ist der Meeresgrund.`; return; }
+  $('sub-hint').textContent = '';
+  subMove(e, () => {
+    sub.last = { s, c, e };
+    sub.log.unshift({ s, c, e });
+    sub.log = sub.log.slice(0, 3);
+    renderSubLog(); showFreeEq();
+  });
+}
+
+function subCustom() {
+  const inp = $('sub-input'), v = parseNum(inp.value);
+  if (v === null || v === 0) { $('sub-hint').textContent = 'Gib eine ganze Zahl mit Vorzeichen ein, zum Beispiel -15 oder +20.'; return; }
+  inp.value = '';
+  subFree(v);
+}
+
+function showFreeEq() {
+  if (sub.last) {
+    const { s, c, e } = sub.last;
+    $('sub-eq').innerHTML = eqHTML(s, c, e, ['vorher', 'Veränderung', 'nachher']);
+    $('sub-explain').innerHTML = moveText(s, c, e);
+  } else {
+    $('sub-eq').innerHTML = '<p class="placeholder">Noch keine Fahrt. Lass das U-Boot auf- oder abtauchen.</p>';
+    $('sub-explain').innerHTML = `Das U-Boot befindet sich bei <b>${fmtState(sub.pos)} m</b>, also ${abs(sub.pos)} m unter dem Meeresspiegel.`;
+  }
+}
+
+function renderSubLog() {
+  $('sub-log').innerHTML = sub.log.length
+    ? sub.log.map(({ s, c, e }) => `<li><span class="leq">${fmtState(s)} + (<span class="${sc(c)}-t">${fmtSigned(c)}</span>) = ${fmtState(e)}</span><span class="route">${c > 0 ? 'aufgetaucht' : 'abgetaucht'}</span></li>`).join('')
+    : '<li class="empty">Hier erscheinen die letzten Fahrten.</li>';
+}
+
+function setSubMode(mode) {
+  if (sub.busy) return;
+  sub.mode = mode;
+  document.querySelectorAll('#sub-mode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode));
+  $('sub-free').hidden = mode !== 'free';
+  $('sub-mission').hidden = mode !== 'mission';
+  $('sub-score').hidden = mode !== 'mission';
+  if (mode === 'mission') { if (!sub.m) newMission(); else showMissionEq(); }
+  else { showTarget(null); showFreeEq(); }
+}
+
+/* Missionen */
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const place = v => v === 0 ? 'an der Wasseroberfläche (0&nbsp;m)' : `bei <b>${fmtState(v)}&nbsp;m</b>`;
+
+function showTarget(v) {
+  const g = $('sub-target');
+  if (v === null) { g.style.display = 'none'; return; }
+  g.style.display = '';
+  g.setAttribute('transform', `translate(0 ${SY(v)})`);
+  $('sub-target-t').textContent = `Ziel ${fmtState(v)}`;
+}
+
+function updateScore() { $('sub-score').textContent = `Gelöst: ${sub.solved} von ${sub.total}`; }
+
+function newMission() {
+  if (sub.busy) return;
+  const old = sub.m;
+  if (old && !old.done && old.tries > 0) sub.total++;
+  const types = sub.type === 'mix' ? ['end', 'change', 'start'] : [sub.type];
+  const type = types[rnd(0, types.length - 1)];
+  let s, c, e;
+  do { s = -5 * rnd(0, 20); c = 5 * rnd(-12, 12); e = s + c; } while (abs(c) < 10 || e > 0 || e < -100 || (s === 0 && e === 0));
+  sub.m = { type, s, c, e, tries: 0, done: false, n: ++sub.count };
+  const m = sub.m, dir = c > 0 ? 'aufsteigen' : 'abtauchen';
+  $('ms-no').textContent = `Mission ${m.n}`;
+  if (type === 'end') {
+    $('ms-text').innerHTML = `Das U-Boot befindet sich ${place(s)}. Die Kapitänin lässt es <b>${abs(c)}&nbsp;m ${dir}</b>. Wo befindet es sich danach?`;
+    $('ms-ask').textContent = 'Position nachher (m):';
+  } else if (type === 'change') {
+    const goal = e === 0 ? 'zur Wasseroberfläche' : e <= -90 ? `zum Wrack bei <b>${fmtState(e)}&nbsp;m</b>` : `auf <b>${fmtState(e)}&nbsp;m</b>`;
+    $('ms-text').innerHTML = `Das U-Boot befindet sich ${place(s)}. Die Kapitänin will ${goal}. Wie lautet die Veränderung? Denk an das Vorzeichen.`;
+    $('ms-ask').textContent = 'Veränderung (m):';
+  } else {
+    $('ms-text').innerHTML = `Das U-Boot ist <b>${abs(c)}&nbsp;m ${c > 0 ? 'aufgestiegen' : 'abgetaucht'}</b>. Jetzt befindet es sich ${place(e)}. Wo war es vorher?`;
+    $('ms-ask').textContent = 'Position vorher (m):';
+  }
+  $('ms-input').value = '';
+  setFb('', '');
+  $('ms-solve').hidden = true;
+  showTarget(type === 'change' ? e : null);
+  showMissionEq();
+  updateScore();
+  subMove(type === 'start' ? e : s, () => $('ms-input').focus());
+}
+
+function showMissionEq() {
+  const m = sub.m;
+  const hide = m.done ? null : m.type === 'end' ? 'c' : m.type === 'change' ? 'b' : 'a';
+  $('sub-eq').innerHTML = eqHTML(m.s, m.c, m.e, ['vorher', 'Veränderung', 'nachher'], { hide });
+  $('sub-explain').innerHTML = m.done ? moveText(m.s, m.c, m.e) : 'Rechne zuerst selbst. Das U-Boot fährt erst, wenn deine Antwort stimmt.';
+}
+
+function setFb(cls, html) { const f = $('ms-fb'); f.className = 'fb ' + cls; f.innerHTML = html; }
+
+function diagnose(m, v) {
+  const up = m.c > 0;
+  if (m.type !== 'change' && v > 0) return 'Das U-Boot ist unter Wasser. Unter dem Meeresspiegel sind alle Positionen negativ.';
+  if (m.type === 'end') {
+    if (v === m.s - m.c) return `Die Richtung ist vertauscht. ${up ? 'Aufsteigen' : 'Abtauchen'} heißt <b>(${fmtSigned(m.c)})</b>.`;
+    if (v === -m.e) return 'Der Betrag stimmt, aber das Vorzeichen nicht. Unter dem Meeresspiegel sind die Werte negativ.';
+    return `Noch nicht. Rechne <b>${fmtState(m.s)} + (${fmtSigned(m.c)})</b> und schau auf die Skala.`;
+  }
+  if (m.type === 'change') {
+    if (v === -m.c) return `Der Betrag stimmt, aber das Vorzeichen nicht: Das U-Boot muss nach <b>${up ? 'oben' : 'unten'}</b>.`;
+    return 'Noch nicht. Zähle auf der Skala, wie viele Meter zwischen Start und Ziel liegen, und überlege dann die Richtung.';
+  }
+  if (v === m.e + m.c) return `Du hast die Veränderung noch einmal ausgeführt. Mach sie rückgängig: Vorher war das U-Boot <b>${up ? 'tiefer' : 'höher'}</b>.`;
+  return `Noch nicht. Welcher Startwert passt in <b>? + (${fmtSigned(m.c)}) = ${fmtState(m.e)}</b>?`;
+}
+
+function checkMission() {
+  const m = sub.m;
+  if (!m || m.done || sub.busy) return;
+  const v = parseNum($('ms-input').value);
+  if (v === null) { setFb('info', 'Gib eine ganze Zahl ein, zum Beispiel -35.'); return; }
+  const want = m.type === 'end' ? m.e : m.type === 'change' ? m.c : m.s;
+  if (v === want) {
+    sub.solved++; sub.total++;
+    finishMission('ok', `<b>Richtig!</b> ${fmtState(m.s)} + (${fmtSigned(m.c)}) = ${fmtState(m.e)}`);
+  } else {
+    m.tries++;
+    setFb('err', diagnose(m, v));
+    if (m.tries >= 2) $('ms-solve').hidden = false;
+  }
+}
+
+function solveMission() {
+  const m = sub.m;
+  if (!m || m.done || sub.busy) return;
+  sub.total++;
+  finishMission('info', `Lösung: <b>${fmtState(m.s)} + (${fmtSigned(m.c)}) = ${fmtState(m.e)}</b>`);
+}
+
+function finishMission(cls, html) {
+  const m = sub.m;
+  m.done = true;
+  setFb(cls, html);
+  $('ms-solve').hidden = true;
+  updateScore();
+  showMissionEq();
+  if (m.type === 'start') { sub.pos = m.s; setSub(m.s); }
+  subMove(m.e, () => showTarget(null));
+}
+
+/* ================= Start ================= */
+nlRender(false);
+buildLift();
+buildBank();
+buildSub();
+</script>
+</body>
+</html>
