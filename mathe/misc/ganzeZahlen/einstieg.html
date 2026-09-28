@@ -79,6 +79,10 @@ main{position:relative;padding:18px 18px 22px;min-height:0}
 .eq .cap{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
 .eq.sm .tile{font-size:32px;min-width:70px;padding:3px 10px}
 .eq.sm .op{font-size:30px;padding-top:5px}
+.eq.xs{gap:6px}
+.eq.xs .tile{font-size:25px;min-width:46px;padding:3px 7px;border-radius:10px}
+.eq.xs .op{font-size:22px;padding-top:4px}
+.eq.xs .cap{font-size:11px}
 
 .scene{padding:0;overflow:hidden}
 .scene svg{display:block;width:100%;height:100%}
@@ -104,8 +108,8 @@ main{position:relative;padding:18px 18px 22px;min-height:0}
 input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor:pointer}
 
 /* ============ Fahrstuhl ============ */
-#m-lift.active{display:grid;grid-template-columns:300px 560px 1fr;gap:20px}
-.panel{border:2px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);padding:18px;display:flex;flex-direction:column;gap:18px;
+#m-lift.active{display:grid;grid-template-columns:260px 520px 1fr;gap:20px}
+.panel{border:2px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);padding:16px 14px;display:flex;flex-direction:column;gap:18px;
   background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.55) 1px,transparent 1.6px) 0 0/8px 8px,linear-gradient(165deg,#E6EAEF,#B6BFCA)}
 .lcd{border:6px solid #28313D;border-radius:10px;padding:8px 14px;background:#B9D46E;color:#1B290B;font-family:var(--mono);
   background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 3px);box-shadow:inset 0 0 12px rgba(0,0,0,.18)}
@@ -115,7 +119,7 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
 .lcd-small{font:500 12px var(--mono);opacity:.75}
 .lcd-txt{font:500 14px var(--mono);min-height:20px}
 .panel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 8px;justify-items:center;padding:6px 0}
-.lbtn{width:62px;height:62px;border-radius:50%;border:2px solid var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;
+.lbtn{width:56px;height:56px;border-radius:50%;border:2px solid var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;
   background:radial-gradient(circle at 35% 30%,#fff,#D7DDE4 60%,#AAB4C0);
   box-shadow:0 0 0 5px #8E98A5,0 0 0 7px var(--ink),inset 0 -3px 5px rgba(0,0,0,.22);
   font:600 24px var(--display);transition:box-shadow .2s,background .2s}
@@ -130,7 +134,8 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
 .panel-steps .btn{white-space:nowrap;padding:8px 6px;font-size:14px}
 .panel .spacer{flex:1}
 .lift-right{display:grid;grid-template-rows:auto 1fr;gap:20px;min-height:0}
-.lift-right .explain{margin-top:14px;min-height:46px}
+.lift-right .explain{margin-top:12px;min-height:44px}
+.mode-card{display:flex;flex-direction:column;gap:12px}
 #car .door{transition:transform .35s ease;transform-box:fill-box}
 #car .door.l{transform-origin:left center}
 #car .door.r{transform-origin:right center}
@@ -201,9 +206,13 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
 .score{font:600 16px var(--display);color:var(--blue);background:var(--blue-l);border:2px solid var(--blue);border-radius:999px;padding:4px 14px}
 .move-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .move-grid .btn{min-width:74px;font-size:18px}
-.sub-free,.sub-mission{display:flex;flex-direction:column;gap:12px;min-height:0}
+.sub-free,.lift-free{display:flex;flex-direction:column;gap:12px;min-height:0}
 .mission-no{font:600 14px var(--display);color:var(--muted)}
-.mission-text{font:500 21px/1.45 var(--display);min-height:92px}
+.mission-text{font:500 19px/1.45 var(--display);min-height:84px}
+.trainer{display:flex;flex-direction:column;gap:11px;min-height:0}
+.ms-opts{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ms-opts .seg.small button{padding:5px 11px}
+.opt{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .mission-text b{font-weight:600;color:var(--blue)}
 .answer{display:flex;align-items:center;gap:12px}
 .answer label{font-size:14px;font-weight:600;color:var(--muted)}
@@ -237,21 +246,21 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
     <div><h1>Negative Zahlen</h1><p>Mathematik, Klasse 6</p></div>
   </div>
   <nav class="tabs" role="tablist" aria-label="Modell wählen">
-    <button class="tab" role="tab" id="t-line" data-tab="line" aria-controls="m-line" aria-selected="true" title="Taste 1">
-      <svg viewBox="0 0 24 24"><path d="M2 13h20M6 10v6M12 8v10M18 10v6"/></svg>Zahlenstrahl</button>
-    <button class="tab" role="tab" id="t-lift" data-tab="lift" aria-controls="m-lift" aria-selected="false" tabindex="-1" title="Taste 2">
+    <button class="tab" role="tab" id="t-lift" data-tab="lift" aria-controls="m-lift" aria-selected="true" title="Taste 1">
       <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 10l3-3 3 3M9 14l3 3 3-3"/></svg>Fahrstuhl</button>
-    <button class="tab" role="tab" id="t-bank" data-tab="bank" aria-controls="m-bank" aria-selected="false" tabindex="-1" title="Taste 3">
-      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M15 15h3"/></svg>Konto</button>
-    <button class="tab" role="tab" id="t-sub" data-tab="sub" aria-controls="m-sub" aria-selected="false" tabindex="-1" title="Taste 4">
+    <button class="tab" role="tab" id="t-sub" data-tab="sub" aria-controls="m-sub" aria-selected="false" tabindex="-1" title="Taste 2">
       <svg viewBox="0 0 24 24"><ellipse cx="12" cy="15" rx="9" ry="4"/><path d="M9 11V8h5v3M12 8V4h3"/></svg>U-Boot</button>
+    <button class="tab" role="tab" id="t-line" data-tab="line" aria-controls="m-line" aria-selected="false" tabindex="-1" title="Taste 3">
+      <svg viewBox="0 0 24 24"><path d="M2 13h20M6 10v6M12 8v10M18 10v6"/></svg>Zahlenstrahl</button>
+    <button class="tab" role="tab" id="t-bank" data-tab="bank" aria-controls="m-bank" aria-selected="false" tabindex="-1" title="Taste 4">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M15 15h3"/></svg>Konto</button>
   </nav>
 </header>
 
 <main>
 
 <!-- ======================= Zahlenstrahl ======================= -->
-<section id="m-line" class="module active" role="tabpanel" aria-labelledby="t-line">
+<section id="m-line" class="module" role="tabpanel" aria-labelledby="t-line">
   <div class="card nl-top">
     <div>
       <div class="h">Rechnung</div>
@@ -309,7 +318,7 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
 </section>
 
 <!-- ======================= Fahrstuhl ======================= -->
-<section id="m-lift" class="module" role="tabpanel" aria-labelledby="t-lift">
+<section id="m-lift" class="module active" role="tabpanel" aria-labelledby="t-lift">
   <div class="panel">
     <div class="lcd" aria-live="polite">
       <div class="lcd-top"><span class="lcd-small">ETAGE</span><span class="lcd-dir" id="lcd-dir"></span></div>
@@ -326,18 +335,28 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
   </div>
 
   <div class="card scene">
-    <svg id="lift-svg" viewBox="0 0 556 672" role="img" aria-label="Gebäude mit Etagen von 5 bis −3 und senkrechtem Zahlenstrahl"></svg>
+    <svg id="lift-svg" viewBox="0 0 516 672" role="img" aria-label="Gebäude mit Etagen von 5 bis −3 und senkrechtem Zahlenstrahl"></svg>
   </div>
 
   <div class="lift-right">
     <div class="card">
       <div class="h">Rechnung zur Fahrt</div>
-      <div id="lift-eq" aria-live="polite"><p class="placeholder">Noch keine Fahrt. Drück eine Etagentaste.</p></div>
-      <p class="explain" id="lift-explain">Der Fahrstuhl wartet im Erdgeschoss, also in Etage 0.</p>
+      <div id="lift-eq" aria-live="polite"></div>
+      <p class="explain" id="lift-explain"></p>
     </div>
-    <div class="card" style="display:flex;flex-direction:column">
-      <div class="h">Fahrtenbuch</div>
-      <ol class="log" id="lift-log"></ol>
+    <div class="card mode-card">
+      <div class="sub-head">
+        <div class="seg" id="lift-mode">
+          <button data-mode="free" aria-pressed="true">Freies Fahren</button>
+          <button data-mode="mission" aria-pressed="false">Missionen</button>
+        </div>
+        <span class="score" id="lift-score" hidden></span>
+      </div>
+      <div class="lift-free" id="lift-free">
+        <div class="h small">Fahrtenbuch</div>
+        <ol class="log" id="lift-log"></ol>
+      </div>
+      <div class="trainer" id="lift-mission" hidden></div>
     </div>
   </div>
 </section>
@@ -425,28 +444,7 @@ input[type=range]{flex:1;min-width:0;height:30px;accent-color:var(--blue);cursor
         <ol class="log" id="sub-log"></ol>
       </div>
 
-      <div class="sub-mission" id="sub-mission" hidden>
-        <div class="seg small" id="ms-type">
-          <button data-type="end" aria-pressed="false">Ziel finden</button>
-          <button data-type="change" aria-pressed="false">Veränderung finden</button>
-          <button data-type="start" aria-pressed="false">Start finden</button>
-          <button data-type="mix" aria-pressed="true">Gemischt</button>
-        </div>
-        <div>
-          <p class="mission-no" id="ms-no"></p>
-          <p class="mission-text" id="ms-text"></p>
-        </div>
-        <div class="answer">
-          <label for="ms-input" id="ms-ask"></label>
-          <input type="text" id="ms-input" autocomplete="off" placeholder="?">
-          <button class="btn primary" id="ms-check">Prüfen</button>
-        </div>
-        <div class="fb" id="ms-fb" aria-live="polite"></div>
-        <div class="btn-row">
-          <button class="btn" id="ms-solve" hidden>Lösung zeigen</button>
-          <button class="btn" id="ms-next">Nächste Mission</button>
-        </div>
-      </div>
+      <div class="trainer" id="sub-mission" hidden></div>
     </div>
   </div>
 </section>
@@ -496,13 +494,21 @@ function parseNum(str) {
   const t = String(str).replace(/[\u2212\u2013\u2014]/g, '-').replace(/\s|m|€/gi, '');
   return /^[+-]?\d+$/.test(t) ? parseInt(t, 10) : null;
 }
+// vals = [Start, Veränderung 1, …, Veränderung n, Ende]
+function eqChain(vals, caps, hideIdx = -1, size = '') {
+  const n = vals.length;
+  let h = `<div class="eq ${size}">`;
+  vals.forEach((v, i) => {
+    const isChange = i > 0 && i < n - 1, hid = i === hideIdx;
+    if (i > 0) h += `<div class="op">${i === n - 1 ? '=' : '+'}</div>`;
+    const txt = isChange ? `(${fmtSigned(v)})` : fmtState(v);
+    h += `<div class="part"><div class="tile ${hid ? 'q' : isChange ? sc(v) : 'state'}">${hid ? '?' : txt}</div><div class="cap">${caps[i]}</div></div>`;
+  });
+  return h + '</div>';
+}
 function eqHTML(a, b, c, caps, opt = {}) {
-  const tile = (v, cls, cap, hid) =>
-    `<div class="part"><div class="tile ${hid ? 'q' : cls}">${hid ? '?' : v}</div><div class="cap">${cap}</div></div>`;
-  return `<div class="eq${opt.sm ? ' sm' : ''}">` +
-    tile(fmtState(a), 'state', caps[0], opt.hide === 'a') + '<div class="op">+</div>' +
-    tile('(' + fmtSigned(b) + ')', sc(b), caps[1], opt.hide === 'b') + '<div class="op">=</div>' +
-    tile(fmtState(c), 'state', caps[2], opt.hide === 'c') + '</div>';
+  const idx = { a: 0, b: 1, c: 2 }[opt.hide];
+  return eqChain([a, b, c], caps, idx === undefined ? -1 : idx, opt.sm ? 'sm' : '');
 }
 
 /* ================= Bühne skalieren ================= */
@@ -514,7 +520,8 @@ addEventListener('resize', fit);
 fit();
 
 /* ================= Tabs ================= */
-const TABS = ['line', 'lift', 'bank', 'sub'];
+const TABS = ['lift', 'sub', 'line', 'bank'];
+let nlReady = false;
 function showTab(name) {
   TABS.forEach(t => {
     const on = t === name, tab = $('t-' + t);
@@ -522,6 +529,7 @@ function showTab(name) {
     tab.tabIndex = on ? 0 : -1;
     $('m-' + t).classList.toggle('active', on);
   });
+  if (name === 'line' && !nlReady) { nlReady = true; nlRender(false); }
 }
 document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
 document.addEventListener('keydown', e => {
@@ -573,7 +581,7 @@ const placeAt = (g, x, y) => g.setAttribute('transform', `translate(${x} ${y})`)
 function arc(svg, x1, x2, y0, h, col, w) {
   const mx = (x1 + x2) / 2, cy = y0 - 2 * h;
   const path = S('path', { d: `M${x1} ${y0} Q${mx} ${cy} ${x2} ${y0}`, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round' }, svg);
-  const L = path.getTotalLength();
+  let L; try { L = path.getTotalLength(); } catch (err) { L = abs(x2 - x1) + 2 * h; }
   const ang = Math.atan2(y0 - cy, x2 - mx), sz = w * 3 + 4;
   const bx = x2 - Math.cos(ang) * sz, by = y0 - Math.sin(ang) * sz;
   const px = -Math.sin(ang) * sz * .6, py = Math.cos(ang) * sz * .6;
@@ -668,7 +676,7 @@ const FLOORS = [5, 4, 3, 2, 1, 0, -1, -2, -3];
 const floorName = f => f > 0 ? `${f}. OG` : f === 0 ? 'EG' : `${abs(f)}. UG`;
 const floorLong = f => f > 0 ? `${f}. Obergeschoss` : f === 0 ? 'Erdgeschoss' : `${abs(f)}. Untergeschoss`;
 const FT = f => 44 + (5 - f) * 64;   // Oberkante einer Etage
-const lift = { floor: 0, busy: false, target: null, log: [] };
+const lift = { floor: 0, busy: false, target: null, log: [], last: null, mode: 'free' };
 
 function carSVG(x, y, col) {
   return `<g transform="translate(${x} ${y})">
@@ -753,18 +761,21 @@ function buildLift() {
 }
 
 function liftUI() {
+  const lock = lift.busy || lift.mode === 'mission';
   document.querySelectorAll('.lbtn').forEach(b => {
     const f = +b.dataset.floor;
     b.classList.toggle('here', !lift.busy && f === lift.floor);
     b.classList.toggle('lit', f === lift.target);
-    b.disabled = lift.busy || f === lift.floor;
+    b.disabled = lock || f === lift.floor;
   });
-  $('lift-up').disabled = lift.busy || lift.floor >= 5;
-  $('lift-down').disabled = lift.busy || lift.floor <= -3;
-  $('lift-reset').disabled = lift.busy;
+  $('lift-up').disabled = lock || lift.floor >= 5;
+  $('lift-down').disabled = lock || lift.floor <= -3;
+  $('lift-reset').disabled = lock;
+  document.querySelectorAll('#lift-mission button, #lift-mode button').forEach(b => b.disabled = lift.busy);
 }
 
-function liftGo(t) {
+// opts.silent: keine Rechnung/Protokoll (Missionen), opts.done: Rückruf nach Ankunft
+function liftGo(t, opts = {}) {
   if (lift.busy || t === lift.floor || t < -3 || t > 5) return;
   const s = lift.floor, d = t - s, car = $('car');
   lift.busy = true; lift.target = t; liftUI();
@@ -772,7 +783,7 @@ function liftGo(t) {
   car.classList.remove('open');
   $('lcd-dir').textContent = d > 0 ? '▲' : '▼';
   $('lcd-txt').textContent = `fährt nach ${d > 0 ? 'oben' : 'unten'}`;
-  $('lift-explain').textContent = 'Türen schließen, der Fahrstuhl fährt los …';
+  if (!opts.silent) $('lift-explain').textContent = 'Türen schließen, der Fahrstuhl fährt los …';
   setTimeout(() => {
     const y0 = (5 - s) * 64, y1 = (5 - t) * 64;
     tween(450 + abs(d) * 320, k => {
@@ -786,36 +797,220 @@ function liftGo(t) {
       $('lcd-num').textContent = fmtState(t);
       $('lcd-txt').textContent = floorLong(t);
       lift.floor = t; lift.busy = false; lift.target = null;
-      liftTrip(s, d, t);
+      lift.log.unshift({ s, d, t });
+      lift.log = lift.log.slice(0, 7);
+      renderLiftLog();
+      if (!opts.silent) { lift.last = { s, d, t }; showLiftFreeEq(); }
       liftUI();
+      if (opts.done) setTimeout(opts.done, RM ? 0 : 450);
     });
   }, RM ? 0 : 380);
 }
 
-function liftTrip(s, d, t) {
-  $('lift-eq').innerHTML = eqHTML(s, d, t, ['Startetage', 'Veränderung', 'Zieletage'], { sm: true });
-  const n = abs(d);
-  $('lift-explain').innerHTML = `Start in Etage <b>${fmtState(s)}</b> (${floorName(s)}). Der Fahrstuhl fährt ` +
-    `<b class="${sc(d)}-t">${n} ${n === 1 ? 'Etage' : 'Etagen'} nach ${d > 0 ? 'oben' : 'unten'}</b> und hält in Etage <b>${fmtState(t)}</b> (${floorName(t)}).`;
-  lift.log.unshift({ s, d, t });
-  lift.log = lift.log.slice(0, 7);
-  renderLiftLog();
+function liftJump(f) {
+  lift.floor = f;
+  $('car').setAttribute('transform', `translate(0 ${(5 - f) * 64})`);
+  $('lcd-num').textContent = fmtState(f); $('lcd-txt').textContent = floorLong(f); $('lcd-dir').textContent = '';
+  liftUI();
+}
+
+function showLiftFreeEq() {
+  if (lift.last) {
+    const { s, d, t } = lift.last, n = abs(d);
+    $('lift-eq').innerHTML = eqHTML(s, d, t, ['Startetage', 'Veränderung', 'Zieletage'], { sm: true });
+    $('lift-explain').innerHTML = `Start in Etage <b>${fmtState(s)}</b> (${floorName(s)}). Der Fahrstuhl fährt ` +
+      `<b class="${sc(d)}-t">${n} ${n === 1 ? 'Etage' : 'Etagen'} nach ${d > 0 ? 'oben' : 'unten'}</b> und hält in Etage <b>${fmtState(t)}</b> (${floorName(t)}).`;
+  } else {
+    $('lift-eq').innerHTML = '<p class="placeholder">Noch keine Fahrt. Drück eine Etagentaste.</p>';
+    $('lift-explain').innerHTML = `Der Fahrstuhl wartet in Etage <b>${fmtState(lift.floor)}</b> (${floorName(lift.floor)}).`;
+  }
 }
 
 function renderLiftLog() {
   $('lift-log').innerHTML = lift.log.length
-    ? lift.log.map(({ s, d, t }) => `<li><span class="leq">${fmtState(s)} + (<span class="${sc(d)}-t">${fmtSigned(d)}</span>) = ${fmtState(t)}</span><span class="route">${floorName(s)} bis ${floorName(t)}</span></li>`).join('')
+    ? lift.log.slice(0, 6).map(({ s, d, t }) => `<li><span class="leq">${fmtState(s)} + (<span class="${sc(d)}-t">${fmtSigned(d)}</span>) = ${fmtState(t)}</span><span class="route">${floorName(s)} bis ${floorName(t)}</span></li>`).join('')
     : '<li class="empty">Hier erscheinen die letzten Fahrten.</li>';
 }
 
 function liftReset() {
   if (lift.busy) return;
-  lift.floor = 0; lift.log = [];
-  $('car').setAttribute('transform', 'translate(0 320)');
-  $('lcd-num').textContent = '0'; $('lcd-txt').textContent = 'Erdgeschoss'; $('lcd-dir').textContent = '';
-  $('lift-eq').innerHTML = '<p class="placeholder">Noch keine Fahrt. Drück eine Etagentaste.</p>';
-  $('lift-explain').textContent = 'Der Fahrstuhl wartet im Erdgeschoss, also in Etage 0.';
-  renderLiftLog(); liftUI();
+  lift.log = []; lift.last = null;
+  liftJump(0);
+  renderLiftLog(); showLiftFreeEq();
+}
+
+function setLiftMode(mode) {
+  if (lift.busy) return;
+  lift.mode = mode;
+  document.querySelectorAll('#lift-mode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode));
+  $('lift-free').hidden = mode !== 'free';
+  $('lift-mission').hidden = mode !== 'mission';
+  $('lift-score').hidden = mode !== 'mission';
+  if (mode === 'mission') liftTrainer.activate(); else showLiftFreeEq();
+  liftUI();
+}
+
+/* ================= Missionen (gemeinsam für Fahrstuhl und U-Boot) ================= */
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = arr => arr[rnd(0, arr.length - 1)];
+const ADV = ['zuerst', 'dann', 'danach'];
+const joinSteps = arr => arr.length === 1 ? arr[0] : arr.length === 2 ? `${arr[0]} und ${arr[1]}` : `${arr[0]}, ${arr[1]} und ${arr[2]}`;
+
+function makeTrainer(cfg) {
+  const st = { level: 1, type: 'mix', m: null, solved: 0, total: 0, count: 0 };
+  const root = $(cfg.root);
+  root.innerHTML = `
+    <div class="ms-opts">
+      <span class="opt"><span class="row-label">${cfg.stepsLabel}</span>
+      <div class="seg small" data-role="level" aria-label="Anzahl der Schritte">${[1, 2, 3].map(n => `<button data-v="${n}" aria-pressed="${n === 1}">${n}</button>`).join('')}</div></span>
+      <span class="opt"><span class="row-label">Gesucht</span>
+      <div class="seg small" data-role="type" aria-label="Gesucht">${[['end', 'Ende'], ['change', 'Veränderung'], ['start', 'Start'], ['mix', 'Gemischt']].map(([v, t]) => `<button data-v="${v}" aria-pressed="${v === 'mix'}">${t}</button>`).join('')}</div></span>
+    </div>
+    <div><p class="mission-no"></p><p class="mission-text"></p></div>
+    <div class="answer"><label for="${cfg.id}-ans"></label><input id="${cfg.id}-ans" type="text" autocomplete="off" placeholder="?"><button class="btn primary" data-act="check">Prüfen</button></div>
+    <div class="fb" aria-live="polite"></div>
+    <div class="btn-row"><button class="btn" data-act="solve" hidden>Lösung zeigen</button><button class="btn" data-act="next">Nächste Mission</button></div>`;
+  const q = sel => root.querySelector(sel);
+  const input = q('input');
+
+  root.querySelectorAll('[data-role] button').forEach(b => b.addEventListener('click', () => {
+    if (cfg.isBusy()) return;
+    const seg = b.parentElement;
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    if (seg.dataset.role === 'level') st.level = +b.dataset.v; else st.type = b.dataset.v;
+    next();
+  }));
+  q('[data-act=check]').addEventListener('click', check);
+  q('[data-act=solve]').addEventListener('click', solve);
+  q('[data-act=next]').addEventListener('click', next);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+
+  function gen() {
+    const n = st.level, type = st.type === 'mix' ? pick(['end', 'change', 'start']) : st.type;
+    const u = cfg.unit;
+    for (let t = 0; t < 5000; t++) {
+      const s = u * rnd(cfg.min / u, cfg.max / u), ch = [], pos = [s];
+      let ok = true;
+      for (let i = 0; i < n; i++) {
+        const c = u * rnd(-cfg.maxC[n - 1], cfg.maxC[n - 1]), p = pos[i] + c;
+        if (abs(c) < u * cfg.minC || p < cfg.min || p > cfg.max) { ok = false; break; }
+        ch.push(c); pos.push(p);
+      }
+      if (!ok || Math.min(...pos) >= 0) continue;                      // negative Zahlen kommen immer vor
+      if (n > 1 && !(ch.some(c => c > 0) && ch.some(c => c < 0))) continue; // Richtung wechselt mindestens einmal
+      return { type, n, s, ch, pos, e: pos[n], k: type === 'change' ? rnd(0, n - 1) : -1, who: pick(cfg.people), tries: 0, done: false };
+    }
+  }
+  const want = m => m.type === 'end' ? m.e : m.type === 'start' ? m.s : m.ch[m.k];
+  const hideIdx = m => m.type === 'end' ? m.n + 1 : m.type === 'start' ? 0 : m.k + 1;
+  const chainStr = (m, hide) => [m.s, ...m.ch, m.e].map((v, i) => {
+    const t = i === hide ? '?' : (i > 0 && i <= m.n) ? `(${fmtSigned(v)})` : fmtState(v);
+    return (i === 0 ? '' : i === m.n + 1 ? ' = ' : ' + ') + t;
+  }).join('');
+
+  function showEq() {
+    const m = st.m;
+    const caps = m.n === 1 ? cfg.caps1 : ['Start', ...m.ch.map((_, i) => `${i + 1}. ${cfg.word}`), 'Ende'];
+    cfg.eq(eqChain([m.s, ...m.ch, m.e], caps, m.done ? -1 : hideIdx(m), cfg.sizes[m.n - 1]));
+    cfg.explain(m.done ? cfg.route(m.pos) : cfg.waitText);
+  }
+  function fb(cls, html) { const f = q('.fb'); f.className = 'fb ' + cls; f.innerHTML = html; }
+  function score() { $(cfg.scoreEl).textContent = `Gelöst: ${st.solved} von ${st.total}`; }
+
+  function next() {
+    if (cfg.isBusy()) return;
+    if (st.m && !st.m.done && st.m.tries > 0) st.total++;
+    const m = st.m = gen();
+    st.count++;
+    q('.mission-no').textContent = `Mission ${st.count}, ${m.n} ${m.n === 1 ? cfg.word : cfg.stepsLabel}`;
+    q('.mission-text').innerHTML = cfg.text(m);
+    q('label').textContent = cfg.ask[m.type];
+    input.value = '';
+    fb('', '');
+    q('[data-act=solve]').hidden = true;
+    cfg.target(m.type === 'change' ? m.e : null);
+    showEq(); score();
+    cfg.place(m.type === 'start' ? m.e : m.s);
+  }
+
+  function diagnose(m, v) {
+    const { type, n, s, ch, pos, e } = m;
+    if (type !== 'change' && (v < cfg.min || v > cfg.max)) return cfg.rangeMsg;
+    if (type === 'end') {
+      if (v === -e && e !== 0) return 'Der Betrag stimmt, aber das Vorzeichen nicht.';
+      for (let i = 1; i < n; i++) if (v === pos[i]) return `Das ist der Zwischenstand nach dem ${i}. Schritt. Rechne weiter bis zum Ende.`;
+      for (let i = 0; i < n; i++) if (v === e - 2 * ch[i]) return n === 1 ? 'Die Richtung ist vertauscht. Nach oben oder nach unten?' : `Beim ${i + 1}. Schritt ist die Richtung vertauscht.`;
+      return `Noch nicht. Rechne Schritt für Schritt: <b>${chainStr(m, n + 1)}</b>`;
+    }
+    if (type === 'start') {
+      if (v === e + (e - s)) return 'Du hast vorwärts gerechnet. Rechne rückwärts und mach die Veränderungen rückgängig.';
+      if (v === -s && s !== 0) return 'Der Betrag stimmt, aber das Vorzeichen nicht.';
+      return `Noch nicht. Welcher Startwert passt in <b>${chainStr(m, 0)}</b>?`;
+    }
+    const w = ch[m.k];
+    if (v === -w) return `Der Betrag stimmt, aber das Vorzeichen nicht: Bei diesem Schritt geht es nach <b>${w > 0 ? 'oben' : 'unten'}</b>.`;
+    return n === 1 ? 'Noch nicht. Zähle auf der Skala, wie weit Start und Ziel auseinanderliegen, und überlege dann die Richtung.'
+      : `Noch nicht. Rechne zuerst die bekannten Schritte aus. Wie weit ist es dann noch bis ${fmtState(e)}?`;
+  }
+
+  function check() {
+    const m = st.m;
+    if (!m || m.done || cfg.isBusy()) return;
+    const v = parseNum(input.value);
+    if (v === null) { fb('info', 'Gib eine ganze Zahl ein, zum Beispiel -3.'); return; }
+    if (v === want(m)) { st.solved++; st.total++; finish('ok', `<b>Richtig!</b> ${chainStr(m, -1)}`); }
+    else { m.tries++; fb('err', diagnose(m, v)); if (m.tries >= 2) q('[data-act=solve]').hidden = false; }
+  }
+  function solve() {
+    const m = st.m;
+    if (!m || m.done || cfg.isBusy()) return;
+    st.total++;
+    finish('info', `Lösung: <b>${chainStr(m, -1)}</b>`);
+  }
+  function finish(cls, html) {
+    const m = st.m;
+    m.done = true;
+    fb(cls, html);
+    q('[data-act=solve]').hidden = true;
+    score(); showEq();
+    if (m.type === 'start') cfg.jump(m.s);
+    const run = i => i >= m.n ? cfg.target(null) : cfg.move(m.pos[i + 1], () => run(i + 1));
+    run(0);
+  }
+
+  return { activate() { if (!st.m) next(); else { showEq(); score(); } } };
+}
+
+const LIFT_PEOPLE = ['Die Hausmeisterin', 'Frau Kaya', 'Die Paketbotin', 'Lina', 'Die Ärztin', 'Frau Novak'];
+const liftStep = c => `${abs(c)}&nbsp;${abs(c) === 1 ? 'Etage' : 'Etagen'} nach ${c > 0 ? 'oben' : 'unten'}`;
+const fl = v => `Etage <b>${fmtState(v)}</b>`;
+let liftTrainer;
+function buildLiftTrainer() {
+  liftTrainer = makeTrainer({
+    id: 'lift', root: 'lift-mission', scoreEl: 'lift-score',
+    min: -3, max: 5, unit: 1, minC: 1, maxC: [8, 6, 5],
+    word: 'Fahrt', stepsLabel: 'Fahrten', people: LIFT_PEOPLE,
+    caps1: ['Startetage', 'Veränderung', 'Zieletage'], sizes: ['sm', 'sm', 'xs'],
+    ask: { end: 'Etage am Ende:', start: 'Etage am Anfang:', change: 'Veränderung:' },
+    rangeMsg: `Diese Etage gibt es nicht: Das Haus geht von ${MINUS}3 bis 5.`,
+    waitText: 'Rechne zuerst selbst. Der Fahrstuhl fährt erst, wenn deine Antwort stimmt.',
+    isBusy: () => lift.busy,
+    place: v => liftJump(v), jump: v => liftJump(v),
+    move: (v, done) => liftGo(v, { silent: true, done }),
+    target: () => {},
+    eq: h => $('lift-eq').innerHTML = h,
+    explain: h => $('lift-explain').innerHTML = h,
+    route: pos => pos.length === 2 ? `Der Fahrstuhl fährt von ${fl(pos[0])} nach ${fl(pos[1])}.`
+      : `Der Fahrstuhl fährt von ${fl(pos[0])} über ${pos.slice(1, -1).map(v => `<b>${fmtState(v)}</b>`).join(' und ')} bis ${fl(pos[pos.length - 1])}.`,
+    text: m => {
+      const steps = m.ch.map((c, i) => (m.n > 1 ? ADV[i] + ' ' : '') + (i === m.k ? 'ein unbekanntes Stück' : liftStep(c)));
+      if (m.type === 'end') return `${m.who} steigt in ${fl(m.s)} ein. Sie fährt ${joinSteps(steps)}. In welcher Etage steigt sie aus?`;
+      if (m.type === 'start') return `${m.who} ist ${joinSteps(steps)} gefahren. Jetzt steigt sie in ${fl(m.e)} aus. In welcher Etage ist sie eingestiegen?`;
+      if (m.n === 1) return `${m.who} steigt in ${fl(m.s)} ein und will in ${fl(m.e)}. Welche Veränderung fährt der Fahrstuhl? Denk an das Vorzeichen.`;
+      return `${m.who} steigt in ${fl(m.s)} ein. Sie fährt ${joinSteps(steps)}. Am Ende steigt sie in ${fl(m.e)} aus. Wie lautet die unbekannte Veränderung?`;
+    }
+  });
+  document.querySelectorAll('#lift-mode button').forEach(b => b.addEventListener('click', () => setLiftMode(b.dataset.mode)));
 }
 
 /* ================= 3. Konto ================= */
@@ -1008,15 +1203,7 @@ function buildSub() {
   $('sub-go').addEventListener('click', subCustom);
   $('sub-input').addEventListener('keydown', e => { if (e.key === 'Enter') subCustom(); });
   document.querySelectorAll('#sub-mode button').forEach(b => b.addEventListener('click', () => setSubMode(b.dataset.mode)));
-  document.querySelectorAll('#ms-type button').forEach(b => b.addEventListener('click', () => {
-    sub.type = b.dataset.type;
-    document.querySelectorAll('#ms-type button').forEach(x => x.setAttribute('aria-pressed', x === b));
-    newMission();
-  }));
-  $('ms-check').addEventListener('click', checkMission);
-  $('ms-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkMission(); });
-  $('ms-next').addEventListener('click', newMission);
-  $('ms-solve').addEventListener('click', solveMission);
+
 
   setSub(sub.pos);
   renderSubLog();
@@ -1052,7 +1239,7 @@ function subMove(to, done) {
 }
 
 function subUI() {
-  document.querySelectorAll('[data-move], #sub-go, #ms-check, #ms-next, #ms-solve, #ms-type button, #sub-mode button').forEach(b => b.disabled = sub.busy);
+  document.querySelectorAll('[data-move], #sub-go, #sub-mission button, #sub-mode button').forEach(b => b.disabled = sub.busy);
 }
 
 const moveText = (s, c, e) => `Das U-Boot ${c > 0 ? 'steigt' : 'taucht'} <b class="${sc(c)}-t">${abs(c)} m ${c > 0 ? 'auf' : 'ab'}</b>: von <b>${fmtState(s)} m</b> auf <b>${fmtState(e)} m</b>.`;
@@ -1102,14 +1289,10 @@ function setSubMode(mode) {
   $('sub-free').hidden = mode !== 'free';
   $('sub-mission').hidden = mode !== 'mission';
   $('sub-score').hidden = mode !== 'mission';
-  if (mode === 'mission') { if (!sub.m) newMission(); else showMissionEq(); }
-  else { showTarget(null); showFreeEq(); }
+  if (mode === 'mission') subTrainer.activate(); else { showTarget(null); showFreeEq(); }
 }
 
-/* Missionen */
-const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const place = v => v === 0 ? 'an der Wasseroberfläche (0&nbsp;m)' : `bei <b>${fmtState(v)}&nbsp;m</b>`;
-
 function showTarget(v) {
   const g = $('sub-target');
   if (v === null) { g.style.display = 'none'; return; }
@@ -1118,103 +1301,48 @@ function showTarget(v) {
   $('sub-target-t').textContent = `Ziel ${fmtState(v)}`;
 }
 
-function updateScore() { $('sub-score').textContent = `Gelöst: ${sub.solved} von ${sub.total}`; }
-
-function newMission() {
-  if (sub.busy) return;
-  const old = sub.m;
-  if (old && !old.done && old.tries > 0) sub.total++;
-  const types = sub.type === 'mix' ? ['end', 'change', 'start'] : [sub.type];
-  const type = types[rnd(0, types.length - 1)];
-  let s, c, e;
-  do { s = -5 * rnd(0, 20); c = 5 * rnd(-12, 12); e = s + c; } while (abs(c) < 10 || e > 0 || e < -100 || (s === 0 && e === 0));
-  sub.m = { type, s, c, e, tries: 0, done: false, n: ++sub.count };
-  const m = sub.m, dir = c > 0 ? 'aufsteigen' : 'abtauchen';
-  $('ms-no').textContent = `Mission ${m.n}`;
-  if (type === 'end') {
-    $('ms-text').innerHTML = `Das U-Boot befindet sich ${place(s)}. Die Kapitänin lässt es <b>${abs(c)}&nbsp;m ${dir}</b>. Wo befindet es sich danach?`;
-    $('ms-ask').textContent = 'Position nachher (m):';
-  } else if (type === 'change') {
-    const goal = e === 0 ? 'zur Wasseroberfläche' : e <= -90 ? `zum Wrack bei <b>${fmtState(e)}&nbsp;m</b>` : `auf <b>${fmtState(e)}&nbsp;m</b>`;
-    $('ms-text').innerHTML = `Das U-Boot befindet sich ${place(s)}. Die Kapitänin will ${goal}. Wie lautet die Veränderung? Denk an das Vorzeichen.`;
-    $('ms-ask').textContent = 'Veränderung (m):';
-  } else {
-    $('ms-text').innerHTML = `Das U-Boot ist <b>${abs(c)}&nbsp;m ${c > 0 ? 'aufgestiegen' : 'abgetaucht'}</b>. Jetzt befindet es sich ${place(e)}. Wo war es vorher?`;
-    $('ms-ask').textContent = 'Position vorher (m):';
-  }
-  $('ms-input').value = '';
-  setFb('', '');
-  $('ms-solve').hidden = true;
-  showTarget(type === 'change' ? e : null);
-  showMissionEq();
-  updateScore();
-  subMove(type === 'start' ? e : s, () => $('ms-input').focus());
-}
-
-function showMissionEq() {
-  const m = sub.m;
-  const hide = m.done ? null : m.type === 'end' ? 'c' : m.type === 'change' ? 'b' : 'a';
-  $('sub-eq').innerHTML = eqHTML(m.s, m.c, m.e, ['vorher', 'Veränderung', 'nachher'], { hide });
-  $('sub-explain').innerHTML = m.done ? moveText(m.s, m.c, m.e) : 'Rechne zuerst selbst. Das U-Boot fährt erst, wenn deine Antwort stimmt.';
-}
-
-function setFb(cls, html) { const f = $('ms-fb'); f.className = 'fb ' + cls; f.innerHTML = html; }
-
-function diagnose(m, v) {
-  const up = m.c > 0;
-  if (m.type !== 'change' && v > 0) return 'Das U-Boot ist unter Wasser. Unter dem Meeresspiegel sind alle Positionen negativ.';
-  if (m.type === 'end') {
-    if (v === m.s - m.c) return `Die Richtung ist vertauscht. ${up ? 'Aufsteigen' : 'Abtauchen'} heißt <b>(${fmtSigned(m.c)})</b>.`;
-    if (v === -m.e) return 'Der Betrag stimmt, aber das Vorzeichen nicht. Unter dem Meeresspiegel sind die Werte negativ.';
-    return `Noch nicht. Rechne <b>${fmtState(m.s)} + (${fmtSigned(m.c)})</b> und schau auf die Skala.`;
-  }
-  if (m.type === 'change') {
-    if (v === -m.c) return `Der Betrag stimmt, aber das Vorzeichen nicht: Das U-Boot muss nach <b>${up ? 'oben' : 'unten'}</b>.`;
-    return 'Noch nicht. Zähle auf der Skala, wie viele Meter zwischen Start und Ziel liegen, und überlege dann die Richtung.';
-  }
-  if (v === m.e + m.c) return `Du hast die Veränderung noch einmal ausgeführt. Mach sie rückgängig: Vorher war das U-Boot <b>${up ? 'tiefer' : 'höher'}</b>.`;
-  return `Noch nicht. Welcher Startwert passt in <b>? + (${fmtSigned(m.c)}) = ${fmtState(m.e)}</b>?`;
-}
-
-function checkMission() {
-  const m = sub.m;
-  if (!m || m.done || sub.busy) return;
-  const v = parseNum($('ms-input').value);
-  if (v === null) { setFb('info', 'Gib eine ganze Zahl ein, zum Beispiel -35.'); return; }
-  const want = m.type === 'end' ? m.e : m.type === 'change' ? m.c : m.s;
-  if (v === want) {
-    sub.solved++; sub.total++;
-    finishMission('ok', `<b>Richtig!</b> ${fmtState(m.s)} + (${fmtSigned(m.c)}) = ${fmtState(m.e)}`);
-  } else {
-    m.tries++;
-    setFb('err', diagnose(m, v));
-    if (m.tries >= 2) $('ms-solve').hidden = false;
-  }
-}
-
-function solveMission() {
-  const m = sub.m;
-  if (!m || m.done || sub.busy) return;
-  sub.total++;
-  finishMission('info', `Lösung: <b>${fmtState(m.s)} + (${fmtSigned(m.c)}) = ${fmtState(m.e)}</b>`);
-}
-
-function finishMission(cls, html) {
-  const m = sub.m;
-  m.done = true;
-  setFb(cls, html);
-  $('ms-solve').hidden = true;
-  updateScore();
-  showMissionEq();
-  if (m.type === 'start') { sub.pos = m.s; setSub(m.s); }
-  subMove(m.e, () => showTarget(null));
+const SUB_PEOPLE = ['Die Kapitänin', 'Die Forscherin', 'Die Steuerfrau'];
+const subVerb = (c, adv) => c > 0 ? `steigt ${adv}${abs(c)}&nbsp;m auf` : `taucht ${adv}${abs(c)}&nbsp;m ab`;
+const subPart = (c, adv) => `${adv}${abs(c)}&nbsp;m ${c > 0 ? 'aufgestiegen' : 'abgetaucht'}`;
+let subTrainer;
+function buildSubTrainer() {
+  subTrainer = makeTrainer({
+    id: 'sub', root: 'sub-mission', scoreEl: 'sub-score',
+    min: -100, max: 0, unit: 5, minC: 2, maxC: [12, 10, 8],
+    word: 'Manöver', stepsLabel: 'Manöver', people: SUB_PEOPLE,
+    caps1: ['vorher', 'Veränderung', 'nachher'], sizes: ['', 'xs', 'xs'],
+    ask: { end: 'Position am Ende (m):', start: 'Position am Anfang (m):', change: 'Veränderung (m):' },
+    rangeMsg: 'Das U-Boot ist unter Wasser: Alle Positionen liegen zwischen 0 m und −100 m.',
+    waitText: 'Rechne zuerst selbst. Das U-Boot fährt erst, wenn deine Antwort stimmt.',
+    isBusy: () => sub.busy,
+    place: v => subMove(v), jump: v => { sub.pos = v; setSub(v); },
+    move: (v, done) => subMove(v, () => setTimeout(done, RM ? 0 : 250)),
+    target: showTarget,
+    eq: h => $('sub-eq').innerHTML = h,
+    explain: h => $('sub-explain').innerHTML = h,
+    route: pos => pos.length === 2 ? `Das U-Boot fährt von <b>${fmtState(pos[0])}&nbsp;m</b> nach <b>${fmtState(pos[1])}&nbsp;m</b>.`
+      : `Das U-Boot fährt von <b>${fmtState(pos[0])}&nbsp;m</b> über ${pos.slice(1, -1).map(v => `<b>${fmtState(v)}&nbsp;m</b>`).join(' und ')} bis <b>${fmtState(pos[pos.length - 1])}&nbsp;m</b>.`,
+    text: m => {
+      const adv = i => m.n > 1 ? ADV[i] + ' ' : '';
+      if (m.type === 'end') return `${m.who} steuert das U-Boot. Es befindet sich ${place(m.s)}. Es ${joinSteps(m.ch.map((c, i) => subVerb(c, adv(i))))}. Wo befindet es sich danach?`;
+      if (m.type === 'start') return `Das U-Boot ist ${joinSteps(m.ch.map((c, i) => subPart(c, adv(i))))}. Jetzt befindet es sich ${place(m.e)}. Wo war es am Anfang?`;
+      if (m.n === 1) {
+        const goal = m.e === 0 ? 'zur Wasseroberfläche' : m.e <= -90 ? `zum Wrack ${place(m.e)}` : `auf <b>${fmtState(m.e)}&nbsp;m</b>`;
+        return `Das U-Boot befindet sich ${place(m.s)}. ${m.who} will ${goal}. Wie lautet die Veränderung? Denk an das Vorzeichen.`;
+      }
+      const steps = m.ch.map((c, i) => i === m.k ? `fährt ${adv(i)}ein unbekanntes Stück` : subVerb(c, adv(i)));
+      return `Das U-Boot befindet sich ${place(m.s)}. Es ${joinSteps(steps)}. Am Ende ist es ${place(m.e)}. Wie lautet die unbekannte Veränderung?`;
+    }
+  });
 }
 
 /* ================= Start ================= */
-nlRender(false);
 buildLift();
+buildLiftTrainer();
+showLiftFreeEq();
 buildBank();
 buildSub();
+buildSubTrainer();
 </script>
 </body>
 </html>
